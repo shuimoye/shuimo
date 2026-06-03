@@ -324,8 +324,22 @@ function playEpisode(episodeIndex) {
             btn.classList.toggle('active', index === episodeIndex);
         });
         
-        // 直接使用iframe嵌入播放页面
-        playerModule.play(episode.url);
+        // 判断播放模式
+        const isDirectVideo = playerModule.isDirectVideoUrl(episode.url);
+        const playMode = isDirectVideo ? 'dplayer' : 'iframe';
+        
+        // 收集所有可用的源URL
+        const allSources = [];
+        if (video.episodes) {
+            video.episodes.forEach(ep => {
+                if (ep.url && !allSources.includes(ep.url)) {
+                    allSources.push(ep.url);
+                }
+            });
+        }
+        
+        // 播放视频
+        playerModule.play(episode.url, allSources, playMode);
     }
 }
 
