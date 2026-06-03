@@ -22,7 +22,16 @@
 
 **优点：** 免费、国内有CDN、访问速度快、支持自定义域名
 
-### 方案2：GitHub Pages（国内访问稳定）
+### 方案2：Cloudflare Pages（国内有CDN）
+
+1. 访访 https://pages.cloudflare.com
+2. 使用GitHub登录
+3. 选择仓库并部署
+4. 获得访问地址（如 `https://xxx.pages.dev`）
+
+**优点：** 免费、全球CDN、国内访问快
+
+### 方案3：GitHub Pages（国内访问稳定）
 
 1. 访问 https://github.com 并登录
 2. 创建新仓库，命名为 `free-video-streaming`
@@ -31,25 +40,6 @@
 5. 访问 `https://你的用户名.github.io/free-video-streaming`
 
 **优点：** 免费、稳定、国内可访问
-
-### 方案3：Gitee Pages（国内平台，速度最快）
-
-1. 访问 https://gitee.com 并注册账号（需实名认证）
-2. 创建新仓库，命名为 `free-video-streaming`
-3. 上传所有文件
-4. 在仓库设置中启用 Gitee Pages
-5. 访问 `https://你的用户名.gitee.io/free-video-streaming`
-
-**优点：** 国内平台、速度最快、免费
-
-### 方案4：Cloudflare Pages（国内有CDN）
-
-1. 访问 https://pages.cloudflare.com
-2. 使用GitHub登录
-3. 选择仓库并部署
-4. 获得访问地址（如 `https://xxx.pages.dev`）
-
-**优点：** 免费、全球CDN、国内访问快
 
 ## 快速部署
 
@@ -98,7 +88,6 @@ free-video-streaming/
 ├── start.sh            # Mac/Linux启动脚本
 ├── deploy.bat          # Windows部署脚本
 ├── deploy.sh           # Mac/Linux部署脚本
-├── netlify.toml        # Netlify配置
 ├── vercel.json         # Vercel配置
 ├── README.md           # 项目说明
 ├── css/                # 样式文件
