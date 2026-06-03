@@ -1,6 +1,6 @@
 /**
  * 播放模块
- * 管理视频播放功能
+ * 管理视频播放功能，支持mp4和m3u8格式
  */
 
 class PlayerModule {
@@ -14,6 +14,7 @@ class PlayerModule {
         this.qualities = [];
         this.currentQuality = '';
         this.error = null;
+        this.hls = null;
     }
     
     /**
@@ -30,20 +31,20 @@ class PlayerModule {
         // 创建视频元素
         this.videoElement = document.createElement('video');
         this.videoElement.className = 'video-player-element';
-        this.videoElement.controls = false; // 使用自定义控制栏
-        this.videoElement.preload = 'metadata';
+        this.videoElement.controls = true; // 使用原生控制栏
+        this.videoElement.preload = 'auto';
         this.videoElement.playsInline = true;
         this.videoElement.setAttribute('playsinline', '');
         this.videoElement.setAttribute('webkit-playsinline', '');
+        this.videoElement.style.width = '100%';
+        this.videoElement.style.maxHeight = '70vh';
+        this.videoElement.style.backgroundColor = '#000';
         
         // 设置事件监听
         this.setupEventListeners();
         
         // 添加到容器
         container.appendChild(this.videoElement);
-        
-        // 创建控制栏
-        this.createControls(container);
         
         console.log('播放器初始化完成');
     }
@@ -57,36 +58,30 @@ class PlayerModule {
         // 播放事件
         this.videoElement.addEventListener('play', () => {
             this.isPlaying = true;
-            this.updatePlayButton();
             this.dispatchEvent('play');
         });
         
         // 暂停事件
         this.videoElement.addEventListener('pause', () => {
             this.isPlaying = false;
-            this.updatePlayButton();
             this.dispatchEvent('pause');
         });
         
         // 时间更新事件
         this.videoElement.addEventListener('timeupdate', () => {
             this.currentTime = this.videoElement.currentTime;
-            this.updateProgressBar();
-            this.updateTimeDisplay();
             this.dispatchEvent('timeupdate', { currentTime: this.currentTime });
         });
         
         // 加载元数据事件
         this.videoElement.addEventListener('loadedmetadata', () => {
             this.duration = this.videoElement.duration;
-            this.updateTimeDisplay();
             this.dispatchEvent('loadedmetadata', { duration: this.duration });
         });
         
         // 结束事件
         this.videoElement.addEventListener('ended', () => {
             this.isPlaying = false;
-            this.updatePlayButton();
             this.dispatchEvent('ended');
         });
         
@@ -96,81 +91,6 @@ class PlayerModule {
             this.handleVideoError(this.error);
             this.dispatchEvent('error', { error: this.error });
         });
-        
-        // 音量变化事件
-        this.videoElement.addEventListener('volumechange', () => {
-            this.volume = this.videoElement.volume;
-            this.updateVolumeSlider();
-        });
-    }
-    
-    /**
-     * 创建控制栏
-     * @param {HTMLElement} container - 容器元素
-     */
-    createControls(container) {
-        const controls = document.createElement('div');
-        controls.className = 'player-controls';
-        controls.innerHTML = `
-            <button class="control-btn play-pause-btn">▶</button>
-            <div class="progress-bar">
-                <div class="progress-fill"></div>
-                <div class="progress-handle"></div>
-            </div>
-            <span class="time-display">00:00 / 00:00</span>
-            <div class="volume-control">
-                <button class="control-btn volume-btn">🔊</button>
-                <input type="range" class="volume-slider" min="0" max="1" step="0.1" value="1">
-            </div>
-            <button class="control-btn fullscreen-btn">⛶</button>
-        `;
-        
-        container.appendChild(controls);
-        
-        // 绑定控制栏事件
-        this.bindControlEvents(controls);
-    }
-    
-    /**
-     * 绑定控制栏事件
-     * @param {HTMLElement} controls - 控制栏元素
-     */
-    bindControlEvents(controls) {
-        // 播放/暂停按钮
-        const playPauseBtn = controls.querySelector('.play-pause-btn');
-        if (playPauseBtn) {
-            playPauseBtn.addEventListener('click', () => this.togglePlay());
-        }
-        
-        // 进度条点击
-        const progressBar = controls.querySelector('.progress-bar');
-        if (progressBar) {
-            progressBar.addEventListener('click', (e) => {
-                const rect = progressBar.getBoundingClientRect();
-                const percent = (e.clientX - rect.left) / rect.width;
-                this.seekTo(percent * this.duration);
-            });
-        }
-        
-        // 音量滑块
-        const volumeSlider = controls.querySelector('.volume-slider');
-        if (volumeSlider) {
-            volumeSlider.addEventListener('input', (e) => {
-                this.setVolume(parseFloat(e.target.value));
-            });
-        }
-        
-        // 音量按钮
-        const volumeBtn = controls.querySelector('.volume-btn');
-        if (volumeBtn) {
-            volumeBtn.addEventListener('click', () => this.toggleMute());
-        }
-        
-        // 全屏按钮
-        const fullscreenBtn = controls.querySelector('.fullscreen-btn');
-        if (fullscreenBtn) {
-            fullscreenBtn.addEventListener('click', () => this.toggleFullscreen());
-        }
     }
     
     /**
@@ -185,14 +105,218 @@ class PlayerModule {
         
         console.log(`播放视频: ${videoUrl}`);
         
-        // 设置视频源
-        this.videoElement.src = videoUrl;
+        // 销毁之前的HLS实例
+        this.destroyHls();
         
-        // 开始播放
-        this.videoElement.play().catch(error => {
-            console.error('播放失败:', error);
-            this.handleVideoError(error);
-        });
+        // 检测视频类型
+        if (this.isM3u8Url(videoUrl)) {
+            this.playHls(videoUrl);
+        } else {
+            this.playDirect(videoUrl);
+        }
+    }
+    
+    /**
+     * 检测是否是m3u8链接
+     * @param {string} url - 视频URL
+     * @returns {boolean} 是否是m3u8链接
+     */
+    isM3u8Url(url) {
+        return url && (url.includes('.m3u8') || url.includes('m3u8'));
+    }
+    
+    /**
+     * 直接播放（mp4等格式）
+     * @param {string} videoUrl - 视频URL
+     */
+    playDirect(videoUrl) {
+        // 处理URL，可能需要代理
+        const proxyUrl = this.getProxyUrl(videoUrl);
+        
+        this.videoElement.src = proxyUrl;
+        this.videoElement.load();
+        
+        const playPromise = this.videoElement.play();
+        if (playPromise !== undefined) {
+            playPromise.catch(error => {
+                console.error('播放失败:', error);
+                // 尝试不使用代理直接播放
+                this.videoElement.src = videoUrl;
+                this.videoElement.load();
+                this.videoElement.play().catch(e => {
+                    console.error('直接播放也失败:', e);
+                    this.showPlayError();
+                });
+            });
+        }
+    }
+    
+    /**
+     * 播放HLS流（m3u8格式）
+     * @param {string} videoUrl - m3u8视频URL
+     */
+    playHls(videoUrl) {
+        // 检查浏览器是否原生支持HLS
+        if (this.videoElement.canPlayType('application/vnd.apple.mpegurl')) {
+            // Safari原生支持
+            this.videoElement.src = videoUrl;
+            this.videoElement.load();
+            this.videoElement.play().catch(error => {
+                console.error('Safari HLS播放失败:', error);
+                this.showPlayError();
+            });
+        } else if (typeof Hls !== 'undefined' && Hls.isSupported()) {
+            // 使用HLS.js播放
+            console.log('使用HLS.js播放');
+            this.hls = new Hls({
+                xhrSetup: (xhr, url) => {
+                    // 设置跨域
+                    xhr.withCredentials = false;
+                }
+            });
+            
+            this.hls.loadSource(videoUrl);
+            this.hls.attachMedia(this.videoElement);
+            
+            this.hls.on(Hls.Events.MANIFEST_PARSED, () => {
+                console.log('HLS manifest解析完成');
+                this.videoElement.play().catch(error => {
+                    console.error('HLS播放失败:', error);
+                });
+            });
+            
+            this.hls.on(Hls.Events.ERROR, (event, data) => {
+                console.error('HLS错误:', data);
+                if (data.fatal) {
+                    switch (data.type) {
+                        case Hls.ErrorTypes.NETWORK_ERROR:
+                            console.log('网络错误，尝试恢复...');
+                            this.hls.startLoad();
+                            break;
+                        case Hls.ErrorTypes.MEDIA_ERROR:
+                            console.log('媒体错误，尝试恢复...');
+                            this.hls.recoverMediaError();
+                            break;
+                        default:
+                            this.destroyHls();
+                            this.showPlayError();
+                            break;
+                    }
+                }
+            });
+        } else {
+            // 不支持HLS，尝试使用代理转换
+            console.log('浏览器不支持HLS，尝试其他方式');
+            this.tryAlternativePlay(videoUrl);
+        }
+    }
+    
+    /**
+     * 尝试替代播放方式
+     * @param {string} videoUrl - 视频URL
+     */
+    async tryAlternativePlay(videoUrl) {
+        // 尝试使用代理服务器转换格式
+        const proxyUrl = this.getProxyUrl(videoUrl);
+        
+        this.videoElement.src = proxyUrl;
+        this.videoElement.load();
+        
+        try {
+            await this.videoElement.play();
+        } catch (error) {
+            console.error('替代播放方式失败:', error);
+            this.showPlayError();
+        }
+    }
+    
+    /**
+     * 获取代理URL
+     * @param {string} url - 原始URL
+     * @returns {string} 代理URL
+     */
+    getProxyUrl(url) {
+        // 检测是否使用本地代理服务器
+        const hostname = window.location.hostname;
+        const port = window.location.port;
+        
+        if ((hostname === 'localhost' || hostname === '127.0.0.1') && port === '8080') {
+            // 使用本地代理
+            return `/proxy/${encodeURIComponent(url)}`;
+        }
+        
+        // 使用CORS代理
+        return `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`;
+    }
+    
+    /**
+     * 显示播放错误提示
+     */
+    showPlayError() {
+        if (this.container) {
+            const errorDiv = document.createElement('div');
+            errorDiv.style.cssText = `
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                background: rgba(0,0,0,0.8);
+                color: white;
+                padding: 20px;
+                border-radius: 8px;
+                text-align: center;
+            `;
+            errorDiv.innerHTML = `
+                <p>视频播放失败</p>
+                <p style="font-size: 12px; margin-top: 10px;">请尝试其他视频源或刷新页面</p>
+            `;
+            this.container.style.position = 'relative';
+            this.container.appendChild(errorDiv);
+            
+            // 3秒后自动移除
+            setTimeout(() => {
+                if (errorDiv.parentNode) {
+                    errorDiv.parentNode.removeChild(errorDiv);
+                }
+            }, 3000);
+        }
+    }
+    
+    /**
+     * 处理视频错误
+     * @param {MediaError} error - 错误对象
+     */
+    handleVideoError(error) {
+        let errorMessage = '视频播放失败';
+        
+        if (error) {
+            switch (error.code) {
+                case MediaError.MEDIA_ERR_ABORTED:
+                    errorMessage = '视频播放被中止';
+                    break;
+                case MediaError.MEDIA_ERR_NETWORK:
+                    errorMessage = '网络错误，请检查网络连接';
+                    break;
+                case MediaError.MEDIA_ERR_DECODE:
+                    errorMessage = '视频解码失败';
+                    break;
+                case MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED:
+                    errorMessage = '视频格式不支持';
+                    break;
+            }
+        }
+        
+        console.error(`视频错误: ${errorMessage}`);
+    }
+    
+    /**
+     * 销毁HLS实例
+     */
+    destroyHls() {
+        if (this.hls) {
+            this.hls.destroy();
+            this.hls = null;
+        }
     }
     
     /**
@@ -243,7 +367,6 @@ class PlayerModule {
     toggleMute() {
         if (this.videoElement) {
             this.videoElement.muted = !this.videoElement.muted;
-            this.updateVolumeButton();
         }
     }
     
@@ -258,135 +381,6 @@ class PlayerModule {
         } else {
             this.container.requestFullscreen().catch(console.error);
         }
-    }
-    
-    /**
-     * 切换清晰度
-     * @param {string} quality - 清晰度
-     */
-    switchQuality(quality) {
-        if (!this.qualities.includes(quality)) {
-            console.warn(`不支持的清晰度: ${quality}`);
-            return;
-        }
-        
-        const currentTime = this.currentTime;
-        const wasPlaying = this.isPlaying;
-        
-        this.currentQuality = quality;
-        
-        // 这里需要根据实际实现切换清晰度
-        // 通常需要重新加载视频源
-        
-        console.log(`切换清晰度: ${quality}`);
-        
-        // 恢复播放状态
-        this.seekTo(currentTime);
-        if (wasPlaying) {
-            this.videoElement.play();
-        }
-    }
-    
-    /**
-     * 更新播放按钮
-     */
-    updatePlayButton() {
-        if (!this.container) return;
-        
-        const playPauseBtn = this.container.querySelector('.play-pause-btn');
-        if (playPauseBtn) {
-            playPauseBtn.textContent = this.isPlaying ? '⏸' : '▶';
-        }
-    }
-    
-    /**
-     * 更新进度条
-     */
-    updateProgressBar() {
-        if (!this.container || !this.duration) return;
-        
-        const progressFill = this.container.querySelector('.progress-fill');
-        if (progressFill) {
-            const percent = (this.currentTime / this.duration) * 100;
-            progressFill.style.width = `${percent}%`;
-        }
-    }
-    
-    /**
-     * 更新时间显示
-     */
-    updateTimeDisplay() {
-        if (!this.container) return;
-        
-        const timeDisplay = this.container.querySelector('.time-display');
-        if (timeDisplay) {
-            timeDisplay.textContent = `${this.formatTime(this.currentTime)} / ${this.formatTime(this.duration)}`;
-        }
-    }
-    
-    /**
-     * 更新音量滑块
-     */
-    updateVolumeSlider() {
-        if (!this.container) return;
-        
-        const volumeSlider = this.container.querySelector('.volume-slider');
-        if (volumeSlider) {
-            volumeSlider.value = this.volume;
-        }
-    }
-    
-    /**
-     * 更新音量按钮
-     */
-    updateVolumeButton() {
-        if (!this.container) return;
-        
-        const volumeBtn = this.container.querySelector('.volume-btn');
-        if (volumeBtn) {
-            volumeBtn.textContent = this.videoElement.muted ? '🔇' : '🔊';
-        }
-    }
-    
-    /**
-     * 处理视频错误
-     * @param {MediaError} error - 错误对象
-     */
-    handleVideoError(error) {
-        let errorMessage = '视频播放失败';
-        
-        if (error) {
-            switch (error.code) {
-                case MediaError.MEDIA_ERR_ABORTED:
-                    errorMessage = '视频播放被中止';
-                    break;
-                case MediaError.MEDIA_ERR_NETWORK:
-                    errorMessage = '网络错误，请检查网络连接';
-                    break;
-                case MediaError.MEDIA_ERR_DECODE:
-                    errorMessage = '视频解码失败，格式可能不支持';
-                    break;
-                case MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED:
-                    errorMessage = '视频源不支持，请尝试其他源';
-                    break;
-            }
-        }
-        
-        console.error(`视频错误: ${errorMessage}`);
-        this.dispatchEvent('error', { message: errorMessage });
-    }
-    
-    /**
-     * 格式化时间
-     * @param {number} seconds - 秒数
-     * @returns {string} 格式化后的时间
-     */
-    formatTime(seconds) {
-        if (isNaN(seconds)) return '00:00';
-        
-        const mins = Math.floor(seconds / 60);
-        const secs = Math.floor(seconds % 60);
-        return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
     }
     
     /**
@@ -407,14 +401,11 @@ class PlayerModule {
      */
     getPlayState() {
         return {
-            videoId: '',
             url: this.videoElement ? this.videoElement.src : '',
             currentTime: this.currentTime,
             duration: this.duration,
             playing: this.isPlaying,
             volume: this.volume,
-            quality: this.currentQuality,
-            qualities: this.qualities,
             error: this.error ? this.error.message : ''
         };
     }
@@ -423,6 +414,8 @@ class PlayerModule {
      * 销毁播放器
      */
     destroy() {
+        this.destroyHls();
+        
         if (this.videoElement) {
             this.videoElement.pause();
             this.videoElement.src = '';

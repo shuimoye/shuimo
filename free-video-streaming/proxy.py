@@ -11,6 +11,7 @@
 功能:
 - 提供静态文件服务
 - 代理API请求解决跨域问题
+- 代理视频流请求
 """
 
 import http.server
@@ -35,7 +36,8 @@ class CORSProxyHandler(http.server.SimpleHTTPRequestHandler):
         """添加CORS头"""
         self.send_header('Access-Control-Allow-Origin', '*')
         self.send_header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
-        self.send_header('Access-Control-Allow-Headers', 'Content-Type')
+        self.send_header('Access-Control-Allow-Headers', 'Content-Type, Range')
+        self.send_header('Access-Control-Expose-Headers', 'Content-Length, Content-Range')
         super().end_headers()
     
     def do_OPTIONS(self):
@@ -66,19 +68,34 @@ class CORSProxyHandler(http.server.SimpleHTTPRequestHandler):
             
             print(f'代理请求: {target_url}')
             
-            # 发送请求
+            # 创建请求
             req = urllib.request.Request(target_url)
             req.add_header('User-Agent', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36')
+            req.add_header('Accept', '*/*')
+            req.add_header('Accept-Language', 'zh-CN,zh;q=0.9,en;q=0.8')
             
-            with urllib.request.urlopen(req, timeout=30) as response:
+            # 处理Range请求（用于视频流）
+            range_header = self.headers.get('Range')
+            if range_header:
+                req.add_header('Range', range_header)
+            
+            # 发送请求
+            with urllib.request.urlopen(req, timeout=60) as response:
                 # 读取响应
                 content = response.read()
-                content_type = response.headers.get('Content-Type', 'application/json')
+                content_type = response.headers.get('Content-Type', 'application/octet-stream')
+                content_length = response.headers.get('Content-Length', len(content))
                 
                 # 发送响应
-                self.send_response(200)
+                self.send_response(response.status if hasattr(response, 'status') else 200)
                 self.send_header('Content-Type', content_type)
-                self.send_header('Content-Length', len(content))
+                self.send_header('Content-Length', content_length)
+                
+                # 转发Content-Range头
+                content_range = response.headers.get('Content-Range')
+                if content_range:
+                    self.send_header('Content-Range', content_range)
+                
                 self.end_headers()
                 self.wfile.write(content)
                 
@@ -91,7 +108,9 @@ class CORSProxyHandler(http.server.SimpleHTTPRequestHandler):
     
     def log_message(self, format, *args):
         """自定义日志格式"""
-        print(f'[代理服务器] {format % args}')
+        # 只记录重要日志，减少刷屏
+        if 'proxy' in str(args).lower() or 'error' in str(args).lower():
+            print(f'[代理服务器] {format % args}')
 
 def main():
     """启动服务器"""
@@ -109,6 +128,7 @@ def main():
 
 功能说明:
 - 自动代理API请求，解决跨域问题
+- 代理视频流请求，支持在线播放
 - 支持所有免费视频资源API
 
 按 Ctrl+C 停止服务器
