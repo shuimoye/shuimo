@@ -11,7 +11,7 @@ const AppState = {
     volume: 1,
     currentTime: 0,
     duration: 0,
-    currentView: 'welcome' // welcome, search, detail, player
+    currentView: 'welcome'
 };
 
 // DOM元素缓存
@@ -20,8 +20,7 @@ const DOMElements = {
     searchBtn: null,
     searchResults: null,
     videoPlayer: null,
-    videoDetail: null,
-    searchHistory: null
+    videoDetail: null
 };
 
 /**
@@ -30,16 +29,9 @@ const DOMElements = {
 function initApp() {
     console.log('初始化免费视频流媒体应用...');
     
-    // 缓存DOM元素
     cacheDOMElements();
-    
-    // 绑定事件
     bindEvents();
-    
-    // 显示欢迎信息
     showWelcomeMessage();
-    
-    // 检查URL参数
     checkUrlParams();
     
     console.log('应用初始化完成');
@@ -60,12 +52,10 @@ function cacheDOMElements() {
  * 绑定事件监听器
  */
 function bindEvents() {
-    // 搜索按钮点击事件
     if (DOMElements.searchBtn) {
         DOMElements.searchBtn.addEventListener('click', handleSearch);
     }
     
-    // 搜索输入框回车事件
     if (DOMElements.searchInput) {
         DOMElements.searchInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') {
@@ -73,11 +63,9 @@ function bindEvents() {
             }
         });
         
-        // 搜索输入框获得焦点时显示搜索历史
         DOMElements.searchInput.addEventListener('focus', showSearchHistory);
     }
     
-    // 点击其他区域隐藏搜索历史
     document.addEventListener('click', (e) => {
         if (!e.target.closest('.search-container')) {
             hideSearchHistory();
@@ -94,10 +82,8 @@ function checkUrlParams() {
     const keyword = urlParams.get('q');
     
     if (videoId) {
-        // 加载指定视频
         loadVideoById(videoId);
     } else if (keyword) {
-        // 执行搜索
         DOMElements.searchInput.value = keyword;
         handleSearch();
     }
@@ -115,24 +101,14 @@ async function handleSearch() {
     }
     
     console.log(`搜索关键词: ${keyword}`);
-    
-    // 显示加载状态
     showLoading();
-    
-    // 添加到搜索历史
     searchModule.addToHistory(keyword);
     
     try {
-        // 调用搜索模块
         const results = await searchModule.search(keyword);
-        
-        // 显示搜索结果
         displaySearchResults(results);
-        
-        // 更新应用状态
         AppState.searchResults = results;
         AppState.currentView = 'search';
-        
     } catch (error) {
         console.error('搜索失败:', error);
         showError('搜索失败，请重试');
@@ -146,7 +122,6 @@ async function handleSearch() {
 function displaySearchResults(results) {
     if (!DOMElements.searchResults) return;
     
-    // 清空现有结果
     DOMElements.searchResults.innerHTML = '';
     
     if (results.length === 0) {
@@ -154,16 +129,13 @@ function displaySearchResults(results) {
         return;
     }
     
-    // 创建结果卡片
     results.forEach(video => {
         const card = createVideoCard(video);
         DOMElements.searchResults.appendChild(card);
     });
     
-    // 显示搜索结果区域
     DOMElements.searchResults.style.display = 'grid';
     
-    // 隐藏其他区域
     if (DOMElements.videoDetail) {
         DOMElements.videoDetail.style.display = 'none';
     }
@@ -181,6 +153,7 @@ function createVideoCard(video) {
     const card = document.createElement('div');
     card.className = 'video-card';
     card.dataset.videoId = video.id;
+    card.dataset.sourceId = video.sourceId;
     
     card.innerHTML = `
         <img class="video-cover" src="${video.cover}" alt="${video.title}" 
@@ -194,7 +167,6 @@ function createVideoCard(video) {
         </div>
     `;
     
-    // 点击事件
     card.addEventListener('click', () => {
         showVideoDetail(video);
     });
@@ -209,16 +181,13 @@ function createVideoCard(video) {
 function showVideoDetail(video) {
     console.log(`显示视频详情: ${video.title}`);
     
-    // 更新应用状态
     AppState.currentVideo = video;
     AppState.currentView = 'detail';
     
-    // 隐藏搜索结果
     if (DOMElements.searchResults) {
         DOMElements.searchResults.style.display = 'none';
     }
     
-    // 显示视频详情区域
     if (DOMElements.videoDetail) {
         DOMElements.videoDetail.style.display = 'block';
         DOMElements.videoDetail.innerHTML = `
@@ -238,7 +207,7 @@ function showVideoDetail(video) {
             
             <div class="episode-list">
                 <h3 class="episode-title">播放列表</h3>
-                <div class="episodes">
+                <div class="episodes" id="episodeList">
                     ${generateEpisodeButtons(video)}
                 </div>
             </div>
@@ -265,16 +234,15 @@ function showVideoDetail(video) {
         `;
     }
     
-    // 显示视频播放器
     if (DOMElements.videoPlayer) {
         DOMElements.videoPlayer.style.display = 'block';
-        
-        // 初始化播放器
         playerModule.initPlayer(DOMElements.videoPlayer);
         
-        // 如果有播放地址，开始播放
-        if (video.sources && video.sources.length > 0 && video.sources[0].url) {
-            playerModule.play(video.sources[0].url);
+        // 自动播放第一集
+        if (video.episodes && video.episodes.length > 0 && video.episodes[0].url) {
+            setTimeout(() => {
+                playerModule.play(video.episodes[0].url);
+            }, 500);
         }
     }
 }
@@ -285,18 +253,14 @@ function showVideoDetail(video) {
  * @returns {string} HTML字符串
  */
 function generateEpisodeButtons(video) {
-    if (!video.sources || video.sources.length === 0) {
-        return '<button class="episode-btn active">第1集</button>';
+    if (!video.episodes || video.episodes.length === 0) {
+        return '<p style="color: #666;">暂无可用播放源</p>';
     }
     
-    const source = video.sources[0];
-    if (!source.episodes || source.episodes.length === 0) {
-        return '<button class="episode-btn active">第1集</button>';
-    }
-    
-    return source.episodes.map((episode, index) => `
+    return video.episodes.map((episode, index) => `
         <button class="episode-btn ${index === 0 ? 'active' : ''}" 
-                onclick="playEpisode(${index})">
+                onclick="playEpisode(${index})"
+                data-url="${episode.url}">
             ${episode.name || `第${index + 1}集`}
         </button>
     `).join('');
@@ -310,13 +274,11 @@ function playEpisode(episodeIndex) {
     if (!AppState.currentVideo) return;
     
     const video = AppState.currentVideo;
-    if (!video.sources || video.sources.length === 0) return;
+    if (!video.episodes || video.episodes.length === 0) return;
     
-    const source = video.sources[0];
-    if (!source.episodes || source.episodes.length === 0) return;
-    
-    const episode = source.episodes[episodeIndex];
+    const episode = video.episodes[episodeIndex];
     if (episode && episode.url) {
+        console.log(`播放: ${episode.name} - ${episode.url}`);
         playerModule.play(episode.url);
         
         // 更新剧集按钮状态
@@ -331,7 +293,6 @@ function playEpisode(episodeIndex) {
  * 返回搜索
  */
 function backToSearch() {
-    // 隐藏视频详情和播放器
     if (DOMElements.videoDetail) {
         DOMElements.videoDetail.style.display = 'none';
     }
@@ -340,12 +301,10 @@ function backToSearch() {
         playerModule.destroy();
     }
     
-    // 显示搜索结果
     if (DOMElements.searchResults) {
         DOMElements.searchResults.style.display = 'grid';
     }
     
-    // 清空当前视频状态
     AppState.currentVideo = null;
     AppState.currentView = 'search';
 }
@@ -362,10 +321,9 @@ function handleDownload() {
     const video = AppState.currentVideo;
     console.log(`开始下载: ${video.title}`);
     
-    // 获取下载链接
     let downloadUrl = '';
-    if (video.sources && video.sources.length > 0) {
-        downloadUrl = video.sources[0].url;
+    if (video.episodes && video.episodes.length > 0) {
+        downloadUrl = video.episodes[0].url;
     }
     
     if (!downloadUrl) {
@@ -373,7 +331,6 @@ function handleDownload() {
         return;
     }
     
-    // 开始下载
     downloadModule.startDownload(downloadUrl, `${video.title}.mp4`);
 }
 
@@ -386,7 +343,6 @@ function handleShare() {
         return;
     }
     
-    // 显示分享对话框
     shareModule.showShareDialog(AppState.currentVideo);
 }
 
@@ -397,10 +353,8 @@ function showSearchHistory() {
     const history = searchModule.getHistory();
     if (history.length === 0) return;
     
-    // 移除已存在的搜索历史
     hideSearchHistory();
     
-    // 创建搜索历史元素
     const historyElement = document.createElement('div');
     historyElement.className = 'search-history';
     historyElement.style.cssText = `
@@ -418,7 +372,6 @@ function showSearchHistory() {
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     `;
     
-    // 添加标题
     const title = document.createElement('div');
     title.style.cssText = `
         padding: 12px 16px;
@@ -435,7 +388,6 @@ function showSearchHistory() {
     `;
     historyElement.appendChild(title);
     
-    // 添加历史记录
     history.forEach(keyword => {
         const item = document.createElement('div');
         item.style.cssText = `
@@ -462,7 +414,6 @@ function showSearchHistory() {
         historyElement.appendChild(item);
     });
     
-    // 添加到搜索容器
     const searchContainer = document.querySelector('.search-container');
     if (searchContainer) {
         searchContainer.style.position = 'relative';
@@ -494,7 +445,7 @@ function clearSearchHistory() {
  */
 function removeFromSearchHistory(keyword) {
     searchModule.removeFromHistory(keyword);
-    showSearchHistory(); // 刷新显示
+    showSearchHistory();
 }
 
 /**
@@ -504,26 +455,7 @@ function removeFromSearchHistory(keyword) {
 async function loadVideoById(videoId) {
     try {
         console.log(`加载视频: ${videoId}`);
-        
-        // 这里应该调用API获取视频详情
-        // 暂时使用模拟数据
-        const mockVideo = {
-            id: videoId,
-            title: '视频标题',
-            cover: 'assets/images/default-cover.jpg',
-            description: '视频描述',
-            year: '2024',
-            type: '电影',
-            source: '示例来源',
-            sources: [{
-                sourceId: 'mock',
-                url: '',
-                episodes: []
-            }]
-        };
-        
-        showVideoDetail(mockVideo);
-        
+        showError('暂不支持直接加载视频ID');
     } catch (error) {
         console.error('加载视频失败:', error);
         showError('加载视频失败');
@@ -579,7 +511,6 @@ function showEmptyState() {
  * @param {string} message - 成功信息
  */
 function showSuccess(message) {
-    // 创建临时提示
     const toast = document.createElement('div');
     toast.style.cssText = `
         position: fixed;
@@ -596,7 +527,6 @@ function showSuccess(message) {
     toast.textContent = message;
     document.body.appendChild(toast);
     
-    // 3秒后移除
     setTimeout(() => {
         document.body.removeChild(toast);
     }, 3000);

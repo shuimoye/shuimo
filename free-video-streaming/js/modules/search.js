@@ -28,33 +28,36 @@ class SearchModule {
         this.isLoading = true;
         this.currentKeyword = keyword;
         this.results = [];
+        this.sources = [];
         
         try {
             console.log(`开始搜索: ${keyword}`);
             
             // 如果没有指定数据源，使用默认数据源
             if (sources.length === 0) {
-                sources = this.getDefaultSources();
+                sources = VIDEO_SOURCES.filter(s => s.enabled);
             }
             
             // 并发搜索所有数据源
             const searchPromises = sources.map(source => 
-                this.searchFromSource(keyword, source)
+                this.searchFromSource(keyword, source).catch(err => {
+                    console.error(`数据源 ${source.name} 搜索失败:`, err);
+                    return [];
+                })
             );
             
-            const results = await Promise.allSettled(searchPromises);
+            const results = await Promise.all(searchPromises);
             
             // 合并结果
             results.forEach((result, index) => {
-                if (result.status === 'fulfilled') {
-                    this.results.push(...result.value);
+                if (result && result.length > 0) {
+                    this.results.push(...result);
                     this.sources.push({
                         sourceId: sources[index].id,
                         status: 'success',
-                        count: result.value.length
+                        count: result.length
                     });
                 } else {
-                    console.error(`数据源 ${sources[index].name} 搜索失败:`, result.reason);
                     this.sources.push({
                         sourceId: sources[index].id,
                         status: 'error',
@@ -84,22 +87,172 @@ class SearchModule {
      * @returns {Promise<Array>} 搜索结果
      */
     async searchFromSource(keyword, source) {
-        // 这里将调用具体的爬虫或API
-        // 暂时返回模拟数据
-        return new Promise((resolve) => {
-            setTimeout(() => {
-                resolve([
-                    {
-                        id: `${source.id}_1`,
-                        title: `${keyword} - 来自${source.name}`,
-                        cover: 'assets/images/default-cover.jpg',
-                        year: '2024',
-                        type: '电影',
-                        source: source.name
-                    }
-                ]);
-            }, 500);
-        });
+        console.log(`从 ${source.name} 搜索: ${keyword}`);
+        
+        const searchUrl = source.api + source.searchPath.replace('{keyword}', encodeURIComponent(keyword));
+        
+        try {
+            const response = await corsModule.fetchWithCORS(searchUrl);
+            const data = await response.json();
+            
+            return this.parseSearchResults(data, source);
+        } catch (error) {
+            console.error(`${source.name} 搜索失败:`, error);
+            return [];
+        }
+    }
+    
+    /**
+     * 解析搜索结果
+     * @param {Object} data - API返回的数据
+     * @param {Object} source - 数据源配置
+     * @returns {Array} 视频列表
+     */
+    parseSearchResults(data, source) {
+        const videos = [];
+        
+        try {
+            // 不同API返回格式不同，需要适配
+            let list = [];
+            
+            if (data.list && Array.isArray(data.list)) {
+                list = data.list;
+            } else if (data.data && data.data.list && Array.isArray(data.data.list)) {
+                list = data.data.list;
+            } else if (Array.isArray(data)) {
+                list = data;
+            }
+            
+            list.forEach((item, index) => {
+                const video = this.parseVideoItem(item, source, index);
+                if (video) {
+                    videos.push(video);
+                }
+            });
+        } catch (error) {
+            console.error('解析搜索结果失败:', error);
+        }
+        
+        return videos;
+    }
+    
+    /**
+     * 解析单个视频项
+     * @param {Object} item - 原始数据
+     * @param {Object} source - 数据源配置
+     * @param {number} index - 索引
+     * @returns {Object|null} 视频信息
+     */
+    parseVideoItem(item, source, index) {
+        try {
+            const id = item.vod_id || item.id || `${source.id}_${index}`;
+            const title = item.vod_name || item.name || item.title || '';
+            
+            if (!title) return null;
+            
+            const cover = item.vod_pic || item.pic || item.img || '';
+            const year = item.vod_year || item.year || '';
+            const type = item.type_name || item.vod_class || item.type || '';
+            const description = item.vod_content || item.vod_blurb || item.desc || '';
+            
+            // 解析播放地址
+            const episodes = this.parseEpisodes(item);
+            
+            return {
+                id: id.toString(),
+                title: title,
+                cover: cover,
+                year: year.toString(),
+                type: type,
+                description: description,
+                source: source.name,
+                sourceId: source.id,
+                episodes: episodes
+            };
+        } catch (error) {
+            console.error('解析视频项失败:', error);
+            return null;
+        }
+    }
+    
+    /**
+     * 解析剧集信息
+     * @param {Object} item - 视频数据
+     * @returns {Array} 剧集列表
+     */
+    parseEpisodes(item) {
+        const episodes = [];
+        
+        try {
+            // 解析播放地址 - 格式通常为 "第1集$url1#第2集$url2"
+            const playUrl = item.vod_play_url || item.play_url || '';
+            
+            if (playUrl) {
+                // 分割不同播放源
+                const sources = playUrl.split('$$$');
+                
+                if (sources.length > 0) {
+                    // 使用第一个播放源
+                    const episodesStr = sources[0];
+                    const episodeList = episodesStr.split('#');
+                    
+                    episodeList.forEach((ep, index) => {
+                        const parts = ep.split('$');
+                        if (parts.length >= 2) {
+                            episodes.push({
+                                name: parts[0] || `第${index + 1}集`,
+                                url: parts[1]
+                            });
+                        } else if (parts.length === 1 && parts[0]) {
+                            episodes.push({
+                                name: `第${index + 1}集`,
+                                url: parts[0]
+                            });
+                        }
+                    });
+                }
+            }
+        } catch (error) {
+            console.error('解析剧集信息失败:', error);
+        }
+        
+        return episodes;
+    }
+    
+    /**
+     * 获取视频详情
+     * @param {string} videoId - 视频ID
+     * @param {string} sourceId - 数据源ID
+     * @returns {Promise<Object>} 视频详情
+     */
+    async getVideoDetail(videoId, sourceId) {
+        const source = VIDEO_SOURCES.find(s => s.id === sourceId);
+        if (!source) {
+            throw new Error('未找到数据源');
+        }
+        
+        const detailUrl = source.api + source.detailPath.replace('{id}', videoId);
+        
+        try {
+            const response = await corsModule.fetchWithCORS(detailUrl);
+            const data = await response.json();
+            
+            let item = null;
+            if (data.list && data.list.length > 0) {
+                item = data.list[0];
+            } else if (data.data && data.data.list && data.data.list.length > 0) {
+                item = data.data.list[0];
+            }
+            
+            if (item) {
+                return this.parseVideoItem(item, source, 0);
+            }
+            
+            throw new Error('未找到视频详情');
+        } catch (error) {
+            console.error('获取视频详情失败:', error);
+            throw error;
+        }
     }
     
     /**
@@ -107,24 +260,7 @@ class SearchModule {
      * @returns {Array} 默认数据源列表
      */
     getDefaultSources() {
-        return [
-            {
-                id: 'source1',
-                name: '免费影视网站A',
-                type: 'crawl',
-                url: 'https://example.com',
-                searchPath: '/search?q=',
-                enabled: true
-            },
-            {
-                id: 'source2',
-                name: '免费API服务',
-                type: 'api',
-                url: 'https://api.example.com',
-                apiKey: '',
-                enabled: true
-            }
-        ];
+        return VIDEO_SOURCES.filter(s => s.enabled);
     }
     
     /**
@@ -154,8 +290,8 @@ class SearchModule {
     
     /**
      * 排序搜索结果
-     * @param {string} sortBy - 排序字段：title/year.source
-     * @param {string} sortOrder - 排序顺序：asc/desc
+     * @param {string} sortBy - 排序字段
+     * @param {string} sortOrder - 排序顺序
      * @returns {Array} 排序后的结果
      */
     sortResults(sortBy = 'title', sortOrder = 'asc') {
@@ -184,7 +320,6 @@ class SearchModule {
                     valueB = b.title || '';
             }
             
-            // 比较值
             if (typeof valueA === 'string') {
                 const comparison = valueA.localeCompare(valueB, 'zh-CN');
                 return sortOrder === 'asc' ? comparison : -comparison;
@@ -209,28 +344,24 @@ class SearchModule {
         
         let filtered = [...this.results];
         
-        // 按类型过滤
         if (filters.type) {
             filtered = filtered.filter(video => 
                 video.type && video.type.includes(filters.type)
             );
         }
         
-        // 按年份过滤
         if (filters.year) {
             filtered = filtered.filter(video => 
                 video.year && video.year.includes(filters.year)
             );
         }
         
-        // 按来源过滤
         if (filters.source) {
             filtered = filtered.filter(video => 
                 video.source && video.source.includes(filters.source)
             );
         }
         
-        // 按关键词过滤
         if (filters.keyword) {
             const keyword = filters.keyword.toLowerCase();
             filtered = filtered.filter(video => 
@@ -264,7 +395,6 @@ class SearchModule {
      */
     switchSource(sourceId) {
         console.log(`切换数据源: ${sourceId}`);
-        // 这里可以实现数据源切换逻辑
     }
     
     /**
@@ -311,18 +441,13 @@ class SearchModule {
         
         const trimmedKeyword = keyword.trim();
         
-        // 移除重复项
         this.searchHistory = this.searchHistory.filter(item => item !== trimmedKeyword);
-        
-        // 添加到开头
         this.searchHistory.unshift(trimmedKeyword);
         
-        // 限制历史记录大小
         if (this.searchHistory.length > this.maxHistorySize) {
             this.searchHistory = this.searchHistory.slice(0, this.maxHistorySize);
         }
         
-        // 保存到本地存储
         this.saveSearchHistory();
     }
     
