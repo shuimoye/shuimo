@@ -5,13 +5,30 @@
 
 class CORSModule {
     constructor() {
-        this.proxyUrls = [
-            'https://api.allorigins.win/raw?url=',
-            'https://corsproxy.io/?',
-            'https://api.codetabs.com/v1/proxy?quest='
+        // 多个CORS代理服务
+        this.proxyServices = [
+            {
+                name: 'allorigins',
+                url: 'https://api.allorigins.win/get?url=',
+                type: 'json' // 返回JSON格式，需要解析contents
+            },
+            {
+                name: 'corsproxy',
+                url: 'https://corsproxy.io/?',
+                type: 'raw'
+            },
+            {
+                name: 'codetabs',
+                url: 'https://api.codetabs.com/v1/proxy?quest=',
+                type: 'raw'
+            },
+            {
+                name: 'cors-anywhere',
+                url: 'https://cors-anywhere.herokuapp.com/',
+                type: 'raw'
+            }
         ];
-        this.failedProxies = new Set();
-        this.jsonpCallbackId = 0;
+        this.failedServices = new Set();
     }
     
     /**
@@ -24,104 +41,63 @@ class CORSModule {
         // 检测是否是file://协议
         const isFileProtocol = window.location.protocol === 'file:';
         
-        if (isFileProtocol) {
-            // file://协议下使用JSONP或代理
-            return this.fetchWithJsonp(url);
-        }
-        
-        // 策略1: 尝试直接请求
-        try {
-            const response = await fetch(url, {
-                ...options,
-                mode: 'cors'
-            });
-            if (response.ok) {
-                return response;
-            }
-        } catch (e) {
-            console.log('直接请求失败，尝试代理...');
-        }
-        
-        // 策略2: 使用CORS代理
-        const availableProxies = this.proxyUrls.filter(p => !this.failedProxies.has(p));
-        
-        for (const proxyUrl of availableProxies) {
+        // 策略1: 尝试直接请求（非file://协议时）
+        if (!isFileProtocol) {
             try {
-                console.log(`尝试代理: ${proxyUrl}`);
-                const proxyFullUrl = proxyUrl + encodeURIComponent(url);
-                const response = await fetch(proxyFullUrl, {
+                const response = await fetch(url, {
+                    ...options,
+                    mode: 'cors'
+                });
+                if (response.ok) {
+                    return response;
+                }
+            } catch (e) {
+                console.log('直接请求失败，尝试代理...');
+            }
+        }
+        
+        // 策略2: 使用代理服务
+        const availableServices = this.proxyServices.filter(s => !this.failedServices.has(s.name));
+        
+        for (const service of availableServices) {
+            try {
+                console.log(`尝试代理: ${service.name}`);
+                const proxyUrl = service.url + encodeURIComponent(url);
+                const response = await fetch(proxyUrl, {
                     ...options,
                     mode: 'cors'
                 });
                 
                 if (response.ok) {
-                    console.log(`代理成功: ${proxyUrl}`);
+                    console.log(`代理成功: ${service.name}`);
+                    
+                    // 根据代理类型处理响应
+                    if (service.type === 'json') {
+                        // allorigins返回 { contents: "..." }
+                        const jsonData = await response.json();
+                        return {
+                            ok: true,
+                            json: () => Promise.resolve(JSON.parse(jsonData.contents)),
+                            text: () => Promise.resolve(jsonData.contents)
+                        };
+                    }
+                    
                     return response;
                 }
             } catch (error) {
-                console.warn(`代理失败: ${proxyUrl}`, error.message);
-                this.failedProxies.add(proxyUrl);
+                console.warn(`代理失败: ${service.name}`, error.message);
+                this.failedServices.add(service.name);
             }
         }
         
-        throw new Error('所有跨域策略都失败了');
+        throw new Error('所有代理服务都失败了，请使用本地代理服务器');
     }
     
     /**
-     * 使用JSONP方式请求
-     * @param {string} url - 请求URL
-     * @returns {Promise<Response>} 响应对象
+     * 重置失败的服务列表
      */
-    fetchWithJsonp(url) {
-        return new Promise((resolve, reject) => {
-            const callbackName = `jsonp_callback_${++this.jsonpCallbackId}`;
-            const separator = url.includes('?') ? '&' : '?';
-            const jsonpUrl = `${url}${separator}callback=${callbackName}`;
-            
-            // 设置超时
-            const timeout = setTimeout(() => {
-                cleanup();
-                reject(new Error('JSONP请求超时'));
-            }, 15000);
-            
-            // 清理函数
-            const cleanup = () => {
-                clearTimeout(timeout);
-                delete window[callbackName];
-                const script = document.getElementById(callbackName);
-                if (script) {
-                    script.remove();
-                }
-            };
-            
-            // 设置回调函数
-            window[callbackName] = (data) => {
-                cleanup();
-                resolve({
-                    ok: true,
-                    json: () => Promise.resolve(data),
-                    text: () => Promise.resolve(JSON.stringify(data))
-                });
-            };
-            
-            // 创建script标签
-            const script = document.createElement('script');
-            script.id = callbackName;
-            script.src = jsonpUrl;
-            script.onerror = () => {
-                cleanup();
-                reject(new Error('JSONP请求失败'));
-            };
-            
-            document.head.appendChild(script);
-        });
-    }
-    
-    /**
-     * 重置失败的代理列表
-     */
-    resetFailedProxies() {
-        this.failedProxies.clear();
+    resetFailedServices() {
+        this.failedServices.clear();
     }
 }
 

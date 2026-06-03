@@ -109,9 +109,20 @@ async function handleSearch() {
         displaySearchResults(results);
         AppState.searchResults = results;
         AppState.currentView = 'search';
+        
+        // 如果结果为空，显示提示
+        if (results.length === 0) {
+            showEmptyState();
+        }
     } catch (error) {
         console.error('搜索失败:', error);
-        showError('搜索失败，请重试');
+        
+        // 检查是否是file://协议
+        if (window.location.protocol === 'file:') {
+            showError('搜索失败：直接打开HTML文件时跨域受限，请使用本地代理服务器');
+        } else {
+            showError('搜索失败，请重试');
+        }
     }
 }
 
@@ -499,10 +510,27 @@ function showError(message) {
  */
 function showEmptyState() {
     if (DOMElements.searchResults) {
+        const isFileProtocol = window.location.protocol === 'file:';
+        
+        let helpText = '';
+        if (isFileProtocol) {
+            helpText = `
+                <p style="font-size: 14px; color: #666; margin-top: 16px; max-width: 400px; text-align: left;">
+                    <strong>提示：</strong>直接打开HTML文件时，由于浏览器安全限制，可能无法访问视频API。<br><br>
+                    <strong>解决方法：</strong><br>
+                    1. 安装Python 3.x<br>
+                    2. 双击运行 <code>start.bat</code>（Windows）<br>
+                    3. 或在终端运行 <code>python3 proxy.py</code><br>
+                    4. 访问 <a href="http://localhost:8080" target="_blank">http://localhost:8080</a>
+                </p>
+            `;
+        }
+        
         DOMElements.searchResults.innerHTML = `
             <div class="empty">
                 <div class="empty-icon">🔍</div>
                 <p>未找到相关视频</p>
+                ${helpText}
             </div>
         `;
     }
