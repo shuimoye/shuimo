@@ -10,9 +10,9 @@
 - 跨平台：支持安卓手机和Windows用户
 - 分享功能：支持分享给朋友
 
-## 部署方案（国内用户推荐）
+## 部署方案
 
-### 方案1：Vercel（推荐，国内访问快）
+### 方案1：Vercel（推荐，国内访问快且稳定）
 
 1. 访问 https://vercel.com 并使用GitHub登录
 2. 点击 "New Project"
@@ -20,18 +20,9 @@
 4. 自动部署并获得访问地址（如 `https://xxx.vercel.app`）
 5. 将地址分享给朋友
 
-**优点：** 免费、国内有CDN、访问速度快、支持自定义域名
+**优点：** 免费、国内有CDN、访问速度快、稳定
 
-### 方案2：Cloudflare Pages（国内有CDN）
-
-1. 访访 https://pages.cloudflare.com
-2. 使用GitHub登录
-3. 选择仓库并部署
-4. 获得访问地址（如 `https://xxx.pages.dev`）
-
-**优点：** 免费、全球CDN、国内访问快
-
-### 方案3：GitHub Pages（国内访问稳定）
+### 方案2：GitHub Pages（国内可访问）
 
 1. 访问 https://github.com 并登录
 2. 创建新仓库，命名为 `free-video-streaming`
@@ -39,7 +30,7 @@
 4. 在仓库 Settings > Pages 中启用
 5. 访问 `https://你的用户名.github.io/free-video-streaming`
 
-**优点：** 免费、稳定、国内可访问
+**优点：** 免费、国内可访问、稳定
 
 ## 快速部署
 
