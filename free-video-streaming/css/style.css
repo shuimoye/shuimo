@@ -1,0 +1,498 @@
+/* 主样式文件 - style.css */
+
+/* 重置默认样式 */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* 基础字体和颜色 */
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    line-height: 1.6;
+    color: #333;
+    background-color: #f5f5f5;
+}
+
+/* 链接样式 */
+a {
+    color: #1a73e8;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+/* 应用容器 */
+.app-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 16px;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* 头部样式 */
+.app-header {
+    background-color: #fff;
+    padding: 16px 0;
+    border-bottom: 1px solid #e0e0e0;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+/* 搜索容器 */
+.search-container {
+    display: flex;
+    gap: 8px;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+/* 搜索输入框 */
+.search-input {
+    flex: 1;
+    padding: 12px 16px;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 16px;
+    outline: none;
+    transition: border-color 0.3s;
+}
+
+.search-input:focus {
+    border-color: #1a73e8;
+}
+
+/* 搜索按钮 */
+.search-btn {
+    padding: 12px 24px;
+    background-color: #1a73e8;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.search-btn:hover {
+    background-color: #1557b0;
+}
+
+/* 主内容区域 */
+.app-main {
+    flex: 1;
+    padding: 16px 0;
+}
+
+/* 搜索结果区域 */
+.search-results {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 16px;
+}
+
+/* 视频卡片 */
+.video-card {
+    background-color: #fff;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s, box-shadow 0.2s;
+    cursor: pointer;
+}
+
+.video-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+}
+
+/* 视频封面 */
+.video-cover {
+    width: 100%;
+    height: 160px;
+    object-fit: cover;
+    background-color: #e0e0e0;
+}
+
+/* 视频信息 */
+.video-info {
+    padding: 12px;
+}
+
+.video-title {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: #333;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.video-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 14px;
+    color: #666;
+}
+
+.video-source {
+    background-color: #f0f0f0;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+}
+
+.video-year {
+    color: #999;
+}
+
+/* 视频播放器区域 */
+.video-player {
+    background-color: #000;
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 16px;
+}
+
+.video-player video {
+    width: 100%;
+    max-height: 70vh;
+    display: block;
+}
+
+/* 播放控制栏 */
+.player-controls {
+    background-color: rgba(0, 0, 0, 0.8);
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.control-btn {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 20px;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+}
+
+.control-btn:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+.progress-bar {
+    flex: 1;
+    height: 4px;
+    background-color: rgba(255, 255, 255, 0.3);
+    border-radius: 2px;
+    position: relative;
+    cursor: pointer;
+}
+
+.progress-fill {
+    height: 100%;
+    background-color: #1a73e8;
+    border-radius: 2px;
+    width: 0%;
+    transition: width 0.1s;
+}
+
+.progress-handle {
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    width: 16px;
+    height: 16px;
+    background-color: #1a73e8;
+    border-radius: 50%;
+    transform: scale(0);
+    transition: transform 0.2s;
+}
+
+.progress-bar:hover .progress-handle {
+    transform: scale(1);
+}
+
+.time-display {
+    color: white;
+    font-size: 14px;
+    min-width: 100px;
+    text-align: center;
+}
+
+.volume-control {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.volume-slider {
+    width: 80px;
+    height: 4px;
+    background-color: rgba(255, 255, 255, 0.3);
+    border-radius: 2px;
+    outline: none;
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+.volume-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 14px;
+    height: 14px;
+    background-color: white;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+/* 视频详情区域 */
+.video-detail {
+    background-color: #fff;
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 16px;
+}
+
+.detail-header {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 16px;
+}
+
+.detail-cover {
+    width: 120px;
+    height: 160px;
+    object-fit: cover;
+    border-radius: 4px;
+}
+
+.detail-info {
+    flex: 1;
+}
+
+.detail-title {
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.detail-meta {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 12px;
+    font-size: 14px;
+    color: #666;
+}
+
+.detail-description {
+    font-size: 14px;
+    color: #666;
+    line-height: 1.6;
+}
+
+/* 剧集列表 */
+.episode-list {
+    margin-top: 16px;
+}
+
+.episode-title {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 12px;
+}
+
+.episodes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.episode-btn {
+    padding: 8px 16px;
+    background-color: #f0f0f0;
+    border: none;
+    border-radius: 4px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.episode-btn:hover {
+    background-color: #e0e0e0;
+}
+
+.episode-btn.active {
+    background-color: #1a73e8;
+    color: white;
+}
+
+/* 下载区域 */
+.download-section {
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid #e0e0e0;
+}
+
+.download-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 24px;
+    background-color: #34a853;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.download-btn:hover {
+    background-color: #2d8e47;
+}
+
+.download-progress {
+    margin-top: 12px;
+    background-color: #f0f0f0;
+    border-radius: 4px;
+    overflow: hidden;
+    height: 8px;
+}
+
+.download-progress-fill {
+    height: 100%;
+    background-color: #34a853;
+    width: 0%;
+    transition: width 0.3s;
+}
+
+.download-status {
+    margin-top: 8px;
+    font-size: 14px;
+    color: #666;
+}
+
+/* 分享区域 */
+.share-section {
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid #e0e0e0;
+}
+
+.share-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 24px;
+    background-color: #ff9800;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.share-btn:hover {
+    background-color: #e68900;
+}
+
+/* 底部区域 */
+.app-footer {
+    background-color: #fff;
+    padding: 24px 16px;
+    border-top: 1px solid #e0e0e0;
+    margin-top: auto;
+}
+
+.disclaimer {
+    text-align: center;
+    margin-bottom: 16px;
+}
+
+.disclaimer p {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 4px;
+}
+
+.copyright {
+    text-align: center;
+    font-size: 14px;
+    color: #999;
+}
+
+/* 加载状态 */
+.loading {
+    text-align: center;
+    padding: 40px;
+    color: #666;
+}
+
+.loading-spinner {
+    display: inline-block;
+    width: 40px;
+    height: 40px;
+    border: 4px solid #e0e0e0;
+    border-top: 4px solid #1a73e8;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 12px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* 错误状态 */
+.error {
+    text-align: center;
+    padding: 40px;
+    color: #d93025;
+}
+
+.error-icon {
+    font-size: 48px;
+    margin-bottom: 12px;
+}
+
+.retry-btn {
+    margin-top: 16px;
+    padding: 8px 24px;
+    background-color: #1a73e8;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.retry-btn:hover {
+    background-color: #1557b0;
+}
+
+/* 空状态 */
+.empty {
+    text-align: center;
+    padding: 40px;
+    color: #666;
+}
+
+.empty-icon {
+    font-size: 48px;
+    margin-bottom: 12px;
+}

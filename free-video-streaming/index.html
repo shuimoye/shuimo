@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="免费视频流媒体网页应用 - 仅供学习使用">
+    <meta name="keywords" content="视频,播放,下载,免费,学习">
+    <title>免费视频流媒体</title>
+    
+    <!-- 样式文件 -->
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/responsive.css">
+</head>
+<body>
+    <!-- 主容器 -->
+    <div class="app-container">
+        <!-- 头部搜索区域 -->
+        <header class="app-header">
+            <div class="search-container">
+                <input type="text" id="searchInput" class="search-input" placeholder="搜索视频...">
+                <button id="searchBtn" class="search-btn">搜索</button>
+            </div>
+        </header>
+        
+        <!-- 主内容区域 -->
+        <main class="app-main">
+            <!-- 搜索结果区域 -->
+            <section id="searchResults" class="search-results">
+                <!-- 搜索结果将在这里动态生成 -->
+            </section>
+            
+            <!-- 视频播放区域 -->
+            <section id="videoPlayer" class="video-player" style="display: none;">
+                <!-- 视频播放器将在这里动态生成 -->
+            </section>
+            
+            <!-- 视频详情区域 -->
+            <section id="videoDetail" class="video-detail" style="display: none;">
+                <!-- 视频详情将在这里动态生成 -->
+            </section>
+        </main>
+        
+        <!-- 底部区域 -->
+        <footer class="app-footer">
+            <div class="disclaimer">
+                <p>免责声明：本应用仅供学习交流使用，所有视频资源均来自互联网，本站不存储任何视频内容。</p>
+                <p>请勿将本应用用于商业用途，如有侵权请联系删除。</p>
+            </div>
+            <div class="copyright">
+                <p>&copy; 2026 免费视频流媒体 - 仅供学习使用</p>
+            </div>
+        </footer>
+    </div>
+    
+    <!-- JavaScript文件 -->
+    <!-- 工具函数 -->
+    <script src="js/utils/helpers.js"></script>
+    <script src="js/utils/models.js"></script>
+    
+    <!-- 核心模块 -->
+    <script src="js/modules/cors.js"></script>
+    <script src="js/modules/crawler.js"></script>
+    <script src="js/modules/api.js"></script>
+    <script src="js/modules/search.js"></script>
+    <script src="js/modules/player.js"></script>
+    <script src="js/modules/download.js"></script>
+    <script src="js/modules/share.js"></script>
+    
+    <!-- 应用入口 -->
+    <script src="js/app.js"></script>
+</body>
+</html>
