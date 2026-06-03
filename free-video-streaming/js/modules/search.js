@@ -157,7 +157,7 @@ class SearchModule {
             const description = item.vod_content || item.vod_blurb || item.desc || '';
             
             // 解析播放地址
-            const episodes = this.parseEpisodes(item);
+            const episodeResult = this.parseEpisodes(item);
             
             return {
                 id: id.toString(),
@@ -168,7 +168,8 @@ class SearchModule {
                 description: description,
                 source: source.name,
                 sourceId: source.id,
-                episodes: episodes
+                episodes: episodeResult.episodes,
+                allSources: episodeResult.allSources
             };
         } catch (error) {
             console.error('解析视频项失败:', error);
@@ -179,10 +180,13 @@ class SearchModule {
     /**
      * 解析剧集信息
      * @param {Object} item - 视频数据
-     * @returns {Array} 剧集列表
+     * @returns {Object} 包含剧集列表和所有播放源
      */
     parseEpisodes(item) {
-        const episodes = [];
+        const result = {
+            episodes: [],
+            allSources: [] // 所有播放源
+        };
         
         try {
             // 解析播放地址 - 格式通常为 "第1集$url1#第2集$url2"
@@ -192,7 +196,7 @@ class SearchModule {
                 // 分割不同播放源
                 const sources = playUrl.split('$$$');
                 
-                // 遍历所有播放源，找到可用的
+                // 遍历所有播放源
                 for (let sourceIndex = 0; sourceIndex < sources.length; sourceIndex++) {
                     const episodesStr = sources[sourceIndex];
                     const episodeList = episodesStr.split('#');
@@ -216,10 +220,18 @@ class SearchModule {
                         }
                     });
                     
-                    // 如果这个播放源有内容，添加到结果中
+                    // 保存这个播放源
                     if (sourceEpisodes.length > 0) {
-                        episodes.push(...sourceEpisodes);
-                        break; // 使用第一个可用的播放源
+                        result.allSources.push({
+                            index: sourceIndex,
+                            name: `源${sourceIndex + 1}`,
+                            episodes: sourceEpisodes
+                        });
+                        
+                        // 默认使用第一个源
+                        if (result.episodes.length === 0) {
+                            result.episodes = sourceEpisodes;
+                        }
                     }
                 }
             }
@@ -227,7 +239,7 @@ class SearchModule {
             console.error('解析剧集信息失败:', error);
         }
         
-        return episodes;
+        return result;
     }
     
     /**

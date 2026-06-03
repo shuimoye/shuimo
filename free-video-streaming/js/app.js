@@ -256,6 +256,33 @@ function showVideoDetail(video) {
             }, 500);
         }
     }
+    
+    // 如果有多个播放源，显示源选择
+    if (video.allSources && video.allSources.length > 1) {
+        const sourceList = document.createElement('div');
+        sourceList.className = 'source-list';
+        sourceList.style.cssText = `
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid #e0e0e0;
+        `;
+        sourceList.innerHTML = `
+            <h3 class="episode-title">播放源</h3>
+            <div class="sources" style="display: flex; gap: 8px; flex-wrap: wrap;">
+                ${video.allSources.map((src, index) => `
+                    <button class="episode-btn ${index === 0 ? 'active' : ''}" 
+                            onclick="switchVideoSource(${index})">
+                        ${src.name}
+                    </button>
+                `).join('')}
+            </div>
+        `;
+        
+        const detailSection = document.querySelector('.episode-list');
+        if (detailSection) {
+            detailSection.after(sourceList);
+        }
+    }
 }
 
 /**
@@ -320,6 +347,35 @@ function backToSearch() {
     
     AppState.currentVideo = null;
     AppState.currentView = 'search';
+}
+
+/**
+ * 切换视频源
+ * @param {number} sourceIndex - 源索引
+ */
+function switchVideoSource(sourceIndex) {
+    if (!AppState.currentVideo || !AppState.currentVideo.allSources) return;
+    
+    const source = AppState.currentVideo.allSources[sourceIndex];
+    if (!source || !source.episodes || source.episodes.length === 0) return;
+    
+    // 更新当前视频的剧集列表
+    AppState.currentVideo.episodes = source.episodes;
+    
+    // 更新剧集按钮
+    const episodeList = document.getElementById('episodeList');
+    if (episodeList) {
+        episodeList.innerHTML = generateEpisodeButtons(AppState.currentVideo);
+    }
+    
+    // 更新源按钮状态
+    const sourceBtns = document.querySelectorAll('.sources .episode-btn');
+    sourceBtns.forEach((btn, index) => {
+        btn.classList.toggle('active', index === sourceIndex);
+    });
+    
+    // 播放第一集
+    playEpisode(0);
 }
 
 /**

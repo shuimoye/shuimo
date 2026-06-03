@@ -1,6 +1,7 @@
 /**
  * 播放模块
  * 使用iframe嵌入方式播放，支持file://协议
+ * 优化播放体验
  */
 
 class PlayerModule {
@@ -8,6 +9,8 @@ class PlayerModule {
         this.container = null;
         this.iframe = null;
         this.isPlaying = false;
+        this.currentSourceIndex = 0;
+        this.sources = [];
     }
     
     /**
@@ -31,14 +34,18 @@ class PlayerModule {
     /**
      * 播放视频
      * @param {string} videoUrl - 视频URL（播放页面地址）
+     * @param {Array} sources - 备用视频源列表
      */
-    play(videoUrl) {
+    play(videoUrl, sources = []) {
         if (!this.container) {
             console.error('播放器未初始化');
             return;
         }
         
         console.log(`播放视频: ${videoUrl}`);
+        
+        this.sources = sources;
+        this.currentSourceIndex = 0;
         
         // 清空容器
         this.container.innerHTML = '';
@@ -67,23 +74,30 @@ class PlayerModule {
         // 添加到容器
         this.container.appendChild(this.iframe);
         
-        // 添加全屏按钮
-        this.addFullscreenButton();
+        // 添加控制按钮
+        this.addControlButtons();
         
         this.isPlaying = true;
     }
     
     /**
-     * 添加全屏按钮
+     * 添加控制按钮
      */
-    addFullscreenButton() {
-        const fullscreenBtn = document.createElement('button');
-        fullscreenBtn.innerHTML = '⛶';
-        fullscreenBtn.style.cssText = `
+    addControlButtons() {
+        const buttonContainer = document.createElement('div');
+        buttonContainer.style.cssText = `
             position: absolute;
             top: 10px;
             right: 10px;
             z-index: 10;
+            display: flex;
+            gap: 8px;
+        `;
+        
+        // 全屏按钮
+        const fullscreenBtn = document.createElement('button');
+        fullscreenBtn.innerHTML = '⛶';
+        fullscreenBtn.style.cssText = `
             background: rgba(0,0,0,0.5);
             color: white;
             border: none;
@@ -93,7 +107,42 @@ class PlayerModule {
             font-size: 18px;
         `;
         fullscreenBtn.onclick = () => this.toggleFullscreen();
-        this.container.appendChild(fullscreenBtn);
+        buttonContainer.appendChild(fullscreenBtn);
+        
+        // 切换源按钮（如果有多个源）
+        if (this.sources.length > 1) {
+            const switchBtn = document.createElement('button');
+            switchBtn.innerHTML = '切换源';
+            switchBtn.style.cssText = `
+                background: rgba(0,0,0,0.5);
+                color: white;
+                border: none;
+                border-radius: 4px;
+                padding: 8px 12px;
+                cursor: pointer;
+                font-size: 14px;
+            `;
+            switchBtn.onclick = () => this.switchSource();
+            buttonContainer.appendChild(switchBtn);
+        }
+        
+        this.container.appendChild(buttonContainer);
+    }
+    
+    /**
+     * 切换视频源
+     */
+    switchSource() {
+        if (this.sources.length <= 1) return;
+        
+        this.currentSourceIndex = (this.currentSourceIndex + 1) % this.sources.length;
+        const newUrl = this.sources[this.currentSourceIndex];
+        
+        console.log(`切换到源 ${this.currentSourceIndex + 1}: ${newUrl}`);
+        
+        if (this.iframe) {
+            this.iframe.src = newUrl;
+        }
     }
     
     /**
@@ -113,7 +162,6 @@ class PlayerModule {
      * 暂停播放
      */
     pause() {
-        // iframe方式无法直接暂停，可以移除iframe
         this.isPlaying = false;
     }
     
@@ -140,6 +188,7 @@ class PlayerModule {
         this.iframe = null;
         this.container = null;
         this.isPlaying = false;
+        this.sources = [];
         
         console.log('播放器已销毁');
     }
