@@ -196,6 +196,10 @@ class SearchModule {
                 // 分割不同播放源
                 const sources = playUrl.split('$$$');
                 
+                // 记录所有源，但优先选择视频流URL
+                let bestSourceIndex = -1;
+                let bestSourceScore = -1;
+                
                 // 遍历所有播放源
                 for (let sourceIndex = 0; sourceIndex < sources.length; sourceIndex++) {
                     const episodesStr = sources[sourceIndex];
@@ -222,17 +226,45 @@ class SearchModule {
                     
                     // 保存这个播放源
                     if (sourceEpisodes.length > 0) {
+                        // 计算源的得分（优先选择视频流URL）
+                        let score = 0;
+                        const firstUrl = sourceEpisodes[0].url || '';
+                        const lowerUrl = firstUrl.toLowerCase();
+                        
+                        // 直接视频流URL得分最高
+                        if (lowerUrl.includes('.m3u8')) {
+                            score = 100;
+                        } else if (lowerUrl.includes('.mp4')) {
+                            score = 90;
+                        } else if (lowerUrl.includes('.flv')) {
+                            score = 80;
+                        } else if (lowerUrl.includes('.ts')) {
+                            score = 70;
+                        } else if (lowerUrl.includes('.mkv') || lowerUrl.includes('.webm')) {
+                            score = 60;
+                        } else {
+                            // 播放页面URL得分较低
+                            score = 10;
+                        }
+                        
                         result.allSources.push({
                             index: sourceIndex,
                             name: `源${sourceIndex + 1}`,
-                            episodes: sourceEpisodes
+                            episodes: sourceEpisodes,
+                            score: score
                         });
                         
-                        // 默认使用第一个源
-                        if (result.episodes.length === 0) {
-                            result.episodes = sourceEpisodes;
+                        // 更新最佳源
+                        if (score > bestSourceScore) {
+                            bestSourceScore = score;
+                            bestSourceIndex = sourceIndex;
                         }
                     }
+                }
+                
+                // 使用最佳源作为默认源
+                if (bestSourceIndex >= 0) {
+                    result.episodes = result.allSources.find(s => s.index === bestSourceIndex).episodes;
                 }
             }
         } catch (error) {
