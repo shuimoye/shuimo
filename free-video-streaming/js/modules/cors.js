@@ -1,19 +1,17 @@
 /**
  * 跨域处理模块
- * 解决跨域访问问题
+ * 支持file://协议下的跨域请求
  */
 
 class CORSModule {
     constructor() {
-        // 更可靠的CORS代理服务列表
         this.proxyUrls = [
             'https://api.allorigins.win/raw?url=',
             'https://corsproxy.io/?',
             'https://api.codetabs.com/v1/proxy?quest='
         ];
-        
-        this.currentProxyIndex = 0;
         this.failedProxies = new Set();
+        this.jsonpCallbackId = 0;
     }
     
     /**
@@ -23,7 +21,15 @@ class CORSModule {
      * @returns {Promise<Response>} 响应对象
      */
     async fetchWithCORS(url, options = {}) {
-        // 策略1: 尝试直接请求（如果API支持CORS）
+        // 检测是否是file://协议
+        const isFileProtocol = window.location.protocol === 'file:';
+        
+        if (isFileProtocol) {
+            // file://协议下使用JSONP或代理
+            return this.fetchWithJsonp(url);
+        }
+        
+        // 策略1: 尝试直接请求
         try {
             const response = await fetch(url, {
                 ...options,
@@ -58,67 +64,57 @@ class CORSModule {
             }
         }
         
-        // 策略3: 使用iframe代理（适用于支持JSONP的API）
-        try {
-            return await this.fetchWithIframeProxy(url);
-        } catch (e) {
-            console.log('iframe代理失败');
-        }
-        
-        throw new Error('所有跨域策略都失败了，请检查网络连接或使用本地代理服务器');
+        throw new Error('所有跨域策略都失败了');
     }
     
     /**
-     * 使用iframe代理请求
+     * 使用JSONP方式请求
      * @param {string} url - 请求URL
      * @returns {Promise<Response>} 响应对象
      */
-    fetchWithIframeProxy(url) {
+    fetchWithJsonp(url) {
         return new Promise((resolve, reject) => {
-            const iframe = document.createElement('iframe');
-            iframe.style.display = 'none';
+            const callbackName = `jsonp_callback_${++this.jsonpCallbackId}`;
+            const separator = url.includes('?') ? '&' : '?';
+            const jsonpUrl = `${url}${separator}callback=${callbackName}`;
             
+            // 设置超时
             const timeout = setTimeout(() => {
-                document.body.removeChild(iframe);
-                reject(new Error('iframe代理超时'));
-            }, 10000);
+                cleanup();
+                reject(new Error('JSONP请求超时'));
+            }, 15000);
             
-            iframe.onload = () => {
-                try {
-                    const content = iframe.contentDocument || iframe.contentWindow.document;
-                    const text = content.body.textContent;
-                    clearTimeout(timeout);
-                    document.body.removeChild(iframe);
-                    
-                    resolve({
-                        ok: true,
-                        json: () => Promise.resolve(JSON.parse(text)),
-                        text: () => Promise.resolve(text)
-                    });
-                } catch (e) {
-                    clearTimeout(timeout);
-                    document.body.removeChild(iframe);
-                    reject(e);
+            // 清理函数
+            const cleanup = () => {
+                clearTimeout(timeout);
+                delete window[callbackName];
+                const script = document.getElementById(callbackName);
+                if (script) {
+                    script.remove();
                 }
             };
             
-            iframe.onerror = () => {
-                clearTimeout(timeout);
-                document.body.removeChild(iframe);
-                reject(new Error('iframe加载失败'));
+            // 设置回调函数
+            window[callbackName] = (data) => {
+                cleanup();
+                resolve({
+                    ok: true,
+                    json: () => Promise.resolve(data),
+                    text: () => Promise.resolve(JSON.stringify(data))
+                });
             };
             
-            document.body.appendChild(iframe);
-            iframe.src = url;
+            // 创建script标签
+            const script = document.createElement('script');
+            script.id = callbackName;
+            script.src = jsonpUrl;
+            script.onerror = () => {
+                cleanup();
+                reject(new Error('JSONP请求失败'));
+            };
+            
+            document.head.appendChild(script);
         });
-    }
-    
-    /**
-     * 获取当前使用的代理
-     * @returns {string} 当前代理URL
-     */
-    getCurrentProxy() {
-        return this.proxyUrls[this.currentProxyIndex];
     }
     
     /**
