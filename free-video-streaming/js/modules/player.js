@@ -55,10 +55,11 @@ class PlayerModule {
         `;
         
         // 设置iframe属性
-        this.iframe.setAttribute('allowfullscreen', 'true');
         this.iframe.setAttribute('allow', 'autoplay; fullscreen; encrypted-media');
         this.iframe.setAttribute('frameborder', '0');
         this.iframe.setAttribute('scrolling', 'no');
+        this.iframe.setAttribute('webkitallowfullscreen', '');
+        this.iframe.setAttribute('mozallowfullscreen', '');
         
         // 加载播放页面
         this.iframe.src = videoUrl;
