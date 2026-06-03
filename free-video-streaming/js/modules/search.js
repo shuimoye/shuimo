@@ -92,7 +92,17 @@ class SearchModule {
         const searchUrl = source.api + source.searchPath.replace('{keyword}', encodeURIComponent(keyword));
         
         try {
-            const response = await corsModule.fetchWithCORS(searchUrl);
+            // 检测是否使用本地代理
+            const isLocalProxy = this.detectLocalProxy();
+            let fetchUrl = searchUrl;
+            
+            if (isLocalProxy) {
+                // 使用本地代理
+                fetchUrl = `/proxy/${encodeURIComponent(searchUrl)}`;
+                console.log(`使用本地代理: ${fetchUrl}`);
+            }
+            
+            const response = await corsModule.fetchWithCORS(fetchUrl);
             const data = await response.json();
             
             return this.parseSearchResults(data, source);
@@ -100,6 +110,30 @@ class SearchModule {
             console.error(`${source.name} 搜索失败:`, error);
             return [];
         }
+    }
+    
+    /**
+     * 检测是否使用本地代理
+     * @returns {boolean} 是否使用本地代理
+     */
+    detectLocalProxy() {
+        // 检查当前是否通过本地代理服务器访问
+        const hostname = window.location.hostname;
+        const port = window.location.port;
+        
+        // 如果是localhost或127.0.0.1，且端口是8080，则使用本地代理
+        if ((hostname === 'localhost' || hostname === '127.0.0.1') && port === '8080') {
+            return true;
+        }
+        
+        // 如果是file://协议，提示用户使用本地代理
+        if (window.location.protocol === 'file:') {
+            console.warn('检测到file://协议，建议使用本地代理服务器以获得更好的体验');
+            console.warn('运行方法: python proxy.py 或 双击 start.bat/start.sh');
+            return false;
+        }
+        
+        return false;
     }
     
     /**

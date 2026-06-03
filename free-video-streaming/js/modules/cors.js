@@ -5,25 +5,15 @@
 
 class CORSModule {
     constructor() {
-        this.strategies = [
-            {
-                name: 'CORS代理',
-                type: 'proxy',
-                urls: [
-                    'https://cors-anywhere.herokuapp.com/',
-                    'https://api.allorigins.win/raw?url=',
-                    'https://corsproxy.io/?'
-                ]
-            },
-            {
-                name: 'JSONP',
-                type: 'jsonp',
-                support: true
-            }
+        // 更可靠的CORS代理服务列表
+        this.proxyUrls = [
+            'https://api.allorigins.win/raw?url=',
+            'https://corsproxy.io/?',
+            'https://api.codetabs.com/v1/proxy?quest='
         ];
         
-        this.currentStrategyIndex = 0;
-        this.proxyIndex = 0;
+        this.currentProxyIndex = 0;
+        this.failedProxies = new Set();
     }
     
     /**
@@ -33,247 +23,109 @@ class CORSModule {
      * @returns {Promise<Response>} 响应对象
      */
     async fetchWithCORS(url, options = {}) {
-        const strategies = this.getAvailableStrategies();
-        
-        for (const strategy of strategies) {
-            try {
-                console.log(`尝试跨域策略: ${strategy.name}`);
-                const response = await this.executeStrategy(strategy, url, options);
-                console.log(`跨域策略 ${strategy.name} 成功`);
+        // 策略1: 尝试直接请求（如果API支持CORS）
+        try {
+            const response = await fetch(url, {
+                ...options,
+                mode: 'cors'
+            });
+            if (response.ok) {
                 return response;
-            } catch (error) {
-                console.warn(`跨域策略 ${strategy.name} 失败:`, error.message);
-                continue;
             }
+        } catch (e) {
+            console.log('直接请求失败，尝试代理...');
         }
         
-        throw new Error('所有跨域策略失败');
-    }
-    
-    /**
-     * 获取可用策略
-     * @returns {Array} 策略列表
-     */
-    getAvailableStrategies() {
-        const strategies = [];
+        // 策略2: 使用CORS代理
+        const availableProxies = this.proxyUrls.filter(p => !this.failedProxies.has(p));
         
-        // 首先尝试直接请求
-        strategies.push({
-            name: '直接请求',
-            type: 'direct'
-        });
-        
-        // 添加CORS代理策略
-        this.strategies.forEach(strategy => {
-            if (strategy.type === 'proxy') {
-                strategy.urls.forEach((url, index) => {
-                    strategies.push({
-                        name: `CORS代理 ${index + 1}`,
-                        type: 'proxy',
-                        proxyUrl: url
-                    });
-                });
-            } else if (strategy.type === 'jsonp' && strategy.support) {
-                strategies.push({
-                    name: 'JSONP',
-                    type: 'jsonp'
-                });
-            }
-        });
-        
-        return strategies;
-    }
-    
-    /**
-     * 执行跨域策略
-     * @param {Object} strategy - 策略配置
-     * @param {string} url - 请求URL
-     * @param {Object} options - 请求选项
-     * @returns {Promise<Response>} 响应对象
-     */
-    async executeStrategy(strategy, url, options) {
-        switch (strategy.type) {
-            case 'direct':
-                return await this.directFetch(url, options);
-            case 'proxy':
-                return await this.proxyFetch(strategy.proxyUrl, url, options);
-            case 'jsonp':
-                return await this.jsonpFetch(url, options);
-            default:
-                throw new Error(`未知的跨域策略类型: ${strategy.type}`);
-        }
-    }
-    
-    /**
-     * 直接请求
-     * @param {string} url - 请求URL
-     * @param {Object} options - 请求选项
-     * @returns {Promise<Response>} 响应对象
-     */
-    async directFetch(url, options) {
-        const response = await fetch(url, {
-            ...options,
-            mode: 'cors'
-        });
-        
-        if (!response.ok) {
-            throw new Error(`HTTP错误: ${response.status}`);
-        }
-        
-        return response;
-    }
-    
-    /**
-     * 代理请求
-     * @param {string} proxyUrl - 代理URL
-     * @param {string} url - 目标URL
-     * @param {Object} options - 请求选项
-     * @returns {Promise<Response>} 响应对象
-     */
-    async proxyFetch(proxyUrl, url, options) {
-        const encodedUrl = encodeURIComponent(url);
-        const fullUrl = proxyUrl + encodedUrl;
-        
-        const response = await fetch(fullUrl, {
-            ...options,
-            mode: 'cors'
-        });
-        
-        if (!response.ok) {
-            throw new Error(`代理请求失败: ${response.status}`);
-        }
-        
-        return response;
-    }
-    
-    /**
-     * JSONP请求
-     * @param {string} url - 请求URL
-     * @param {Object} options - 请求选项
-     * @returns {Promise<Object>} 响应数据
-     */
-    async jsonpFetch(url, options) {
-        return new Promise((resolve, reject) => {
-            const callbackName = 'jsonp_callback_' + Date.now() + '_' + Math.random().toString(36).substr(2);
-            const script = document.createElement('script');
-            
-            // 清理函数
-            const cleanup = () => {
-                if (script.parentNode) {
-                    script.parentNode.removeChild(script);
-                }
-                delete window[callbackName];
-            };
-            
-            // 设置回调函数
-            window[callbackName] = (data) => {
-                cleanup();
-                resolve({
-                    ok: true,
-                    json: () => Promise.resolve(data),
-                    text: () => Promise.resolve(JSON.stringify(data))
-                });
-            };
-            
-            // 设置超时
-            const timeout = setTimeout(() => {
-                cleanup();
-                reject(new Error('JSONP请求超时'));
-            }, options.timeout || 10000);
-            
-            // 处理URL
-            const separator = url.includes('?') ? '&' : '?';
-            const jsonpUrl = `${url}${separator}callback=${callbackName}`;
-            
-            script.src = jsonpUrl;
-            script.onerror = () => {
-                clearTimeout(timeout);
-                cleanup();
-                reject(new Error('JSONP脚本加载失败'));
-            };
-            
-            document.head.appendChild(script);
-        });
-    }
-    
-    /**
-     * 带重试的请求
-     * @param {string} url - 请求URL
-     * @param {Object} options - 请求选项
-     * @param {number} retries - 重试次数
-     * @returns {Promise<Response>} 响应对象
-     */
-    async fetchWithRetry(url, options = {}, retries = 3) {
-        let lastError;
-        
-        for (let i = 0; i < retries; i++) {
+        for (const proxyUrl of availableProxies) {
             try {
-                const response = await this.fetchWithCORS(url, options);
-                return response;
-            } catch (error) {
-                lastError = error;
-                console.warn(`请求失败，第 ${i + 1} 次重试:`, error.message);
+                console.log(`尝试代理: ${proxyUrl}`);
+                const proxyFullUrl = proxyUrl + encodeURIComponent(url);
+                const response = await fetch(proxyFullUrl, {
+                    ...options,
+                    mode: 'cors'
+                });
                 
-                if (i < retries - 1) {
-                    // 指数退避
-                    await this.delay(1000 * Math.pow(2, i));
+                if (response.ok) {
+                    console.log(`代理成功: ${proxyUrl}`);
+                    return response;
                 }
+            } catch (error) {
+                console.warn(`代理失败: ${proxyUrl}`, error.message);
+                this.failedProxies.add(proxyUrl);
             }
         }
         
-        throw lastError;
-    }
-    
-    /**
-     * 延迟函数
-     * @param {number} ms - 毫秒数
-     * @returns {Promise} Promise对象
-     */
-    delay(ms) {
-        return new Promise(resolve => setTimeout(resolve, ms));
-    }
-    
-    /**
-     * 添加自定义代理
-     * @param {string} proxyUrl - 代理URL
-     */
-    addProxy(proxyUrl) {
-        const proxyStrategy = this.strategies.find(s => s.type === 'proxy');
-        if (proxyStrategy) {
-            proxyStrategy.urls.push(proxyUrl);
+        // 策略3: 使用iframe代理（适用于支持JSONP的API）
+        try {
+            return await this.fetchWithIframeProxy(url);
+        } catch (e) {
+            console.log('iframe代理失败');
         }
+        
+        throw new Error('所有跨域策略都失败了，请检查网络连接或使用本地代理服务器');
     }
     
     /**
-     * 移除代理
-     * @param {string} proxyUrl - 代理URL
+     * 使用iframe代理请求
+     * @param {string} url - 请求URL
+     * @returns {Promise<Response>} 响应对象
      */
-    removeProxy(proxyUrl) {
-        const proxyStrategy = this.strategies.find(s => s.type === 'proxy');
-        if (proxyStrategy) {
-            const index = proxyStrategy.urls.indexOf(proxyUrl);
-            if (index > -1) {
-                proxyStrategy.urls.splice(index, 1);
-            }
-        }
+    fetchWithIframeProxy(url) {
+        return new Promise((resolve, reject) => {
+            const iframe = document.createElement('iframe');
+            iframe.style.display = 'none';
+            
+            const timeout = setTimeout(() => {
+                document.body.removeChild(iframe);
+                reject(new Error('iframe代理超时'));
+            }, 10000);
+            
+            iframe.onload = () => {
+                try {
+                    const content = iframe.contentDocument || iframe.contentWindow.document;
+                    const text = content.body.textContent;
+                    clearTimeout(timeout);
+                    document.body.removeChild(iframe);
+                    
+                    resolve({
+                        ok: true,
+                        json: () => Promise.resolve(JSON.parse(text)),
+                        text: () => Promise.resolve(text)
+                    });
+                } catch (e) {
+                    clearTimeout(timeout);
+                    document.body.removeChild(iframe);
+                    reject(e);
+                }
+            };
+            
+            iframe.onerror = () => {
+                clearTimeout(timeout);
+                document.body.removeChild(iframe);
+                reject(new Error('iframe加载失败'));
+            };
+            
+            document.body.appendChild(iframe);
+            iframe.src = url;
+        });
     }
     
     /**
-     * 获取当前策略
-     * @returns {Object} 当前策略
+     * 获取当前使用的代理
+     * @returns {string} 当前代理URL
      */
-    getCurrentStrategy() {
-        return this.strategies[this.currentStrategyIndex];
+    getCurrentProxy() {
+        return this.proxyUrls[this.currentProxyIndex];
     }
     
     /**
-     * 切换策略
-     * @param {number} index - 策略索引
+     * 重置失败的代理列表
      */
-    switchStrategy(index) {
-        if (index >= 0 && index < this.strategies.length) {
-            this.currentStrategyIndex = index;
-        }
+    resetFailedProxies() {
+        this.failedProxies.clear();
     }
 }
 
