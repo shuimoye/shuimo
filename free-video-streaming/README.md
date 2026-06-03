@@ -10,57 +10,66 @@
 - 跨平台：支持安卓手机和Windows用户
 - 分享功能：支持分享给朋友
 
-## 在线访问
+## 部署方案（国内用户推荐）
 
-部署后访问地址：[你的网站地址]
+### 方案1：Vercel（推荐，国内访问快）
 
-## 快速部署到Netlify（推荐）
-
-### 方法一：拖拽部署（最简单）
-
-1. 访问 https://app.netlify.com/drop
-2. 登录或注册账号
-3. 将整个 `free-video-streaming` 文件夹拖拽到页面上
-4. 等待部署完成，获得访问地址
+1. 访问 https://vercel.com 并使用GitHub登录
+2. 点击 "New Project"
+3. 导入GitHub仓库或直接上传文件夹
+4. 自动部署并获得访问地址（如 `https://xxx.vercel.app`）
 5. 将地址分享给朋友
 
-### 方法二：使用Netlify CLI
+**优点：** 免费、国内有CDN、访问速度快、支持自定义域名
 
-```bash
-# 安装Netlify CLI
-npm install -g netlify-cli
+### 方案2：GitHub Pages（国内访问稳定）
 
-# 登录
-netlify login
-
-# 部署
-netlify deploy --prod --dir=free-video-streaming
-```
-
-## 快速部署到GitHub Pages
-
-1. 创建GitHub账号
+1. 访问 https://github.com 并登录
 2. 创建新仓库，命名为 `free-video-streaming`
 3. 上传所有文件
-4. 在仓库设置中启用GitHub Pages
+4. 在仓库 Settings > Pages 中启用
 5. 访问 `https://你的用户名.github.io/free-video-streaming`
 
-## 快速部署到Vercel
+**优点：** 免费、稳定、国内可访问
 
-1. 访问 https://vercel.com
+### 方案3：Gitee Pages（国内平台，速度最快）
+
+1. 访问 https://gitee.com 并注册账号（需实名认证）
+2. 创建新仓库，命名为 `free-video-streaming`
+3. 上传所有文件
+4. 在仓库设置中启用 Gitee Pages
+5. 访问 `https://你的用户名.gitee.io/free-video-streaming`
+
+**优点：** 国内平台、速度最快、免费
+
+### 方案4：Cloudflare Pages（国内有CDN）
+
+1. 访问 https://pages.cloudflare.com
 2. 使用GitHub登录
-3. 导入仓库
-4. 自动部署并获得访问地址
+3. 选择仓库并部署
+4. 获得访问地址（如 `https://xxx.pages.dev`）
 
-## 本地使用
+**优点：** 免费、全球CDN、国内访问快
+
+## 快速部署
 
 ### Windows用户：
 ```bash
-# 双击 start.bat
+# 双击 deploy.bat
 ```
 
 ### Mac/Linux用户：
 ```bash
+chmod +x deploy.sh
+./deploy.sh
+```
+
+## 本地使用
+
+### 启动本地服务器：
+```bash
+# Windows用户：双击 start.bat
+# Mac/Linux用户：
 python3 proxy.py
 ```
 
@@ -87,6 +96,10 @@ free-video-streaming/
 ├── proxy.py            # 本地代理服务器
 ├── start.bat           # Windows启动脚本
 ├── start.sh            # Mac/Linux启动脚本
+├── deploy.bat          # Windows部署脚本
+├── deploy.sh           # Mac/Linux部署脚本
+├── netlify.toml        # Netlify配置
+├── vercel.json         # Vercel配置
 ├── README.md           # 项目说明
 ├── css/                # 样式文件
 ├── js/                 # JavaScript文件
