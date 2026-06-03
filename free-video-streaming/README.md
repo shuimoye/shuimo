@@ -10,60 +10,74 @@
 - 跨平台：支持安卓手机和Windows用户
 - 分享功能：支持分享给朋友
 
-## 快速开始
+## 在线访问
 
-### 方法一：使用本地代理服务器（推荐）
+部署后访问地址：[你的网站地址]
 
-本地代理服务器可以解决跨域问题，提供更好的使用体验。
+## 快速部署到Netlify（推荐）
 
-#### Windows用户：
-1. 确保已安装Python 3.x
-2. 双击运行 `start.bat`
-3. 在浏览器中访问：http://localhost:8080
+### 方法一：拖拽部署（最简单）
 
-#### Mac/Linux用户：
-1. 确保已安装Python 3.x
-2. 打开终端，进入项目目录
-3. 运行：`chmod +x start.sh && ./start.sh`
-4. 在浏览器中访问：http://localhost:8080
+1. 访问 https://app.netlify.com/drop
+2. 登录或注册账号
+3. 将整个 `free-video-streaming` 文件夹拖拽到页面上
+4. 等待部署完成，获得访问地址
+5. 将地址分享给朋友
 
-#### 手动启动：
+### 方法二：使用Netlify CLI
+
 ```bash
-# 进入项目目录
-cd free-video-streaming
+# 安装Netlify CLI
+npm install -g netlify-cli
 
-# 启动代理服务器
-python proxy.py
+# 登录
+netlify login
 
-# 或者使用Python 3
+# 部署
+netlify deploy --prod --dir=free-video-streaming
+```
+
+## 快速部署到GitHub Pages
+
+1. 创建GitHub账号
+2. 创建新仓库，命名为 `free-video-streaming`
+3. 上传所有文件
+4. 在仓库设置中启用GitHub Pages
+5. 访问 `https://你的用户名.github.io/free-video-streaming`
+
+## 快速部署到Vercel
+
+1. 访问 https://vercel.com
+2. 使用GitHub登录
+3. 导入仓库
+4. 自动部署并获得访问地址
+
+## 本地使用
+
+### Windows用户：
+```bash
+# 双击 start.bat
+```
+
+### Mac/Linux用户：
+```bash
 python3 proxy.py
 ```
 
-### 方法二：直接打开HTML文件
-
-1. 双击打开 `index.html` 文件
-2. 注意：此方法可能遇到跨域问题，部分功能可能无法正常使用
+然后访问 http://localhost:8080
 
 ## 使用说明
 
-1. 在搜索框中输入视频名称（如：电影名、电视剧名、动漫名）
-2. 点击搜索按钮或按回车键
+1. 在搜索框中输入视频名称
+2. 点击搜索按钮
 3. 从搜索结果中选择要观看的视频
 4. 选择剧集开始播放
-5. 可以下载或分享给朋友
 
 ## 支持的视频源
 
 - 黑木耳资源
 - 非凡资源
 - 红牛资源
-
-## 技术栈
-
-- HTML5
-- CSS3
-- JavaScript (原生)
-- Python (本地代理服务器)
 
 ## 项目结构
 
@@ -74,32 +88,18 @@ free-video-streaming/
 ├── start.bat           # Windows启动脚本
 ├── start.sh            # Mac/Linux启动脚本
 ├── README.md           # 项目说明
-├── css/
-│   ├── style.css       # 主样式
-│   └── responsive.css  # 响应式样式
-├── js/
-│   ├── app.js          # 应用入口
-│   ├── modules/        # 功能模块
-│   └── utils/          # 工具函数
-└── assets/
-    └── images/         # 图片资源
+├── css/                # 样式文件
+├── js/                 # JavaScript文件
+└── assets/             # 资源文件
 ```
 
 ## 免责声明
 
 本应用仅供学习交流使用，所有视频资源均来自互联网，本站不存储任何视频内容。请勿将本应用用于商业用途，如有侵权请联系删除。
 
-## 常见问题
+## 技术栈
 
-### Q: 为什么搜索不到内容？
-A: 可能是跨域问题，请使用本地代理服务器启动项目。
-
-### Q: 视频无法播放？
-A: 请检查网络连接，或者尝试其他视频源。
-
-### Q: 如何下载视频？
-A: 在视频详情页面点击下载按钮即可。
-
-## 许可证
-
-仅供学习使用，请勿用于商业用途。
+- HTML5
+- CSS3
+- JavaScript (原生)
+- Python (本地代理服务器)

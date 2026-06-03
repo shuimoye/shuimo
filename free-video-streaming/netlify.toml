@@ -1,0 +1,19 @@
+# Netlify配置文件
+
+# 构建设置
+[build]
+  publish = "."
+
+# 重定向规则
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# 自定义头部
+[[headers]]
+  for = "/*"
+  [headers.values]
+    Access-Control-Allow-Origin = "*"
+    Access-Control-Allow-Methods = "GET, POST, OPTIONS"
+    Access-Control-Allow-Headers = "Content-Type"
