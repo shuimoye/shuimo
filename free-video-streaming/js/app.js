@@ -270,7 +270,7 @@ function generateEpisodeButtons(video) {
  * 播放指定剧集
  * @param {number} episodeIndex - 剧集索引
  */
-async function playEpisode(episodeIndex) {
+function playEpisode(episodeIndex) {
     if (!AppState.currentVideo) return;
     
     const video = AppState.currentVideo;
@@ -286,49 +286,8 @@ async function playEpisode(episodeIndex) {
             btn.classList.toggle('active', index === episodeIndex);
         });
         
-        // 显示加载提示
-        const playerContainer = document.getElementById('videoPlayer');
-        if (playerContainer) {
-            const loadingDiv = document.createElement('div');
-            loadingDiv.id = 'videoLoading';
-            loadingDiv.style.cssText = `
-                position: absolute;
-                top: 50%;
-                left: 50%;
-                transform: translate(-50%, -50%);
-                background: rgba(0,0,0,0.8);
-                color: white;
-                padding: 20px;
-                border-radius: 8px;
-                text-align: center;
-                z-index: 10;
-            `;
-            loadingDiv.textContent = '正在解析视频地址...';
-            playerContainer.style.position = 'relative';
-            playerContainer.appendChild(loadingDiv);
-        }
-        
-        try {
-            // 获取真实的视频地址
-            const realUrl = await searchModule.getRealVideoUrl(episode.url);
-            console.log(`真实视频地址: ${realUrl}`);
-            
-            // 移除加载提示
-            const loadingEl = document.getElementById('videoLoading');
-            if (loadingEl) loadingEl.remove();
-            
-            // 播放视频
-            playerModule.play(realUrl);
-        } catch (error) {
-            console.error('解析视频地址失败:', error);
-            
-            // 移除加载提示
-            const loadingEl = document.getElementById('videoLoading');
-            if (loadingEl) loadingEl.remove();
-            
-            // 尝试直接播放
-            playerModule.play(episode.url);
-        }
+        // 直接使用iframe嵌入播放页面
+        playerModule.play(episode.url);
     }
 }
 
