@@ -2,6 +2,51 @@
 
 一个免费观看网上影视剧的单机网页应用，仅供学习使用。
 
+## 最简单的部署方法
+
+### 方法1：Tiiny.host（最简单，无需注册）
+
+1. 把 `free-video-streaming` 文件夹压缩成zip文件
+2. 访问 https://tiiny.host
+3. 上传zip文件
+4. 获得访问地址
+5. 分享给朋友
+
+**优点：** 无需注册、一键上传、国内可访问
+
+### 方法2：Netlify Drop（拖拽即可）
+
+1. 访问 https://app.netlify.com/drop
+2. 把 `free-video-streaming` 文件夹拖拽到页面上
+3. 获得访问地址
+4. 分享给朋友
+
+**优点：** 无需注册、拖拽即可
+
+### 方法3：Surge.sh（命令行一行部署）
+
+```bash
+# 安装surge
+npm install -g surge
+
+# 进入项目目录
+cd free-video-streaming
+
+# 一行命令部署
+surge
+```
+
+**优点：** 命令行部署、快速
+
+### 方法4：Vercel（国内访问最快）
+
+1. 访问 https://vercel.com 并用GitHub登录
+2. 点击 "New Project"
+3. 上传文件夹
+4. 自动部署
+
+**优点：** 国内有CDN、访问最快
+
 ## 功能特性
 
 - 视频搜索：搜索多个免费视频资源网站
@@ -10,47 +55,15 @@
 - 跨平台：支持安卓手机和Windows用户
 - 分享功能：支持分享给朋友
 
-## 部署方案
-
-### 方案1：Vercel（推荐，国内访问快且稳定）
-
-1. 访问 https://vercel.com 并使用GitHub登录
-2. 点击 "New Project"
-3. 导入GitHub仓库或直接上传文件夹
-4. 自动部署并获得访问地址（如 `https://xxx.vercel.app`）
-5. 将地址分享给朋友
-
-**优点：** 免费、国内有CDN、访问速度快、稳定
-
-### 方案2：GitHub Pages（国内可访问）
-
-1. 访问 https://github.com 并登录
-2. 创建新仓库，命名为 `free-video-streaming`
-3. 上传所有文件
-4. 在仓库 Settings > Pages 中启用
-5. 访问 `https://你的用户名.github.io/free-video-streaming`
-
-**优点：** 免费、国内可访问、稳定
-
-## 快速部署
+## 本地使用
 
 ### Windows用户：
 ```bash
-# 双击 deploy.bat
+# 双击 start.bat
 ```
 
 ### Mac/Linux用户：
 ```bash
-chmod +x deploy.sh
-./deploy.sh
-```
-
-## 本地使用
-
-### 启动本地服务器：
-```bash
-# Windows用户：双击 start.bat
-# Mac/Linux用户：
 python3 proxy.py
 ```
 
@@ -69,30 +82,6 @@ python3 proxy.py
 - 非凡资源
 - 红牛资源
 
-## 项目结构
-
-```
-free-video-streaming/
-├── index.html          # 主页面
-├── proxy.py            # 本地代理服务器
-├── start.bat           # Windows启动脚本
-├── start.sh            # Mac/Linux启动脚本
-├── deploy.bat          # Windows部署脚本
-├── deploy.sh           # Mac/Linux部署脚本
-├── vercel.json         # Vercel配置
-├── README.md           # 项目说明
-├── css/                # 样式文件
-├── js/                 # JavaScript文件
-└── assets/             # 资源文件
-```
-
 ## 免责声明
 
 本应用仅供学习交流使用，所有视频资源均来自互联网，本站不存储任何视频内容。请勿将本应用用于商业用途，如有侵权请联系删除。
-
-## 技术栈
-
-- HTML5
-- CSS3
-- JavaScript (原生)
-- Python (本地代理服务器)
