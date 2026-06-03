@@ -244,29 +244,44 @@ class PlayerModule {
      * @param {HTMLElement} container - 容器
      */
     addControlButtons(container) {
+        // 移除已有的控制按钮
+        const existingBtns = container.querySelector('.custom-controls');
+        if (existingBtns) {
+            existingBtns.remove();
+        }
+        
         const buttonContainer = document.createElement('div');
+        buttonContainer.className = 'custom-controls';
         buttonContainer.style.cssText = `
             position: absolute;
             top: 10px;
             right: 10px;
-            z-index: 10;
+            z-index: 99999;
             display: flex;
             gap: 8px;
+            pointer-events: auto;
         `;
         
         // 全屏按钮
         const fullscreenBtn = document.createElement('button');
         fullscreenBtn.innerHTML = '⛶';
         fullscreenBtn.style.cssText = `
-            background: rgba(0,0,0,0.5);
+            background: rgba(0,0,0,0.7);
             color: white;
-            border: none;
+            border: 2px solid rgba(255,255,255,0.3);
             border-radius: 4px;
             padding: 8px 12px;
             cursor: pointer;
             font-size: 18px;
+            pointer-events: auto;
+            position: relative;
+            z-index: 99999;
         `;
-        fullscreenBtn.onclick = () => this.toggleFullscreen();
+        fullscreenBtn.onclick = (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            this.toggleFullscreen();
+        };
         buttonContainer.appendChild(fullscreenBtn);
         
         // 切换源按钮
@@ -274,15 +289,22 @@ class PlayerModule {
             const switchBtn = document.createElement('button');
             switchBtn.innerHTML = '切换源';
             switchBtn.style.cssText = `
-                background: rgba(0,0,0,0.5);
+                background: rgba(0,0,0,0.7);
                 color: white;
-                border: none;
+                border: 2px solid rgba(255,255,255,0.3);
                 border-radius: 4px;
                 padding: 8px 12px;
                 cursor: pointer;
                 font-size: 14px;
+                pointer-events: auto;
+                position: relative;
+                z-index: 99999;
             `;
-            switchBtn.onclick = () => this.switchToNextSource();
+            switchBtn.onclick = (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                this.switchToNextSource();
+            };
             buttonContainer.appendChild(switchBtn);
         }
         

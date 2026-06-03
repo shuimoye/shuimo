@@ -214,6 +214,47 @@ a:hover {
     height: 100% !important;
 }
 
+/* DPlayer控制栏可点击 */
+.dplayer-controller {
+    z-index: 100 !important;
+    pointer-events: auto !important;
+}
+
+.dplayer-bar-wrap {
+    pointer-events: auto !important;
+}
+
+.dplayer-icons {
+    pointer-events: auto !important;
+}
+
+/* 自定义控制按钮 */
+.custom-controls {
+    z-index: 99999 !important;
+    pointer-events: auto !important;
+}
+
+.custom-controls button {
+    pointer-events: auto !important;
+    position: relative !important;
+    z-index: 99999 !important;
+}
+
+/* 确保DPlayer容器不阻挡点击 */
+#dplayer {
+    position: relative !important;
+}
+
+#playerContainer {
+    position: relative !important;
+    z-index: 1 !important;
+}
+
+.video-player {
+    position: relative !important;
+    z-index: 1 !important;
+}
+
 /* 播放器容器 */
 #playerContainer {
     width: 100%;
