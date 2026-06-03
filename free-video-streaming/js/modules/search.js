@@ -225,25 +225,35 @@ class SearchModule {
                 // 分割不同播放源
                 const sources = playUrl.split('$$$');
                 
-                if (sources.length > 0) {
-                    // 使用第一个播放源
-                    const episodesStr = sources[0];
+                // 遍历所有播放源，找到可用的
+                for (let sourceIndex = 0; sourceIndex < sources.length; sourceIndex++) {
+                    const episodesStr = sources[sourceIndex];
                     const episodeList = episodesStr.split('#');
+                    
+                    const sourceEpisodes = [];
                     
                     episodeList.forEach((ep, index) => {
                         const parts = ep.split('$');
                         if (parts.length >= 2) {
-                            episodes.push({
+                            sourceEpisodes.push({
                                 name: parts[0] || `第${index + 1}集`,
-                                url: parts[1]
+                                url: parts[1],
+                                sourceIndex: sourceIndex
                             });
                         } else if (parts.length === 1 && parts[0]) {
-                            episodes.push({
+                            sourceEpisodes.push({
                                 name: `第${index + 1}集`,
-                                url: parts[0]
+                                url: parts[0],
+                                sourceIndex: sourceIndex
                             });
                         }
                     });
+                    
+                    // 如果这个播放源有内容，添加到结果中
+                    if (sourceEpisodes.length > 0) {
+                        episodes.push(...sourceEpisodes);
+                        break; // 使用第一个可用的播放源
+                    }
                 }
             }
         } catch (error) {
@@ -251,6 +261,83 @@ class SearchModule {
         }
         
         return episodes;
+    }
+    
+    /**
+     * 获取真实的视频播放地址
+     * @param {string} url - 播放页面URL
+     * @returns {Promise<string>} 真实的视频URL
+     */
+    async getRealVideoUrl(url) {
+        try {
+            // 如果已经是视频文件链接，直接返回
+            if (this.isVideoFileUrl(url)) {
+                return url;
+            }
+            
+            // 尝试从播放页面提取视频URL
+            const response = await corsModule.fetchWithCORS(url);
+            const html = await response.text();
+            
+            // 尝试多种方式提取视频URL
+            let videoUrl = null;
+            
+            // 方法1: 查找m3u8链接
+            const m3u8Match = html.match(/https?:\/\/[^"'\s]+\.m3u8[^"'\s]*/);
+            if (m3u8Match) {
+                videoUrl = m3u8Match[0];
+            }
+            
+            // 方法2: 查找mp4链接
+            if (!videoUrl) {
+                const mp4Match = html.match(/https?:\/\/[^"'\s]+\.mp4[^"'\s]*/);
+                if (mp4Match) {
+                    videoUrl = mp4Match[0];
+                }
+            }
+            
+            // 方法3: 查找video标签的src
+            if (!videoUrl) {
+                const videoSrcMatch = html.match(/<video[^>]+src=["']([^"']+)["']/);
+                if (videoSrcMatch) {
+                    videoUrl = videoSrcMatch[1];
+                }
+            }
+            
+            // 方法4: 查找source标签的src
+            if (!videoUrl) {
+                const sourceSrcMatch = html.match(/<source[^>]+src=["']([^"']+)["']/);
+                if (sourceSrcMatch) {
+                    videoUrl = sourceSrcMatch[1];
+                }
+            }
+            
+            // 方法5: 查找player相关的配置
+            if (!videoUrl) {
+                const playerConfigMatch = html.match(/(?:url|src|file)\s*[:=]\s*["']([^"']+\.(?:m3u8|mp4|flv)[^"']*)["']/);
+                if (playerConfigMatch) {
+                    videoUrl = playerConfigMatch[1];
+                }
+            }
+            
+            return videoUrl || url;
+            
+        } catch (error) {
+            console.error('获取真实视频地址失败:', error);
+            return url;
+        }
+    }
+    
+    /**
+     * 检查是否是视频文件URL
+     * @param {string} url - URL
+     * @returns {boolean} 是否是视频文件
+     */
+    isVideoFileUrl(url) {
+        if (!url) return false;
+        const videoExtensions = ['.m3u8', '.mp4', '.flv', '.ts', '.avi', '.mkv', '.webm'];
+        const lowerUrl = url.toLowerCase();
+        return videoExtensions.some(ext => lowerUrl.includes(ext));
     }
     
     /**
