@@ -185,6 +185,35 @@ a:hover {
     min-height: 400px;
 }
 
+/* DPlayer全屏样式 */
+.dplayer-full {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    z-index: 9999 !important;
+    border-radius: 0 !important;
+}
+
+.dplayer-full #dplayer {
+    width: 100% !important;
+    height: 100% !important;
+    min-height: auto !important;
+}
+
+/* DPlayer视频填充 */
+.dplayer-video {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: contain !important;
+}
+
+.dplayer-video-wrap {
+    width: 100% !important;
+    height: 100% !important;
+}
+
 /* 播放器容器 */
 #playerContainer {
     width: 100%;

@@ -116,6 +116,8 @@ class PlayerModule {
             preload: 'auto',
             volume: 0.7,
             mutex: true,
+            fullscreen: true,
+            fullscreenWeb: true,
             video: {
                 url: videoUrl,
                 type: videoType,
