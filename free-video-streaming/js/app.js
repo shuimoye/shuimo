@@ -340,6 +340,25 @@ function playEpisode(episodeIndex) {
         
         // 播放视频
         playerModule.play(episode.url, allSources, playMode);
+        
+        // 如果有多个源，添加切换源按钮
+        if (video.allSources && video.allSources.length > 1) {
+            const playerContainer = document.getElementById('playerContainer');
+            if (playerContainer) {
+                // 移除已有的切换源按钮
+                const existingBtn = playerContainer.querySelector('.switch-source-btn');
+                if (existingBtn) {
+                    existingBtn.remove();
+                }
+                
+                // 创建切换源按钮
+                const switchBtn = document.createElement('button');
+                switchBtn.className = 'switch-source-btn';
+                switchBtn.textContent = '切换源';
+                switchBtn.onclick = () => switchVideoSource();
+                playerContainer.appendChild(switchBtn);
+            }
+        }
     }
 }
 
@@ -364,10 +383,33 @@ function backToSearch() {
 }
 
 /**
- * 切换视频源
+ * 切换视频源（下一个源）
+ */
+function switchVideoSource() {
+    if (!AppState.currentVideo || !AppState.currentVideo.allSources) return;
+    
+    const sources = AppState.currentVideo.allSources;
+    if (sources.length <= 1) return;
+    
+    // 找到当前源的索引
+    let currentIndex = 0;
+    const currentEpisodes = AppState.currentVideo.episodes;
+    if (currentEpisodes && currentEpisodes.length > 0) {
+        const currentSourceIndex = currentEpisodes[0].sourceIndex;
+        currentIndex = sources.findIndex(s => s.index === currentSourceIndex);
+        if (currentIndex === -1) currentIndex = 0;
+    }
+    
+    // 切换到下一个源
+    const nextIndex = (currentIndex + 1) % sources.length;
+    switchVideoSourceByIndex(nextIndex);
+}
+
+/**
+ * 切换到指定索引的视频源
  * @param {number} sourceIndex - 源索引
  */
-function switchVideoSource(sourceIndex) {
+function switchVideoSourceByIndex(sourceIndex) {
     if (!AppState.currentVideo || !AppState.currentVideo.allSources) return;
     
     const source = AppState.currentVideo.allSources[sourceIndex];

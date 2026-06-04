@@ -163,103 +163,8 @@ a:hover {
     margin-bottom: 16px;
     position: relative;
     width: 100%;
-    min-height: 400px;
-}
-
-.video-player video,
-.video-player iframe {
-    width: 100%;
-    height: 400px;
-    border: none;
-    display: block;
-}
-
-.video-player video {
-    max-height: 70vh;
-}
-
-/* DPlayer容器 */
-#dplayer {
-    width: 100%;
-    height: 100%;
-    min-height: 400px;
-}
-
-/* DPlayer全屏样式 */
-.dplayer-full {
-    position: fixed !important;
-    top: 0 !important;
-    left: 0 !important;
-    width: 100vw !important;
-    height: 100vh !important;
-    z-index: 9999 !important;
-    border-radius: 0 !important;
-}
-
-.dplayer-full #dplayer {
-    width: 100% !important;
-    height: 100% !important;
-    min-height: auto !important;
-}
-
-/* DPlayer视频填充 */
-.dplayer-video {
-    width: 100% !important;
-    height: 100% !important;
-    object-fit: contain !important;
-}
-
-.dplayer-video-wrap {
-    width: 100% !important;
-    height: 100% !important;
-}
-
-/* DPlayer控制栏可点击 */
-.dplayer-controller {
-    z-index: 100 !important;
-    pointer-events: auto !important;
-}
-
-.dplayer-bar-wrap {
-    pointer-events: auto !important;
-}
-
-.dplayer-icons {
-    pointer-events: auto !important;
-}
-
-/* 自定义控制按钮 */
-.custom-controls {
-    z-index: 99999 !important;
-    pointer-events: auto !important;
-}
-
-.custom-controls button {
-    pointer-events: auto !important;
-    position: relative !important;
-    z-index: 99999 !important;
-}
-
-/* 确保DPlayer容器不阻挡点击 */
-#dplayer {
-    position: relative !important;
-}
-
-#playerContainer {
-    position: relative !important;
-    z-index: 1 !important;
-}
-
-.video-player {
-    position: relative !important;
-    z-index: 1 !important;
-}
-
-/* 播放器容器 */
-#playerContainer {
-    width: 100%;
-    height: 100%;
-    min-height: 400px;
+    height: 0;
+    padding-bottom: 56.25%; /* 16:9 宽高比 */
 }
 
 /* 播放控制栏 */
@@ -588,4 +493,60 @@ a:hover {
 .empty-icon {
     font-size: 48px;
     margin-bottom: 12px;
+}
+
+/* 播放器容器 */
+#playerContainer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+/* DPlayer容器 */
+#dplayer {
+    width: 100%;
+    height: 100%;
+}
+
+/* DPlayer视频样式 */
+.dplayer-video {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.dplayer-video-wrap {
+    width: 100%;
+    height: 100%;
+}
+
+/* DPlayer控制栏 */
+.dplayer-controller {
+    display: flex;
+    align-items: center;
+}
+
+.dplayer-bar-wrap {
+    flex: 1;
+}
+
+/* 切换源按钮 */
+.switch-source-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 10;
+    background: rgba(0, 0, 0, 0.7);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 8px 16px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.switch-source-btn:hover {
+    background: rgba(0, 0, 0, 0.9);
 }

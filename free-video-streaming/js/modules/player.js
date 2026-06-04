@@ -1,6 +1,6 @@
 /**
  * 播放模块
- * 支持iframe嵌入和DPlayer直接播放
+ * 使用DPlayer播放器，提供更好的播放体验
  */
 
 class PlayerModule {
@@ -68,9 +68,6 @@ class PlayerModule {
             this.playWithIframe(videoUrl, playerContainer);
         }
         
-        // 添加控制按钮
-        this.addControlButtons(playerContainer);
-        
         this.isPlaying = true;
     }
     
@@ -101,8 +98,13 @@ class PlayerModule {
         // 创建DPlayer容器
         const dpContainer = document.createElement('div');
         dpContainer.id = 'dplayer';
-        dpContainer.style.width = '100%';
-        dpContainer.style.height = '100%';
+        dpContainer.style.cssText = `
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+        `;
         container.appendChild(dpContainer);
         
         // 创建DPlayer实例
@@ -116,8 +118,6 @@ class PlayerModule {
             preload: 'auto',
             volume: 0.7,
             mutex: true,
-            fullscreen: true,
-            fullscreenWeb: true,
             video: {
                 url: videoUrl,
                 type: videoType,
@@ -182,6 +182,9 @@ class PlayerModule {
             height: 100%;
             border: none;
             background: #000;
+            position: absolute;
+            top: 0;
+            left: 0;
         `;
         iframe.src = pageUrl;
         iframe.allowFullscreen = true;
@@ -237,78 +240,6 @@ class PlayerModule {
         console.log(`切换到源 ${this.currentSourceIndex + 1}: ${newUrl}`);
         
         this.play(newUrl, this.sources, this.playMode);
-    }
-    
-    /**
-     * 添加控制按钮
-     * @param {HTMLElement} container - 容器
-     */
-    addControlButtons(container) {
-        // 移除已有的控制按钮
-        const existingBtns = container.querySelector('.custom-controls');
-        if (existingBtns) {
-            existingBtns.remove();
-        }
-        
-        const buttonContainer = document.createElement('div');
-        buttonContainer.className = 'custom-controls';
-        buttonContainer.style.cssText = `
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            z-index: 99999;
-            display: flex;
-            gap: 8px;
-            pointer-events: auto;
-        `;
-        
-        // 全屏按钮
-        const fullscreenBtn = document.createElement('button');
-        fullscreenBtn.innerHTML = '⛶';
-        fullscreenBtn.style.cssText = `
-            background: rgba(0,0,0,0.7);
-            color: white;
-            border: 2px solid rgba(255,255,255,0.3);
-            border-radius: 4px;
-            padding: 8px 12px;
-            cursor: pointer;
-            font-size: 18px;
-            pointer-events: auto;
-            position: relative;
-            z-index: 99999;
-        `;
-        fullscreenBtn.onclick = (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            this.toggleFullscreen();
-        };
-        buttonContainer.appendChild(fullscreenBtn);
-        
-        // 切换源按钮
-        if (this.sources.length > 1) {
-            const switchBtn = document.createElement('button');
-            switchBtn.innerHTML = '切换源';
-            switchBtn.style.cssText = `
-                background: rgba(0,0,0,0.7);
-                color: white;
-                border: 2px solid rgba(255,255,255,0.3);
-                border-radius: 4px;
-                padding: 8px 12px;
-                cursor: pointer;
-                font-size: 14px;
-                pointer-events: auto;
-                position: relative;
-                z-index: 99999;
-            `;
-            switchBtn.onclick = (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                this.switchToNextSource();
-            };
-            buttonContainer.appendChild(switchBtn);
-        }
-        
-        container.appendChild(buttonContainer);
     }
     
     /**
