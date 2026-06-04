@@ -510,28 +510,6 @@ a:hover {
     height: 100%;
 }
 
-/* DPlayer视频样式 */
-.dplayer-video {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-}
-
-.dplayer-video-wrap {
-    width: 100%;
-    height: 100%;
-}
-
-/* DPlayer控制栏 */
-.dplayer-controller {
-    display: flex;
-    align-items: center;
-}
-
-.dplayer-bar-wrap {
-    flex: 1;
-}
-
 /* 切换源按钮 */
 .switch-source-btn {
     position: absolute;
