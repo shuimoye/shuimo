@@ -163,8 +163,8 @@ a:hover {
     margin-bottom: 16px;
     position: relative;
     width: 100%;
-    height: 0;
-    padding-bottom: 56.25%; /* 16:9 宽高比 */
+    height: 500px;
+    min-height: 400px;
 }
 
 /* 播放控制栏 */
