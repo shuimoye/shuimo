@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DPlayer测试</title>
+    <link rel="stylesheet" href="lib/DPlayer.min.css">
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            background: #f0f0f0;
+        }
+        #player {
+            width: 800px;
+            height: 450px;
+            margin: 0 auto;
+            background: #000;
+        }
+    </style>
+</head>
+<body>
+    <h1 style="text-align: center;">DPlayer测试页面</h1>
+    <div id="player"></div>
+    
+    <script src="lib/hls.min.js"></script>
+    <script src="lib/DPlayer.min.js"></script>
+    <script>
+        const dp = new DPlayer({
+            container: document.getElementById('player'),
+            autoplay: true,
+            video: {
+                url: 'https://hn.bfvvs.com/play/PdyOwq6a/index.m3u8',
+                type: 'customHls',
+                customType: {
+                    customHls: function(video, player) {
+                        if (Hls.isSupported()) {
+                            const hls = new Hls();
+                            hls.loadSource(video.src);
+                            hls.attachMedia(video);
+                            hls.on(Hls.Events.MANIFEST_PARSED, function() {
+                                video.play();
+                            });
+                        }
+                    }
+                }
+            }
+        });
+        
+        dp.on('playing', function() {
+            console.log('视频开始播放');
+        });
+        
+        dp.on('error', function(e) {
+            console.error('播放错误:', e);
+        });
+    </script>
+</body>
+</html>
