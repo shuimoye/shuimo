@@ -22,17 +22,6 @@ class PlayerModule {
         this.container = container;
         container.innerHTML = '';
         
-        // 创建播放器容器
-        const playerContainer = document.createElement('div');
-        playerContainer.id = 'playerContainer';
-        playerContainer.style.cssText = `
-            width: 100%;
-            height: 100%;
-            position: relative;
-            background: #000;
-        `;
-        container.appendChild(playerContainer);
-        
         console.log('播放器初始化完成');
     }
     
@@ -54,18 +43,15 @@ class PlayerModule {
         this.currentSourceIndex = 0;
         this.playMode = mode;
         
-        const playerContainer = document.getElementById('playerContainer');
-        if (!playerContainer) return;
-        
         // 清空容器
-        playerContainer.innerHTML = '';
+        this.container.innerHTML = '';
         
         if (mode === 'dplayer' && this.isDirectVideoUrl(videoUrl)) {
             // 使用DPlayer直接播放
-            this.playWithDPlayer(videoUrl, playerContainer);
+            this.playWithDPlayer(videoUrl, this.container);
         } else {
             // 使用iframe嵌入
-            this.playWithIframe(videoUrl, playerContainer);
+            this.playWithIframe(videoUrl, this.container);
         }
         
         this.isPlaying = true;
@@ -98,13 +84,6 @@ class PlayerModule {
         // 创建DPlayer容器
         const dpContainer = document.createElement('div');
         dpContainer.id = 'dplayer';
-        dpContainer.style.cssText = `
-            width: 100%;
-            height: 100%;
-            position: absolute;
-            top: 0;
-            left: 0;
-        `;
         container.appendChild(dpContainer);
         
         // 创建DPlayer实例
@@ -151,9 +130,6 @@ class PlayerModule {
             height: 100%;
             border: none;
             background: #000;
-            position: absolute;
-            top: 0;
-            left: 0;
         `;
         iframe.src = pageUrl;
         iframe.allowFullscreen = true;

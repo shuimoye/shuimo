@@ -340,25 +340,6 @@ function playEpisode(episodeIndex) {
         
         // 播放视频
         playerModule.play(episode.url, allSources, playMode);
-        
-        // 如果有多个源，添加切换源按钮
-        if (video.allSources && video.allSources.length > 1) {
-            const playerContainer = document.getElementById('playerContainer');
-            if (playerContainer) {
-                // 移除已有的切换源按钮
-                const existingBtn = playerContainer.querySelector('.switch-source-btn');
-                if (existingBtn) {
-                    existingBtn.remove();
-                }
-                
-                // 创建切换源按钮
-                const switchBtn = document.createElement('button');
-                switchBtn.className = 'switch-source-btn';
-                switchBtn.textContent = '切换源';
-                switchBtn.onclick = () => switchVideoSource();
-                playerContainer.appendChild(switchBtn);
-            }
-        }
     }
 }
 
