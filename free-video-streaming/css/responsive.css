@@ -43,28 +43,8 @@
     }
     
     /* 视频播放器 */
-    .video-player video {
-        max-height: 50vh;
-    }
-    
-    /* 播放控制栏 */
-    .player-controls {
-        padding: 8px 12px;
-        gap: 8px;
-    }
-    
-    .control-btn {
-        font-size: 18px;
-        padding: 4px 6px;
-    }
-    
-    .time-display {
-        font-size: 12px;
-        min-width: 80px;
-    }
-    
-    .volume-control {
-        display: none;
+    .video-player {
+        height: 300px;
     }
     
     /* 视频详情 */
@@ -131,6 +111,11 @@
     .video-title {
         font-size: 15px;
     }
+    
+    /* 视频播放器 */
+    .video-player {
+        height: 400px;
+    }
 }
 
 /* 大屏幕设备 (桌面, 1024px以上) */
@@ -140,23 +125,13 @@
         grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
         gap: 16px;
     }
-    
-    /* 视频播放器 */
-    .video-player video {
-        max-height: 70vh;
-    }
 }
 
 /* 横屏模式 */
 @media screen and (orientation: landscape) {
     /* 视频播放器全屏 */
-    .video-player video {
-        max-height: 80vh;
-    }
-    
-    /* 播放控制栏 */
-    .player-controls {
-        padding: 12px 24px;
+    .video-player {
+        height: 70vh;
     }
 }
 
@@ -169,10 +144,6 @@
 /* 触摸设备优化 */
 @media (hover: none) and (pointer: coarse) {
     /* 增大触摸目标 */
-    .control-btn {
-        padding: 8px 12px;
-    }
-    
     .episode-btn {
         padding: 10px 16px;
     }
@@ -196,14 +167,9 @@
 @media print {
     .app-header,
     .app-footer,
-    .player-controls,
     .download-section,
     .share-section {
         display: none;
-    }
-    
-    .video-player video {
-        max-height: 300px;
     }
 }
 
@@ -274,7 +240,6 @@
         border: 2px solid #333;
     }
     
-    .control-btn,
     .episode-btn,
     .download-btn,
     .share-btn {
