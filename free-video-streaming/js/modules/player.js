@@ -92,8 +92,8 @@ class PlayerModule {
      * @param {HTMLElement} container - 容器
      */
     playWithDPlayer(videoUrl, container) {
-        // 检测视频类型
-        const videoType = this.getVideoType(videoUrl);
+        // 获取视频配置
+        const videoConfig = this.getVideoConfig(videoUrl);
         
         // 创建DPlayer容器
         const dpContainer = document.createElement('div');
@@ -120,39 +120,8 @@ class PlayerModule {
             mutex: true,
             video: {
                 url: videoUrl,
-                type: videoType,
-                customType: {
-                    customHls: function(video, player) {
-                        if (Hls.isSupported()) {
-                            const hls = new Hls({
-                                maxBufferLength: 30,
-                                maxMaxBufferLength: 60,
-                                maxBufferSize: 60 * 1000 * 1000,
-                                maxBufferHole: 0.5,
-                                lowLatencyMode: false,
-                                startLevel: -1,
-                                abrEwmaDefaultEstimate: 500000,
-                                abrEwmaFastEstimate: 500000,
-                                abrEwmaSlowEstimate: 500000
-                            });
-                            hls.loadSource(video.src);
-                            hls.attachMedia(video);
-                            hls.on(Hls.Events.ERROR, function(event, data) {
-                                if (data.fatal) {
-                                    console.error('HLS错误:', data);
-                                    if (data.type === Hls.ErrorTypes.NETWORK_ERROR) {
-                                        hls.startLoad();
-                                    } else if (data.type === Hls.ErrorTypes.MEDIA_ERROR) {
-                                        hls.recoverMediaError();
-                                    }
-                                }
-                            });
-                            hls.on(Hls.Events.MANIFEST_PARSED, function() {
-                                video.play();
-                            });
-                        }
-                    }
-                }
+                type: videoConfig.type,
+                customType: videoConfig.customType
             }
         });
         
@@ -207,25 +176,59 @@ class PlayerModule {
     /**
      * 获取视频类型
      * @param {string} url - 视频URL
-     * @returns {string} 视频类型
+     * @returns {Object} 包含type和customType
      */
-    getVideoType(url) {
-        if (!url) return 'auto';
+    getVideoConfig(url) {
+        if (!url) return { type: 'auto', customType: {} };
         
         const lowerUrl = url.toLowerCase();
         
         if (lowerUrl.includes('.m3u8')) {
-            return 'customHls';
+            return {
+                type: 'customHls',
+                customType: {
+                    customHls: function(video, player) {
+                        if (Hls.isSupported()) {
+                            const hls = new Hls({
+                                maxBufferLength: 30,
+                                maxMaxBufferLength: 60,
+                                maxBufferSize: 60 * 1000 * 1000,
+                                maxBufferHole: 0.5,
+                                lowLatencyMode: false,
+                                startLevel: -1,
+                                abrEwmaDefaultEstimate: 500000,
+                                abrEwmaFastEstimate: 500000,
+                                abrEwmaSlowEstimate: 500000
+                            });
+                            hls.loadSource(video.src);
+                            hls.attachMedia(video);
+                            hls.on(Hls.Events.ERROR, function(event, data) {
+                                if (data.fatal) {
+                                    console.error('HLS错误:', data);
+                                    if (data.type === Hls.ErrorTypes.NETWORK_ERROR) {
+                                        hls.startLoad();
+                                    } else if (data.type === Hls.ErrorTypes.MEDIA_ERROR) {
+                                        hls.recoverMediaError();
+                                    }
+                                }
+                            });
+                            hls.on(Hls.Events.MANIFEST_PARSED, function() {
+                                video.play();
+                            });
+                        }
+                    }
+                }
+            };
         } else if (lowerUrl.includes('.mp4')) {
-            return 'auto';
+            return { type: 'auto', customType: {} };
         } else if (lowerUrl.includes('.flv')) {
-            return 'flv';
+            return { type: 'flv', customType: {} };
         } else if (lowerUrl.includes('.webm')) {
-            return 'auto';
+            return { type: 'auto', customType: {} };
         }
         
-        // 默认使用HLS
-        return 'customHls';
+        // 默认使用auto
+        return { type: 'auto', customType: {} };
     }
     
     /**
