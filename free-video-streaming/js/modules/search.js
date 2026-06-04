@@ -11,10 +11,12 @@ class SearchModule {
         this.isLoading = false;
         this.searchHistory = this.loadSearchHistory();
         this.maxHistorySize = 20;
+        this.cache = new Map(); // 搜索缓存
+        this.cacheTime = 5 * 60 * 1000; // 缓存5分钟
     }
     
     /**
-     * 搜索视频
+     * 搜索视频（优化版）
      * @param {string} keyword - 搜索关键词
      * @param {Array} sources - 数据源列表
      * @returns {Promise<Array>} 搜索结果
@@ -22,6 +24,15 @@ class SearchModule {
     async search(keyword, sources = []) {
         if (this.isLoading) {
             console.log('搜索正在进行中...');
+            return this.results;
+        }
+        
+        // 检查缓存
+        const cacheKey = keyword.toLowerCase().trim();
+        const cached = this.cache.get(cacheKey);
+        if (cached && Date.now() - cached.time < this.cacheTime) {
+            console.log(`使用缓存: ${keyword}`);
+            this.results = cached.results;
             return this.results;
         }
         
@@ -38,36 +49,45 @@ class SearchModule {
                 sources = VIDEO_SOURCES.filter(s => s.enabled);
             }
             
-            // 并发搜索所有数据源
-            const searchPromises = sources.map(source => 
-                this.searchFromSource(keyword, source).catch(err => {
+            // 竞速搜索：哪个源先返回就先用
+            const searchPromises = sources.map(async (source) => {
+                try {
+                    const result = await this.searchFromSource(keyword, source);
+                    return { source, result, success: true };
+                } catch (err) {
                     console.error(`数据源 ${source.name} 搜索失败:`, err);
-                    return [];
-                })
-            );
+                    return { source, result: [], success: false };
+                }
+            });
             
-            const results = await Promise.all(searchPromises);
+            // 使用 Promise.allSettled 等待所有结果
+            const results = await Promise.allSettled(searchPromises);
             
-            // 合并结果
-            results.forEach((result, index) => {
-                if (result && result.length > 0) {
-                    this.results.push(...result);
-                    this.sources.push({
-                        sourceId: sources[index].id,
-                        status: 'success',
-                        count: result.length
-                    });
-                } else {
-                    this.sources.push({
-                        sourceId: sources[index].id,
-                        status: 'error',
-                        count: 0
-                    });
+            // 收集成功的结果
+            results.forEach((settled) => {
+                if (settled.status === 'fulfilled' && settled.value.success) {
+                    const { source, result } = settled.value;
+                    if (result && result.length > 0) {
+                        this.results.push(...result);
+                        this.sources.push({
+                            sourceId: source.id,
+                            status: 'success',
+                            count: result.length
+                        });
+                    }
                 }
             });
             
             // 去重
             this.results = this.deduplicateResults(this.results);
+            
+            // 缓存结果
+            if (this.results.length > 0) {
+                this.cache.set(cacheKey, {
+                    results: this.results,
+                    time: Date.now()
+                });
+            }
             
             console.log(`搜索完成，找到 ${this.results.length} 个结果`);
             return this.results;
@@ -91,16 +111,11 @@ class SearchModule {
         
         const searchUrl = source.api + source.searchPath.replace('{keyword}', encodeURIComponent(keyword));
         
-        try {
-            // 使用corsModule处理跨域（自动检测file://协议并使用JSONP）
-            const response = await corsModule.fetchWithCORS(searchUrl);
-            const data = await response.json();
-            
-            return this.parseSearchResults(data, source);
-        } catch (error) {
-            console.error(`${source.name} 搜索失败:`, error);
-            return [];
-        }
+        // 使用更快的超时时间
+        const response = await corsModule.fetchWithCORS(searchUrl, { timeout: 4000 });
+        const data = await response.json();
+        
+        return this.parseSearchResults(data, source);
     }
     
     /**
@@ -185,22 +200,17 @@ class SearchModule {
     parseEpisodes(item) {
         const result = {
             episodes: [],
-            allSources: [] // 所有播放源
+            allSources: []
         };
         
         try {
-            // 解析播放地址 - 格式通常为 "第1集$url1#第2集$url2"
             const playUrl = item.vod_play_url || item.play_url || '';
             
             if (playUrl) {
-                // 分割不同播放源
                 const sources = playUrl.split('$$$');
-                
-                // 记录所有源，但优先选择视频流URL
                 let bestSourceIndex = -1;
                 let bestSourceScore = -1;
                 
-                // 遍历所有播放源
                 for (let sourceIndex = 0; sourceIndex < sources.length; sourceIndex++) {
                     const episodesStr = sources[sourceIndex];
                     const episodeList = episodesStr.split('#');
@@ -224,28 +234,16 @@ class SearchModule {
                         }
                     });
                     
-                    // 保存这个播放源
                     if (sourceEpisodes.length > 0) {
-                        // 计算源的得分（优先选择视频流URL）
                         let score = 0;
                         const firstUrl = sourceEpisodes[0].url || '';
                         const lowerUrl = firstUrl.toLowerCase();
                         
-                        // 直接视频流URL得分最高
-                        if (lowerUrl.includes('.m3u8')) {
-                            score = 100;
-                        } else if (lowerUrl.includes('.mp4')) {
-                            score = 90;
-                        } else if (lowerUrl.includes('.flv')) {
-                            score = 80;
-                        } else if (lowerUrl.includes('.ts')) {
-                            score = 70;
-                        } else if (lowerUrl.includes('.mkv') || lowerUrl.includes('.webm')) {
-                            score = 60;
-                        } else {
-                            // 播放页面URL得分较低
-                            score = 10;
-                        }
+                        if (lowerUrl.includes('.m3u8')) score = 100;
+                        else if (lowerUrl.includes('.mp4')) score = 90;
+                        else if (lowerUrl.includes('.flv')) score = 80;
+                        else if (lowerUrl.includes('.ts')) score = 70;
+                        else score = 10;
                         
                         result.allSources.push({
                             index: sourceIndex,
@@ -254,7 +252,6 @@ class SearchModule {
                             score: score
                         });
                         
-                        // 更新最佳源
                         if (score > bestSourceScore) {
                             bestSourceScore = score;
                             bestSourceIndex = sourceIndex;
@@ -262,7 +259,6 @@ class SearchModule {
                     }
                 }
                 
-                // 使用最佳源作为默认源
                 if (bestSourceIndex >= 0) {
                     result.episodes = result.allSources.find(s => s.index === bestSourceIndex).episodes;
                 }
@@ -272,83 +268,6 @@ class SearchModule {
         }
         
         return result;
-    }
-    
-    /**
-     * 获取真实的视频播放地址
-     * @param {string} url - 播放页面URL
-     * @returns {Promise<string>} 真实的视频URL
-     */
-    async getRealVideoUrl(url) {
-        try {
-            // 如果已经是视频文件链接，直接返回
-            if (this.isVideoFileUrl(url)) {
-                return url;
-            }
-            
-            // 尝试从播放页面提取视频URL
-            const response = await corsModule.fetchWithCORS(url);
-            const html = await response.text();
-            
-            // 尝试多种方式提取视频URL
-            let videoUrl = null;
-            
-            // 方法1: 查找m3u8链接
-            const m3u8Match = html.match(/https?:\/\/[^"'\s]+\.m3u8[^"'\s]*/);
-            if (m3u8Match) {
-                videoUrl = m3u8Match[0];
-            }
-            
-            // 方法2: 查找mp4链接
-            if (!videoUrl) {
-                const mp4Match = html.match(/https?:\/\/[^"'\s]+\.mp4[^"'\s]*/);
-                if (mp4Match) {
-                    videoUrl = mp4Match[0];
-                }
-            }
-            
-            // 方法3: 查找video标签的src
-            if (!videoUrl) {
-                const videoSrcMatch = html.match(/<video[^>]+src=["']([^"']+)["']/);
-                if (videoSrcMatch) {
-                    videoUrl = videoSrcMatch[1];
-                }
-            }
-            
-            // 方法4: 查找source标签的src
-            if (!videoUrl) {
-                const sourceSrcMatch = html.match(/<source[^>]+src=["']([^"']+)["']/);
-                if (sourceSrcMatch) {
-                    videoUrl = sourceSrcMatch[1];
-                }
-            }
-            
-            // 方法5: 查找player相关的配置
-            if (!videoUrl) {
-                const playerConfigMatch = html.match(/(?:url|src|file)\s*[:=]\s*["']([^"']+\.(?:m3u8|mp4|flv)[^"']*)["']/);
-                if (playerConfigMatch) {
-                    videoUrl = playerConfigMatch[1];
-                }
-            }
-            
-            return videoUrl || url;
-            
-        } catch (error) {
-            console.error('获取真实视频地址失败:', error);
-            return url;
-        }
-    }
-    
-    /**
-     * 检查是否是视频文件URL
-     * @param {string} url - URL
-     * @returns {boolean} 是否是视频文件
-     */
-    isVideoFileUrl(url) {
-        if (!url) return false;
-        const videoExtensions = ['.m3u8', '.mp4', '.flv', '.ts', '.avi', '.mkv', '.webm'];
-        const lowerUrl = url.toLowerCase();
-        return videoExtensions.some(ext => lowerUrl.includes(ext));
     }
     
     /**
@@ -452,12 +371,10 @@ class SearchModule {
                     valueB = b.title || '';
             }
             
-            if (typeof valueA === 'string') {
-                const comparison = valueA.localeCompare(valueB, 'zh-CN');
-                return sortOrder === 'asc' ? comparison : -comparison;
+            if (sortOrder === 'asc') {
+                return valueA > valueB ? 1 : -1;
             } else {
-                const comparison = valueA - valueB;
-                return sortOrder === 'asc' ? comparison : -comparison;
+                return valueA < valueB ? 1 : -1;
             }
         });
         
@@ -465,117 +382,52 @@ class SearchModule {
     }
     
     /**
-     * 过滤搜索结果
-     * @param {Object} filters - 过滤条件
-     * @returns {Array} 过滤后的结果
+     * 按类型筛选
+     * @param {string} type - 类型
+     * @returns {Array} 筛选后的结果
      */
-    filterResults(filters = {}) {
-        if (!this.results || this.results.length === 0) {
-            return [];
+    filterByType(type) {
+        if (!type || type === 'all') {
+            return this.results;
         }
         
-        let filtered = [...this.results];
-        
-        if (filters.type) {
-            filtered = filtered.filter(video => 
-                video.type && video.type.includes(filters.type)
-            );
-        }
-        
-        if (filters.year) {
-            filtered = filtered.filter(video => 
-                video.year && video.year.includes(filters.year)
-            );
-        }
-        
-        if (filters.source) {
-            filtered = filtered.filter(video => 
-                video.source && video.source.includes(filters.source)
-            );
-        }
-        
-        if (filters.keyword) {
-            const keyword = filters.keyword.toLowerCase();
-            filtered = filtered.filter(video => 
-                (video.title && video.title.toLowerCase().includes(keyword)) ||
-                (video.description && video.description.toLowerCase().includes(keyword))
-            );
-        }
-        
-        return filtered;
+        return this.results.filter(video => 
+            video.type && video.type.includes(type)
+        );
     }
     
     /**
-     * 获取可用的过滤选项
-     * @returns {Object} 过滤选项
-     */
-    getFilterOptions() {
-        if (!this.results || this.results.length === 0) {
-            return { types: [], years: [], sources: [] };
-        }
-        
-        const types = [...new Set(this.results.map(v => v.type).filter(Boolean))];
-        const years = [...new Set(this.results.map(v => v.year).filter(Boolean))].sort();
-        const sources = [...new Set(this.results.map(v => v.source).filter(Boolean))];
-        
-        return { types, years, sources };
-    }
-    
-    /**
-     * 切换数据源
-     * @param {string} sourceId - 数据源ID
-     */
-    switchSource(sourceId) {
-        console.log(`切换数据源: ${sourceId}`);
-    }
-    
-    /**
-     * 获取数据源状态
-     * @returns {Array} 数据源状态列表
-     */
-    getSourcesStatus() {
-        return this.sources;
-    }
-    
-    /**
-     * 加载搜索历史
-     * @returns {Array} 搜索历史
+     * 搜索历史管理
      */
     loadSearchHistory() {
         try {
             const history = localStorage.getItem('searchHistory');
             return history ? JSON.parse(history) : [];
-        } catch (error) {
-            console.error('加载搜索历史失败:', error);
+        } catch (e) {
             return [];
         }
     }
     
-    /**
-     * 保存搜索历史
-     */
     saveSearchHistory() {
         try {
             localStorage.setItem('searchHistory', JSON.stringify(this.searchHistory));
-        } catch (error) {
-            console.error('保存搜索历史失败:', error);
+        } catch (e) {
+            console.error('保存搜索历史失败:', e);
         }
     }
     
-    /**
-     * 添加搜索历史
-     * @param {string} keyword - 搜索关键词
-     */
     addToHistory(keyword) {
-        if (!keyword || !keyword.trim()) {
-            return;
-        }
+        if (!keyword || !keyword.trim()) return;
         
-        const trimmedKeyword = keyword.trim();
+        keyword = keyword.trim();
         
-        this.searchHistory = this.searchHistory.filter(item => item !== trimmedKeyword);
-        this.searchHistory.unshift(trimmedKeyword);
+        // 移除重复项
+        this.searchHistory = this.searchHistory.filter(item => item !== keyword);
         
+        // 添加到开头
+        this.searchHistory.unshift(keyword);
+        
+        // 限制大小
         if (this.searchHistory.length > this.maxHistorySize) {
             this.searchHistory = this.searchHistory.slice(0, this.maxHistorySize);
         }
@@ -583,29 +435,25 @@ class SearchModule {
         this.saveSearchHistory();
     }
     
-    /**
-     * 获取搜索历史
-     * @returns {Array} 搜索历史
-     */
-    getHistory() {
-        return this.searchHistory;
+    removeFromHistory(keyword) {
+        this.searchHistory = this.searchHistory.filter(item => item !== keyword);
+        this.saveSearchHistory();
     }
     
-    /**
-     * 清空搜索历史
-     */
     clearHistory() {
         this.searchHistory = [];
         this.saveSearchHistory();
     }
     
+    getHistory() {
+        return this.searchHistory;
+    }
+    
     /**
-     * 删除单条搜索历史
-     * @param {string} keyword - 要删除的关键词
+     * 清除缓存
      */
-    removeFromHistory(keyword) {
-        this.searchHistory = this.searchHistory.filter(item => item !== keyword);
-        this.saveSearchHistory();
+    clearCache() {
+        this.cache.clear();
     }
 }
 

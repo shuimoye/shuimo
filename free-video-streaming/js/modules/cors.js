@@ -5,26 +5,16 @@
 
 class CORSModule {
     constructor() {
-        // 多个CORS代理服务
+        // 只保留最快的代理服务
         this.proxyServices = [
             {
                 name: 'allorigins',
                 url: 'https://api.allorigins.win/get?url=',
-                type: 'json' // 返回JSON格式，需要解析contents
+                type: 'json'
             },
             {
                 name: 'corsproxy',
                 url: 'https://corsproxy.io/?',
-                type: 'raw'
-            },
-            {
-                name: 'codetabs',
-                url: 'https://api.codetabs.com/v1/proxy?quest=',
-                type: 'raw'
-            },
-            {
-                name: 'cors-anywhere',
-                url: 'https://cors-anywhere.herokuapp.com/',
                 type: 'raw'
             }
         ];
@@ -32,22 +22,24 @@ class CORSModule {
     }
     
     /**
-     * 发送跨域请求
+     * 发送跨域请求（带超时）
      * @param {string} url - 请求URL
      * @param {Object} options - 请求选项
      * @returns {Promise<Response>} 响应对象
      */
     async fetchWithCORS(url, options = {}) {
+        const timeout = options.timeout || 5000; // 默认5秒超时
+        
         // 检测是否是file://协议
         const isFileProtocol = window.location.protocol === 'file:';
         
         // 策略1: 尝试直接请求（非file://协议时）
         if (!isFileProtocol) {
             try {
-                const response = await fetch(url, {
+                const response = await this.fetchWithTimeout(url, {
                     ...options,
                     mode: 'cors'
-                });
+                }, timeout);
                 if (response.ok) {
                     return response;
                 }
@@ -63,17 +55,16 @@ class CORSModule {
             try {
                 console.log(`尝试代理: ${service.name}`);
                 const proxyUrl = service.url + encodeURIComponent(url);
-                const response = await fetch(proxyUrl, {
+                const response = await this.fetchWithTimeout(proxyUrl, {
                     ...options,
                     mode: 'cors'
-                });
+                }, timeout);
                 
                 if (response.ok) {
                     console.log(`代理成功: ${service.name}`);
                     
                     // 根据代理类型处理响应
                     if (service.type === 'json') {
-                        // allorigins返回 { contents: "..." }
                         const jsonData = await response.json();
                         return {
                             ok: true,
@@ -90,7 +81,19 @@ class CORSModule {
             }
         }
         
-        throw new Error('所有代理服务都失败了，请使用本地代理服务器');
+        throw new Error('所有代理服务都失败了');
+    }
+    
+    /**
+     * 带超时的fetch
+     */
+    fetchWithTimeout(url, options, timeout) {
+        return Promise.race([
+            fetch(url, options),
+            new Promise((_, reject) => 
+                setTimeout(() => reject(new Error('请求超时')), timeout)
+            )
+        ]);
     }
     
     /**
