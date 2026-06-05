@@ -784,59 +784,6 @@ a:hover {
     display: none;
 }
 
-/* 底部链接 */
-.hero-bottom-links {
-    display: flex;
-    gap: 16px;
-    justify-content: center;
-    margin-top: 40px;
-    padding-top: 30px;
-    border-top: 1px solid rgba(255,255,255,0.08);
-    position: relative;
-    z-index: 1;
-}
-
-.bottom-link {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    color: rgba(255,255,255,0.6);
-    font-size: 14px;
-    padding: 10px 20px;
-    border-radius: 10px;
-    background: rgba(255,255,255,0.05);
-    border: 1px solid rgba(255,255,255,0.1);
-    transition: var(--transition);
-    text-decoration: none;
-}
-
-.bottom-link:hover {
-    color: white;
-    background: rgba(99, 102, 241, 0.2);
-    border-color: rgba(99, 102, 241, 0.3);
-    transform: translateY(-2px);
-}
-
-.bottom-link-icon {
-    display: flex;
-    align-items: center;
-}
-
-.bottom-link-icon svg {
-    width: 16px;
-    height: 16px;
-}
-
-.vpn-link {
-    background: rgba(236, 72, 153, 0.1);
-    border-color: rgba(236, 72, 153, 0.2);
-}
-
-.vpn-link:hover {
-    background: rgba(236, 72, 153, 0.25);
-    border-color: rgba(236, 72, 153, 0.4);
-}
-
 .hero-description {
     font-size: 16px;
     color: rgba(255,255,255,0.5);
@@ -1803,6 +1750,20 @@ a:hover {
 .footer-links a:hover {
     color: white;
     text-decoration: none;
+}
+
+.vpn-footer-link {
+    color: #f472b6 !important;
+    position: relative;
+}
+
+.vpn-footer-link::before {
+    content: '🔒 ';
+    font-size: 12px;
+}
+
+.vpn-footer-link:hover {
+    color: #ec4899 !important;
 }
 
 .footer-copyright p {
