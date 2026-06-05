@@ -11,7 +11,7 @@ const AISecureConfig = (() => {
     const _rotate = (s, n) => s.split('').map(c => {
         const code = c.charCodeAt(0);
         if (code >= 32 && code <= 126) {
-            return String.fromCharCode(((code - 32 + n) % 95) + 32);
+            return String.fromCharCode(((code - 32 + n + 95) % 95) + 32);
         }
         return c;
     }).join('');
@@ -24,9 +24,8 @@ const AISecureConfig = (() => {
     const _emodel = _rev('hsalf-0.2-senga');
     
     // API 地址: https://apihub.agnes-ai.com/v1
-    const _eendpoint = _rotate(_rev(
-        '1v/moc.ia-senga.buhipa//:sptth'
-    ), 5);
+    // 加密方式: 先反转，再凯撒密码偏移5
+    const _eendpoint = '6{4rth3nf2xjslf3gzmnuf44?xuyym';
     
     // API Key (分段存储)
     const _kparts = [
@@ -53,7 +52,7 @@ const AISecureConfig = (() => {
     
     return {
         get model() { return _emodel; },
-        get endpoint() { return _rotate(_rev(_eendpoint), -5); },
+        get endpoint() { return _rev(_rotate(_eendpoint, -5)); },
         get apiKey() { return _decryptKey(); }
     };
 })();
