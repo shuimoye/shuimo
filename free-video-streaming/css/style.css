@@ -1737,33 +1737,71 @@ a:hover {
 
 .footer-links {
     display: flex;
-    gap: 24px;
+    gap: 12px;
+    flex-wrap: wrap;
+    justify-content: center;
 }
 
-.footer-links a {
+.footer-link-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
     color: rgba(255,255,255,0.7);
     text-decoration: none;
     transition: var(--transition);
     font-weight: 500;
+    font-size: 14px;
+    padding: 8px 16px;
+    border-radius: 8px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.1);
 }
 
-.footer-links a:hover {
-    color: white;
+.footer-link-item:hover {
+    transform: translateY(-2px);
     text-decoration: none;
 }
 
-.vpn-footer-link {
-    color: #f472b6 !important;
-    position: relative;
+.footer-link-icon {
+    display: flex;
+    align-items: center;
 }
 
-.vpn-footer-link::before {
-    content: '🔒 ';
-    font-size: 12px;
+.footer-link-icon svg {
+    width: 14px;
+    height: 14px;
 }
 
-.vpn-footer-link:hover {
-    color: #ec4899 !important;
+.github-link {
+    color: rgba(255,255,255,0.8);
+}
+
+.github-link:hover {
+    color: white;
+    background: rgba(255,255,255,0.15);
+    border-color: rgba(255,255,255,0.2);
+}
+
+.gitee-link {
+    color: rgba(255,255,255,0.8);
+}
+
+.gitee-link:hover {
+    color: #f87171;
+    background: rgba(248, 113, 113, 0.15);
+    border-color: rgba(248, 113, 113, 0.3);
+}
+
+.vpn-link {
+    color: #f472b6;
+    background: rgba(236, 72, 153, 0.1);
+    border-color: rgba(236, 72, 153, 0.2);
+}
+
+.vpn-link:hover {
+    color: #ec4899;
+    background: rgba(236, 72, 153, 0.2);
+    border-color: rgba(236, 72, 153, 0.4);
 }
 
 .footer-copyright p {
