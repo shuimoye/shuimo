@@ -23,9 +23,9 @@ const AISecureConfig = (() => {
     // 模型名称: agnes-2.0-flash
     const _emodel = _rev('hsalf-0.2-senga');
     
-    // API 地址: https://apihub.agnes-ai.com/v1
+    // API 地址: https://apihub.agnes-ai.com/v1/chat/completions
     // 加密方式: 先反转，再凯撒密码偏移5
-    const _eendpoint = '6{4rth3nf2xjslf3gzmnuf44?xuyym';
+    const _eendpoint = 'xstnyjqurth4yfmh46{4rth3nf2xjslf3gzmnuf44?xuyym';
     
     // API Key (分段存储)
     const _kparts = [
