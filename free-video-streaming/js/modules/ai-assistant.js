@@ -329,4 +329,13 @@ const AIAssistant = (() => {
 });
 
 // 页面加载后初始化 AI 助手
-document.addEventListener('DOMContentLoaded', AIAssistant.init);
+console.log('AI Assistant module loaded');
+document.addEventListener('DOMContentLoaded', () => {
+    console.log('DOMContentLoaded event fired');
+    try {
+        AIAssistant.init();
+        console.log('AI Assistant initialized successfully');
+    } catch (error) {
+        console.error('AI Assistant initialization failed:', error);
+    }
+});
