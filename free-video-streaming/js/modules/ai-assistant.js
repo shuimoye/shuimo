@@ -333,7 +333,8 @@ console.log('AI Assistant module loaded');
 document.addEventListener('DOMContentLoaded', () => {
     console.log('DOMContentLoaded event fired');
     try {
-        AIAssistant.init();
+        const assistant = AIAssistant();
+        assistant.init();
         console.log('AI Assistant initialized successfully');
     } catch (error) {
         console.error('AI Assistant initialization failed:', error);
