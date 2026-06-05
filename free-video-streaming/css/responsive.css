@@ -1,248 +1,113 @@
-/* 响应式样式文件 - responsive.css */
+/* 响应式样式 - responsive.css */
 
-/* 小屏幕设备 (手机, 768px以下) */
-@media screen and (max-width: 768px) {
-    /* 搜索容器 */
-    .search-container {
+/* 平板设备 */
+@media (max-width: 768px) {
+    .nav-links {
+        display: none;
+        flex-direction: column;
+        position: absolute;
+        top: 60px;
+        left: 0;
+        right: 0;
+        background: #fff;
+        padding: 20px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+
+    .nav-links.show {
+        display: flex;
+    }
+
+    .nav-toggle {
+        display: block;
+    }
+
+    .hero-section {
+        padding: 60px 20px;
+    }
+
+    .hero-title {
+        font-size: 28px;
+    }
+
+    .hero-subtitle {
+        font-size: 16px;
+    }
+
+    .section {
+        padding: 60px 0;
+    }
+
+    .section-title {
+        font-size: 24px;
+        margin-bottom: 30px;
+    }
+
+    .blog-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .video-search-box {
         flex-direction: column;
     }
-    
-    .search-input {
-        width: 100%;
+
+    .video-results {
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
     }
-    
-    .search-btn {
-        width: 100%;
+
+    .about-content {
+        grid-template-columns: 1fr;
     }
-    
-    /* 搜索结果网格 */
-    .search-results {
-        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-        gap: 12px;
-    }
-    
-    /* 视频卡片 */
-    .video-card {
-        margin-bottom: 0;
-    }
-    
-    .video-cover {
-        height: 120px;
-    }
-    
-    .video-info {
-        padding: 8px;
-    }
-    
-    .video-title {
-        font-size: 14px;
-    }
-    
-    .video-meta {
-        font-size: 12px;
-    }
-    
-    /* 视频播放器 */
-    .video-player {
+
+    .video-player-container {
         height: 300px;
     }
-    
-    /* 视频详情 */
-    .detail-header {
+}
+
+/* 手机设备 */
+@media (max-width: 480px) {
+    .nav-container {
+        padding: 0 15px;
+    }
+
+    .nav-logo {
+        font-size: 20px;
+    }
+
+    .hero-title {
+        font-size: 24px;
+    }
+
+    .hero-links {
         flex-direction: column;
-        gap: 12px;
+        gap: 10px;
     }
-    
-    .detail-cover {
-        width: 100%;
-        height: 200px;
-    }
-    
-    .detail-title {
-        font-size: 18px;
-    }
-    
-    .detail-meta {
-        flex-wrap: wrap;
-        gap: 8px;
-    }
-    
-    /* 剧集列表 */
-    .episodes {
-        gap: 6px;
-    }
-    
-    .episode-btn {
-        padding: 6px 12px;
-        font-size: 12px;
-    }
-    
-    /* 下载和分享按钮 */
-    .download-btn,
-    .share-btn {
-        width: 100%;
-        justify-content: center;
-        padding: 14px 24px;
-    }
-    
-    /* 底部区域 */
-    .app-footer {
-        padding: 16px 12px;
-    }
-    
-    .disclaimer p {
-        font-size: 12px;
-    }
-}
 
-/* 中等屏幕设备 (平板, 768px到1024px) */
-@media screen and (min-width: 769px) and (max-width: 1024px) {
-    /* 搜索结果网格 */
-    .search-results {
-        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-        gap: 14px;
+    .video-search-input {
+        font-size: 14px;
     }
-    
-    /* 视频卡片 */
+
+    .video-search-btn {
+        font-size: 14px;
+    }
+
+    .video-card {
+        border-radius: 6px;
+    }
+
     .video-cover {
-        height: 140px;
+        height: 90px;
     }
-    
-    .video-title {
-        font-size: 15px;
-    }
-    
-    /* 视频播放器 */
-    .video-player {
-        height: 400px;
-    }
-}
 
-/* 大屏幕设备 (桌面, 1024px以上) */
-@media screen and (min-width: 1025px) {
-    /* 搜索结果网格 */
-    .search-results {
-        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-        gap: 16px;
+    .video-player-container {
+        height: 250px;
     }
-}
 
-/* 横屏模式 */
-@media screen and (orientation: landscape) {
-    /* 视频播放器全屏 */
-    .video-player {
-        height: 70vh;
+    .blog-card {
+        padding: 15px;
     }
-}
 
-/* 高分辨率屏幕 */
-@media screen and (-webkit-min-device-pixel-ratio: 2),
-       screen and (min-resolution: 192dpi) {
-    /* 可以在这里添加高分辨率屏幕的特殊样式 */
-}
-
-/* 触摸设备优化 */
-@media (hover: none) and (pointer: coarse) {
-    /* 增大触摸目标 */
-    .episode-btn {
-        padding: 10px 16px;
-    }
-    
-    .search-btn {
-        padding: 14px 24px;
-    }
-    
-    /* 禁用悬停效果 */
-    .video-card:hover {
-        transform: none;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    }
-    
-    .video-card:active {
-        transform: scale(0.98);
-    }
-}
-
-/* 打印样式 */
-@media print {
-    .app-header,
-    .app-footer,
-    .download-section,
-    .share-section {
-        display: none;
-    }
-}
-
-/* 暗色模式支持 */
-@media (prefers-color-scheme: dark) {
-    body {
-        background-color: #1a1a1a;
-        color: #e0e0e0;
-    }
-    
-    .app-header {
-        background-color: #2d2d2d;
-        border-bottom-color: #404040;
-    }
-    
-    .search-input {
-        background-color: #3d3d3d;
-        border-color: #505050;
-        color: #e0e0e0;
-    }
-    
-    .search-input::placeholder {
-        color: #808080;
-    }
-    
-    .video-card {
-        background-color: #2d2d2d;
-    }
-    
-    .video-title {
-        color: #e0e0e0;
-    }
-    
-    .video-meta {
-        color: #b0b0b0;
-    }
-    
-    .video-detail {
-        background-color: #2d2d2d;
-    }
-    
-    .app-footer {
-        background-color: #2d2d2d;
-        border-top-color: #404040;
-    }
-    
-    .disclaimer p,
-    .copyright {
-        color: #b0b0b0;
-    }
-}
-
-/* 无障碍访问优化 */
-@media (prefers-reduced-motion: reduce) {
-    * {
-        animation: none !important;
-        transition: none !important;
-    }
-}
-
-/* 高对比度模式 */
-@media (prefers-contrast: high) {
-    .search-input {
-        border-width: 3px;
-    }
-    
-    .video-card {
-        border: 2px solid #333;
-    }
-    
-    .episode-btn,
-    .download-btn,
-    .share-btn {
-        border: 2px solid currentColor;
+    .blog-title {
+        font-size: 18px;
     }
 }

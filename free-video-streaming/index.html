@@ -3,69 +3,138 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="免费视频流媒体网页应用 - 仅供学习使用">
-    <meta name="keywords" content="视频,播放,下载,免费,学习">
-    <title>免费视频流媒体</title>
-    
-    <!-- 样式文件 -->
+    <meta name="description" content="个人主页 - 博客与视频分享">
+    <meta name="keywords" content="博客,视频,个人主页">
+    <title>水墨页 - 个人主页</title>
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/responsive.css">
-    
-    <!-- DPlayer播放器样式（本地） -->
     <link rel="stylesheet" href="lib/DPlayer.min.css">
 </head>
 <body>
-    <!-- 主容器 -->
-    <div class="app-container">
-        <!-- 头部搜索区域 -->
-        <header class="app-header">
-            <div class="search-container">
-                <input type="text" id="searchInput" class="search-input" placeholder="搜索视频...">
-                <button id="searchBtn" class="search-btn">搜索</button>
+    <!-- 导航栏 -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="#" class="nav-logo">水墨页</a>
+            <div class="nav-links">
+                <a href="#home" class="nav-link active">首页</a>
+                <a href="#blog" class="nav-link">博客</a>
+                <a href="#video" class="nav-link">视频</a>
+                <a href="#about" class="nav-link">关于</a>
             </div>
-        </header>
-        
-        <!-- 主内容区域 -->
-        <main class="app-main">
-            <!-- 搜索结果区域 -->
-            <section id="searchResults" class="search-results">
-                <!-- 搜索结果将在这里动态生成 -->
-            </section>
-            
-            <!-- 视频播放区域 -->
-            <section id="videoPlayer" class="video-player" style="display: none;">
-                <!-- 视频播放器将在这里动态生成 -->
-            </section>
-            
-            <!-- 视频详情区域 -->
-            <section id="videoDetail" class="video-detail" style="display: none;">
-                <!-- 视频详情将在这里动态生成 -->
-            </section>
-        </main>
-        
-        <!-- 底部区域 -->
-        <footer class="app-footer">
-            <div class="disclaimer">
-                <p>免责声明：本应用仅供学习交流使用，所有视频资源均来自互联网，本站不存储任何视频内容。</p>
-                <p>请勿将本应用用于商业用途，如有侵权请联系删除。</p>
+            <button class="nav-toggle">☰</button>
+        </div>
+    </nav>
+
+    <!-- 主页内容 -->
+    <main class="main-content">
+        <!-- 个人介绍区域 -->
+        <section id="home" class="hero-section">
+            <div class="hero-content">
+                <div class="hero-avatar">
+                    <div class="avatar-placeholder">墨</div>
+                </div>
+                <h1 class="hero-title">你好，我是水墨</h1>
+                <p class="hero-subtitle">热爱技术，热爱生活</p>
+                <div class="hero-links">
+                    <a href="https://github.com/shuimoye" target="_blank" class="hero-link">GitHub</a>
+                    <a href="https://gitee.com/gx95" target="_blank" class="hero-link">Gitee</a>
+                    <a href="#blog" class="hero-link">博客</a>
+                </div>
             </div>
-            <div class="copyright">
-                <p>&copy; 2026 免费视频流媒体 - 仅供学习使用</p>
+        </section>
+
+        <!-- 博客区域 -->
+        <section id="blog" class="section">
+            <div class="container">
+                <h2 class="section-title">博客文章</h2>
+                <div class="blog-grid">
+                    <article class="blog-card">
+                        <div class="blog-date">2026-06-04</div>
+                        <h3 class="blog-title">搭建免费视频流媒体网站</h3>
+                        <p class="blog-excerpt">使用纯前端技术搭建了一个免费的视频流媒体网站，支持搜索、播放、下载功能...</p>
+                        <a href="#" class="blog-link" onclick="showArticle('video-project')">阅读全文 →</a>
+                    </article>
+                    <article class="blog-card">
+                        <div class="blog-date">2026-06-03</div>
+                        <h3 class="blog-title">Cloudflare Pages 部署指南</h3>
+                        <p class="blog-excerpt">如何使用 Cloudflare Pages 免费部署静态网站，享受全球CDN加速...</p>
+                        <a href="#" class="blog-link" onclick="showArticle('cloudflare')">阅读全文 →</a>
+                    </article>
+                    <article class="blog-card">
+                        <div class="blog-date">2026-06-02</div>
+                        <h3 class="blog-title">Git 多远程仓库管理</h3>
+                        <p class="blog-excerpt">如何同时管理 GitHub、Gitee 等多个远程仓库，实现代码多平台同步...</p>
+                        <a href="#" class="blog-link" onclick="showArticle('git-multi')">阅读全文 →</a>
+                    </article>
+                </div>
             </div>
-        </footer>
+        </section>
+
+        <!-- 视频区域 -->
+        <section id="video" class="section section-dark">
+            <div class="container">
+                <h2 class="section-title">视频搜索</h2>
+                <div class="video-search-box">
+                    <input type="text" id="searchInput" class="video-search-input" placeholder="搜索视频...">
+                    <button id="searchBtn" class="video-search-btn">搜索</button>
+                </div>
+                <div id="searchResults" class="video-results"></div>
+                <div id="videoPlayer" class="video-player-container" style="display: none;"></div>
+                <div id="videoDetail" class="video-detail-container" style="display: none;"></div>
+            </div>
+        </section>
+
+        <!-- 关于区域 -->
+        <section id="about" class="section">
+            <div class="container">
+                <h2 class="section-title">关于我</h2>
+                <div class="about-content">
+                    <div class="about-text">
+                        <p>热爱技术，热爱生活。</p>
+                        <p>喜欢探索新技术，分享学习心得。</p>
+                        <p>这个网站是我的个人空间，记录博客文章和分享视频资源。</p>
+                    </div>
+                    <div class="about-skills">
+                        <h3>技术栈</h3>
+                        <div class="skill-tags">
+                            <span class="skill-tag">HTML</span>
+                            <span class="skill-tag">CSS</span>
+                            <span class="skill-tag">JavaScript</span>
+                            <span class="skill-tag">Git</span>
+                            <span class="skill-tag">Node.js</span>
+                            <span class="skill-tag">Python</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- 底部 -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2026 水墨页 - 个人主页</p>
+            <p class="footer-links">
+                <a href="https://github.com/shuimoye" target="_blank">GitHub</a>
+                <a href="https://gitee.com/gx95" target="_blank">Gitee</a>
+            </p>
+        </div>
+    </footer>
+
+    <!-- 博客文章详情模态框 -->
+    <div id="articleModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal()">&times;</button>
+            <div id="articleContent" class="article-content"></div>
+        </div>
     </div>
-    
-    <!-- JavaScript文件 -->
-    <!-- 工具函数 -->
+
+    <!-- JavaScript -->
     <script src="js/utils/helpers.js"></script>
     <script src="js/utils/models.js"></script>
     <script src="js/utils/sources.js"></script>
-    
-    <!-- DPlayer播放器（本地） -->
     <script src="lib/hls.min.js"></script>
     <script src="lib/DPlayer.min.js"></script>
-    
-    <!-- 核心模块 -->
     <script src="js/modules/cors.js"></script>
     <script src="js/modules/crawler.js"></script>
     <script src="js/modules/api.js"></script>
@@ -73,8 +142,105 @@
     <script src="js/modules/player.js"></script>
     <script src="js/modules/download.js"></script>
     <script src="js/modules/share.js"></script>
-    
-    <!-- 应用入口 -->
     <script src="js/app.js"></script>
+    <script>
+        // 博客文章内容
+        const articles = {
+            'video-project': {
+                title: '搭建免费视频流媒体网站',
+                date: '2026-06-04',
+                content: `
+                    <h2>搭建免费视频流媒体网站</h2>
+                    <p>最近做了一个免费视频流媒体网站，可以搜索和播放各种视频资源。</p>
+                    <h3>技术栈</h3>
+                    <ul>
+                        <li>HTML/CSS/JavaScript（纯前端）</li>
+                        <li>DPlayer（视频播放器）</li>
+                        <li>HLS.js（m3u8流播放）</li>
+                    </ul>
+                    <h3>功能特点</h3>
+                    <ul>
+                        <li>支持多个视频源搜索</li>
+                        <li>自动选择最佳视频源</li>
+                        <li>支持下载和分享</li>
+                        <li>响应式设计，支持手机和电脑</li>
+                    </ul>
+                    <h3>部署</h3>
+                    <p>使用 Cloudflare Pages 部署，享受免费CDN加速。</p>
+                    <p><a href="https://github.com/shuimoye/shuimo" target="_blank">项目地址</a></p>
+                `
+            },
+            'cloudflare': {
+                title: 'Cloudflare Pages 部署指南',
+                date: '2026-06-03',
+                content: `
+                    <h2>Cloudflare Pages 部署指南</h2>
+                    <p>Cloudflare Pages 是一个免费的静态网站托管服务，支持全球CDN加速。</p>
+                    <h3>优势</h3>
+                    <ul>
+                        <li>免费使用</li>
+                        <li>全球CDN加速</li>
+                        <li>自动HTTPS</li>
+                        <li>支持自定义域名</li>
+                    </ul>
+                    <h3>部署步骤</h3>
+                    <ol>
+                        <li>登录 Cloudflare Dashboard</li>
+                        <li>选择 Workers & Pages</li>
+                        <li>连接 GitHub 仓库</li>
+                        <li>配置构建设置</li>
+                        <li>点击部署</li>
+                    </ol>
+                    <h3>注意事项</h3>
+                    <p>Cloudflare Pages 只支持 GitHub 和 GitLab，不支持 Gitee。</p>
+                `
+            },
+            'git-multi': {
+                title: 'Git 多远程仓库管理',
+                date: '2026-06-02',
+                content: `
+                    <h2>Git 多远程仓库管理</h2>
+                    <p>有时候我们需要把代码推送到多个远程仓库，比如 GitHub 和 Gitee。</p>
+                    <h3>添加多个远程仓库</h3>
+                    <pre><code>git remote add github https://github.com/user/repo.git
+git remote add gitee https://gitee.com/user/repo.git</code></pre>
+                    <h3>推送到多个仓库</h3>
+                    <pre><code>git push github master
+git push gitee master</code></pre>
+                    <h3>查看远程仓库</h3>
+                    <pre><code>git remote -v</code></pre>
+                    <h3>设置默认远程仓库</h3>
+                    <pre><code>git push origin master</code></pre>
+                `
+            }
+        };
+
+        // 显示文章
+        function showArticle(id) {
+            const article = articles[id];
+            if (article) {
+                document.getElementById('articleContent').innerHTML = article.content;
+                document.getElementById('articleModal').style.display = 'flex';
+            }
+        }
+
+        // 关闭模态框
+        function closeModal() {
+            document.getElementById('articleModal').style.display = 'none';
+        }
+
+        // 导航链接点击
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', function(e) {
+                document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+
+        // 移动端导航切换
+        document.querySelector('.nav-toggle').addEventListener('click', function() {
+            document.querySelector('.nav-links').classList.toggle('show');
+        });
+    </script>
 </body>
 </html>

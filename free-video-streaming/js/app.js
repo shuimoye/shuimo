@@ -258,6 +258,7 @@ function showVideoDetail(video) {
     }
     
     // 如果有多个播放源，显示源选择
+    console.log('allSources:', video.allSources);
     if (video.allSources && video.allSources.length > 1) {
         const sourceList = document.createElement('div');
         sourceList.className = 'source-list';

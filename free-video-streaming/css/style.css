@@ -1,16 +1,19 @@
 /* 主样式文件 - style.css */
 
-/* 基础字体和颜色 */
-body {
+/* 基础样式 */
+* {
     margin: 0;
     padding: 0;
+    box-sizing: border-box;
+}
+
+body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
     line-height: 1.6;
     color: #333;
-    background-color: #f5f5f5;
+    background-color: #fff;
 }
 
-/* 链接样式 */
 a {
     color: #1a73e8;
     text-decoration: none;
@@ -20,36 +23,211 @@ a:hover {
     text-decoration: underline;
 }
 
-/* 应用容器 */
-.app-container {
+/* 容器 */
+.container {
     max-width: 1200px;
     margin: 0 auto;
-    padding: 0 16px;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
+    padding: 0 20px;
 }
 
-/* 头部样式 */
-.app-header {
-    background-color: #fff;
-    padding: 16px 0;
-    border-bottom: 1px solid #e0e0e0;
-    position: sticky;
+/* 导航栏 */
+.navbar {
+    background: #fff;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    position: fixed;
     top: 0;
-    z-index: 100;
+    left: 0;
+    right: 0;
+    z-index: 1000;
 }
 
-/* 搜索容器 */
-.search-container {
+.nav-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
     display: flex;
-    gap: 8px;
+    align-items: center;
+    justify-content: space-between;
+    height: 60px;
+}
+
+.nav-logo {
+    font-size: 24px;
+    font-weight: bold;
+    color: #333;
+    text-decoration: none;
+}
+
+.nav-logo:hover {
+    text-decoration: none;
+}
+
+.nav-links {
+    display: flex;
+    gap: 30px;
+}
+
+.nav-link {
+    color: #666;
+    text-decoration: none;
+    font-size: 16px;
+    transition: color 0.3s;
+}
+
+.nav-link:hover,
+.nav-link.active {
+    color: #1a73e8;
+    text-decoration: none;
+}
+
+.nav-toggle {
+    display: none;
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+}
+
+/* 主页内容 */
+.main-content {
+    margin-top: 60px;
+}
+
+/* 个人介绍区域 */
+.hero-section {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 80px 20px;
+    text-align: center;
+}
+
+.hero-content {
     max-width: 600px;
     margin: 0 auto;
 }
 
-/* 搜索输入框 */
-.search-input {
+.hero-avatar {
+    margin-bottom: 20px;
+}
+
+.avatar-placeholder {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+    font-size: 48px;
+    font-weight: bold;
+}
+
+.hero-title {
+    font-size: 36px;
+    margin-bottom: 10px;
+}
+
+.hero-subtitle {
+    font-size: 18px;
+    opacity: 0.9;
+    margin-bottom: 20px;
+}
+
+.hero-links {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+}
+
+.hero-link {
+    color: white;
+    background: rgba(255,255,255,0.2);
+    padding: 10px 20px;
+    border-radius: 25px;
+    text-decoration: none;
+    transition: background 0.3s;
+}
+
+.hero-link:hover {
+    background: rgba(255,255,255,0.3);
+    text-decoration: none;
+}
+
+/* 通用区域样式 */
+.section {
+    padding: 80px 0;
+}
+
+.section-dark {
+    background: #f5f5f5;
+}
+
+.section-title {
+    font-size: 32px;
+    text-align: center;
+    margin-bottom: 40px;
+    color: #333;
+}
+
+/* 博客区域 */
+.blog-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 30px;
+}
+
+.blog-card {
+    background: #fff;
+    border-radius: 8px;
+    padding: 25px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.blog-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+}
+
+.blog-date {
+    color: #999;
+    font-size: 14px;
+    margin-bottom: 10px;
+}
+
+.blog-title {
+    font-size: 20px;
+    margin-bottom: 10px;
+    color: #333;
+}
+
+.blog-excerpt {
+    color: #666;
+    font-size: 14px;
+    margin-bottom: 15px;
+    line-height: 1.6;
+}
+
+.blog-link {
+    color: #1a73e8;
+    font-size: 14px;
+    text-decoration: none;
+}
+
+.blog-link:hover {
+    text-decoration: underline;
+}
+
+/* 视频区域 */
+.video-search-box {
+    max-width: 600px;
+    margin: 0 auto 30px;
+    display: flex;
+    gap: 10px;
+}
+
+.video-search-input {
     flex: 1;
     padding: 12px 16px;
     border: 2px solid #e0e0e0;
@@ -59,72 +237,59 @@ a:hover {
     transition: border-color 0.3s;
 }
 
-.search-input:focus {
+.video-search-input:focus {
     border-color: #1a73e8;
 }
 
-/* 搜索按钮 */
-.search-btn {
+.video-search-btn {
     padding: 12px 24px;
-    background-color: #1a73e8;
+    background: #1a73e8;
     color: white;
     border: none;
     border-radius: 8px;
     font-size: 16px;
     cursor: pointer;
-    transition: background-color 0.3s;
+    transition: background 0.3s;
 }
 
-.search-btn:hover {
-    background-color: #1557b0;
+.video-search-btn:hover {
+    background: #1557b0;
 }
 
-/* 主内容区域 */
-.app-main {
-    flex: 1;
-    padding: 16px 0;
-}
-
-/* 搜索结果区域 */
-.search-results {
+.video-results {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 16px;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 20px;
 }
 
-/* 视频卡片 */
 .video-card {
-    background-color: #fff;
+    background: #fff;
     border-radius: 8px;
     overflow: hidden;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     cursor: pointer;
+    transition: transform 0.3s;
 }
 
 .video-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+    transform: translateY(-3px);
 }
 
-/* 视频封面 */
 .video-cover {
     width: 100%;
-    height: 160px;
+    height: 120px;
     object-fit: cover;
-    background-color: #e0e0e0;
+    background: #e0e0e0;
 }
 
-/* 视频信息 */
 .video-info {
-    padding: 12px;
+    padding: 10px;
 }
 
 .video-title {
-    font-size: 16px;
+    font-size: 14px;
     font-weight: 600;
-    margin-bottom: 8px;
-    color: #333;
+    margin-bottom: 5px;
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
@@ -132,87 +297,172 @@ a:hover {
 }
 
 .video-meta {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-size: 14px;
+    font-size: 12px;
     color: #666;
 }
 
-.video-source {
-    background-color: #f0f0f0;
-    padding: 2px 8px;
-    border-radius: 4px;
-    font-size: 12px;
-}
-
-.video-year {
-    color: #999;
-}
-
-/* 视频播放器区域 */
-.video-player {
-    background-color: #000;
+.video-player-container {
+    margin-top: 30px;
+    background: #000;
     border-radius: 8px;
-    margin-bottom: 16px;
-    width: 100%;
+    overflow: hidden;
     height: 500px;
 }
 
-/* 视频详情区域 */
-.video-detail {
-    background-color: #fff;
+.video-detail-container {
+    margin-top: 20px;
+    background: #fff;
     border-radius: 8px;
-    padding: 16px;
-    margin-bottom: 16px;
+    padding: 20px;
 }
 
-.detail-header {
+/* 关于区域 */
+.about-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+}
+
+.about-text p {
+    margin-bottom: 15px;
+    line-height: 1.8;
+}
+
+.about-skills h3 {
+    margin-bottom: 15px;
+    color: #333;
+}
+
+.skill-tags {
     display: flex;
-    gap: 16px;
-    margin-bottom: 16px;
+    flex-wrap: wrap;
+    gap: 10px;
 }
 
-.detail-cover {
-    width: 120px;
-    height: 160px;
-    object-fit: cover;
-    border-radius: 4px;
+.skill-tag {
+    background: #e3f2fd;
+    color: #1a73e8;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 14px;
 }
 
-.detail-info {
-    flex: 1;
+/* 底部 */
+.footer {
+    background: #333;
+    color: #fff;
+    padding: 30px 0;
+    text-align: center;
 }
 
-.detail-title {
-    font-size: 20px;
-    font-weight: 600;
+.footer p {
+    margin-bottom: 10px;
+}
+
+.footer-links {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+}
+
+.footer-links a {
+    color: #fff;
+    text-decoration: none;
+}
+
+.footer-links a:hover {
+    text-decoration: underline;
+}
+
+/* 模态框 */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+}
+
+.modal-content {
+    background: #fff;
+    border-radius: 8px;
+    padding: 30px;
+    max-width: 800px;
+    width: 90%;
+    max-height: 80vh;
+    overflow-y: auto;
+    position: relative;
+}
+
+.modal-close {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: #666;
+}
+
+.article-content h2 {
+    margin-bottom: 20px;
+    color: #333;
+}
+
+.article-content h3 {
+    margin-top: 20px;
+    margin-bottom: 10px;
+    color: #333;
+}
+
+.article-content p {
+    margin-bottom: 15px;
+    line-height: 1.8;
+}
+
+.article-content ul,
+.article-content ol {
+    margin-bottom: 15px;
+    padding-left: 20px;
+}
+
+.article-content li {
     margin-bottom: 8px;
-}
-
-.detail-meta {
-    display: flex;
-    gap: 12px;
-    margin-bottom: 12px;
-    font-size: 14px;
-    color: #666;
-}
-
-.detail-description {
-    font-size: 14px;
-    color: #666;
     line-height: 1.6;
 }
 
-/* 剧集列表 */
+.article-content pre {
+    background: #f5f5f5;
+    padding: 15px;
+    border-radius: 8px;
+    overflow-x: auto;
+    margin-bottom: 15px;
+}
+
+.article-content code {
+    font-family: 'Courier New', monospace;
+    font-size: 14px;
+}
+
+.article-content a {
+    color: #1a73e8;
+}
+
+/* 剧集和源选择按钮 */
 .episode-list {
-    margin-top: 16px;
+    margin-top: 20px;
 }
 
 .episode-title {
-    font-size: 16px;
+    font-size: 18px;
     font-weight: 600;
-    margin-bottom: 12px;
+    margin-bottom: 15px;
 }
 
 .episodes {
@@ -223,117 +473,21 @@ a:hover {
 
 .episode-btn {
     padding: 8px 16px;
-    background-color: #f0f0f0;
+    background: #f0f0f0;
     border: none;
     border-radius: 4px;
     font-size: 14px;
     cursor: pointer;
-    transition: background-color 0.2s;
+    transition: background 0.2s;
 }
 
 .episode-btn:hover {
-    background-color: #e0e0e0;
+    background: #e0e0e0;
 }
 
 .episode-btn.active {
-    background-color: #1a73e8;
+    background: #1a73e8;
     color: white;
-}
-
-/* 下载区域 */
-.download-section {
-    margin-top: 16px;
-    padding-top: 16px;
-    border-top: 1px solid #e0e0e0;
-}
-
-.download-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 12px 24px;
-    background-color: #34a853;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    font-size: 16px;
-    cursor: pointer;
-    transition: background-color 0.2s;
-}
-
-.download-btn:hover {
-    background-color: #2d8e47;
-}
-
-.download-progress {
-    margin-top: 12px;
-    background-color: #f0f0f0;
-    border-radius: 4px;
-    overflow: hidden;
-    height: 8px;
-}
-
-.download-progress-fill {
-    height: 100%;
-    background-color: #34a853;
-    width: 0%;
-    transition: width 0.3s;
-}
-
-.download-status {
-    margin-top: 8px;
-    font-size: 14px;
-    color: #666;
-}
-
-/* 分享区域 */
-.share-section {
-    margin-top: 16px;
-    padding-top: 16px;
-    border-top: 1px solid #e0e0e0;
-}
-
-.share-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 12px 24px;
-    background-color: #ff9800;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    font-size: 16px;
-    cursor: pointer;
-    transition: background-color 0.2s;
-}
-
-.share-btn:hover {
-    background-color: #e68900;
-}
-
-/* 底部区域 */
-.app-footer {
-    background-color: #fff;
-    padding: 24px 16px;
-    border-top: 1px solid #e0e0e0;
-    margin-top: auto;
-}
-
-.disclaimer {
-    text-align: center;
-    margin-bottom: 16px;
-}
-
-.disclaimer p {
-    font-size: 14px;
-    color: #666;
-    margin-bottom: 4px;
-}
-
-.copyright {
-    text-align: center;
-    font-size: 14px;
-    color: #999;
 }
 
 /* 加载状态 */
@@ -366,15 +520,10 @@ a:hover {
     color: #d93025;
 }
 
-.error-icon {
-    font-size: 48px;
-    margin-bottom: 12px;
-}
-
 .retry-btn {
     margin-top: 16px;
     padding: 8px 24px;
-    background-color: #1a73e8;
+    background: #1a73e8;
     color: white;
     border: none;
     border-radius: 4px;
@@ -382,7 +531,7 @@ a:hover {
 }
 
 .retry-btn:hover {
-    background-color: #1557b0;
+    background: #1557b0;
 }
 
 /* 空状态 */
@@ -390,21 +539,4 @@ a:hover {
     text-align: center;
     padding: 40px;
     color: #666;
-}
-
-.empty-icon {
-    font-size: 48px;
-    margin-bottom: 12px;
-}
-
-/* 播放器容器 */
-#playerContainer {
-    width: 100%;
-    height: 100%;
-}
-
-/* DPlayer容器 */
-#dplayer {
-    width: 100%;
-    height: 100%;
 }
