@@ -11,6 +11,9 @@ class PlayerModule {
         this.currentSourceIndex = 0;
         this.sources = [];
         this.playMode = 'iframe'; // 'iframe' 或 'dplayer'
+        this.episodes = []; // 剧集列表
+        this.currentEpisodeIndex = 0; // 当前剧集索引
+        this.onEpisodeChange = null; // 剧集切换回调
     }
     
     /**
@@ -30,8 +33,9 @@ class PlayerModule {
      * @param {string} videoUrl - 视频URL或页面URL
      * @param {Array} sources - 备用视频源列表
      * @param {string} mode - 播放模式: 'iframe' 或 'dplayer'
+     * @param {Object} options - 额外选项，包含episodes和currentEpisodeIndex
      */
-    play(videoUrl, sources = [], mode = 'iframe') {
+    play(videoUrl, sources = [], mode = 'iframe', options = {}) {
         if (!this.container) {
             console.error('播放器未初始化');
             return;
@@ -42,6 +46,14 @@ class PlayerModule {
         this.sources = sources;
         this.currentSourceIndex = 0;
         this.playMode = mode;
+        
+        // 设置剧集信息
+        if (options.episodes) {
+            this.episodes = options.episodes;
+        }
+        if (options.currentEpisodeIndex !== undefined) {
+            this.currentEpisodeIndex = options.currentEpisodeIndex;
+        }
         
         // 清空容器
         this.container.innerHTML = '';
@@ -113,6 +125,12 @@ class PlayerModule {
         this.dp.on('playing', () => {
             console.log('视频开始播放');
             this.isPlaying = true;
+        });
+        
+        // 视频播放结束时自动播放下一集
+        this.dp.on('ended', () => {
+            console.log('视频播放结束，尝试播放下一集...');
+            this.playNextEpisode();
         });
         
         console.log('DPlayer播放器创建成功');
@@ -219,6 +237,51 @@ class PlayerModule {
         console.log(`切换到源 ${this.currentSourceIndex + 1}: ${newUrl}`);
         
         this.play(newUrl, this.sources, this.playMode);
+    }
+    
+    /**
+     * 播放下一集
+     */
+    playNextEpisode() {
+        if (!this.episodes || this.episodes.length === 0) {
+            console.log('没有剧集信息');
+            return;
+        }
+        
+        const nextIndex = this.currentEpisodeIndex + 1;
+        if (nextIndex >= this.episodes.length) {
+            console.log('已经是最后一集');
+            return;
+        }
+        
+        const nextEpisode = this.episodes[nextIndex];
+        if (!nextEpisode || !nextEpisode.url) {
+            console.log('下一集URL无效');
+            return;
+        }
+        
+        console.log(`自动播放下一集: ${nextEpisode.name}`);
+        this.currentEpisodeIndex = nextIndex;
+        
+        // 判断播放模式
+        const isDirectVideo = this.isDirectVideoUrl(nextEpisode.url);
+        const playMode = isDirectVideo ? 'dplayer' : 'iframe';
+        
+        // 播放下一集
+        this.play(nextEpisode.url, this.sources, playMode);
+        
+        // 调用回调函数更新UI
+        if (typeof this.onEpisodeChange === 'function') {
+            this.onEpisodeChange(this.currentEpisodeIndex);
+        }
+    }
+    
+    /**
+     * 设置剧集切换回调
+     * @param {Function} callback - 回调函数
+     */
+    setOnEpisodeChange(callback) {
+        this.onEpisodeChange = callback;
     }
     
     /**

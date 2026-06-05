@@ -49,34 +49,80 @@ class SearchModule {
                 sources = VIDEO_SOURCES.filter(s => s.enabled);
             }
             
-            // 竞速搜索：哪个源先返回就先用
-            const searchPromises = sources.map(async (source) => {
+            // 优先搜索暴风资源（priority=1）
+            const primarySource = sources.find(s => s.id === 'bfzy');
+            const fallbackSources = sources.filter(s => s.id !== 'bfzy');
+            
+            // 先搜索暴风资源
+            if (primarySource) {
                 try {
-                    const result = await this.searchFromSource(keyword, source);
-                    return { source, result, success: true };
-                } catch (err) {
-                    console.error(`数据源 ${source.name} 搜索失败:`, err);
-                    return { source, result: [], success: false };
-                }
-            });
-            
-            // 使用 Promise.allSettled 等待所有结果
-            const results = await Promise.allSettled(searchPromises);
-            
-            // 收集成功的结果
-            results.forEach((settled) => {
-                if (settled.status === 'fulfilled' && settled.value.success) {
-                    const { source, result } = settled.value;
+                    const result = await this.searchFromSource(keyword, primarySource);
                     if (result && result.length > 0) {
                         this.results.push(...result);
                         this.sources.push({
-                            sourceId: source.id,
+                            sourceId: primarySource.id,
                             status: 'success',
                             count: result.length
                         });
+                        console.log(`暴风资源搜索成功，找到 ${result.length} 个结果`);
+                    } else {
+                        console.log('暴风资源搜索无结果，启动补搜索...');
+                        // 暴风资源搜索不到，立即调用红牛和360进行补搜索
+                        const fallbackPromises = fallbackSources.map(async (source) => {
+                            try {
+                                const fallbackResult = await this.searchFromSource(keyword, source);
+                                return { source, result: fallbackResult, success: true };
+                            } catch (err) {
+                                console.error(`补搜索 ${source.name} 失败:`, err);
+                                return { source, result: [], success: false };
+                            }
+                        });
+                        
+                        const fallbackResults = await Promise.allSettled(fallbackPromises);
+                        fallbackResults.forEach((settled) => {
+                            if (settled.status === 'fulfilled' && settled.value.success) {
+                                const { source, result } = settled.value;
+                                if (result && result.length > 0) {
+                                    this.results.push(...result);
+                                    this.sources.push({
+                                        sourceId: source.id,
+                                        status: 'success',
+                                        count: result.length
+                                    });
+                                    console.log(`补搜索 ${source.name} 成功，找到 ${result.length} 个结果`);
+                                }
+                            }
+                        });
                     }
+                } catch (err) {
+                    console.error('暴风资源搜索失败，启动补搜索...', err);
+                    // 暴风资源搜索失败，立即调用红牛和360进行补搜索
+                    const fallbackPromises = fallbackSources.map(async (source) => {
+                        try {
+                            const fallbackResult = await this.searchFromSource(keyword, source);
+                            return { source, result: fallbackResult, success: true };
+                        } catch (fallbackErr) {
+                            console.error(`补搜索 ${source.name} 失败:`, fallbackErr);
+                            return { source, result: [], success: false };
+                        }
+                    });
+                    
+                    const fallbackResults = await Promise.allSettled(fallbackPromises);
+                    fallbackResults.forEach((settled) => {
+                        if (settled.status === 'fulfilled' && settled.value.success) {
+                            const { source, result } = settled.value;
+                            if (result && result.length > 0) {
+                                this.results.push(...result);
+                                this.sources.push({
+                                    sourceId: source.id,
+                                    status: 'success',
+                                    count: result.length
+                                });
+                            }
+                        }
+                    });
                 }
-            });
+            }
             
             // 去重
             this.results = this.deduplicateResults(this.results);

@@ -6,20 +6,20 @@
 
 const VIDEO_SOURCES = [
     {
-        id: 'hongniu',
-        name: '红牛资源',
+        id: 'bfzy',
+        name: '暴风资源',
         type: 'api',
-        api: 'https://www.hongniuzy2.com/api.php/provide/vod',
+        api: 'https://bfzyapi.com/api.php/provide/vod',
         searchPath: '/?ac=detail&wd={keyword}',
         detailPath: '/?ac=detail&ids={id}',
         enabled: true,
         priority: 1
     },
     {
-        id: 'bfzy',
-        name: '暴风资源',
+        id: 'hongniu',
+        name: '红牛资源',
         type: 'api',
-        api: 'https://bfzyapi.com/api.php/provide/vod',
+        api: 'https://www.hongniuzy2.com/api.php/provide/vod',
         searchPath: '/?ac=detail&wd={keyword}',
         detailPath: '/?ac=detail&ids={id}',
         enabled: true,
