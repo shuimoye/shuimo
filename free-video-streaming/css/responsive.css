@@ -85,6 +85,15 @@
         grid-template-columns: 1fr;
     }
 
+    .about-card {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .skills-grid {
+        grid-template-columns: 1fr;
+    }
+
     .video-player-container {
         height: 300px;
     }
