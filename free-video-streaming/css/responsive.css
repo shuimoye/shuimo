@@ -1,4 +1,4 @@
-/* 响应式样式 - responsive.css */
+/* 响应式样式 - 商业级设计 */
 
 /* 平板设备 */
 @media (max-width: 768px) {
@@ -6,12 +6,14 @@
         display: none;
         flex-direction: column;
         position: absolute;
-        top: 60px;
+        top: 72px;
         left: 0;
         right: 0;
-        background: #fff;
-        padding: 20px;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        background: rgba(255, 255, 255, 0.98);
+        backdrop-filter: blur(20px);
+        padding: 16px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        border-bottom: 1px solid var(--border);
     }
 
     .nav-links.show {
@@ -26,12 +28,24 @@
         padding: 60px 20px;
     }
 
-    .hero-title {
-        font-size: 28px;
+    .hero-title .name {
+        font-size: 36px;
     }
 
     .hero-subtitle {
-        font-size: 16px;
+        font-size: 18px;
+    }
+
+    .hero-description {
+        font-size: 15px;
+    }
+
+    .hero-stats {
+        gap: 32px;
+    }
+
+    .stat-number {
+        font-size: 28px;
     }
 
     .section {
@@ -39,20 +53,32 @@
     }
 
     .section-title {
-        font-size: 24px;
-        margin-bottom: 30px;
+        font-size: 32px;
+    }
+
+    .section-subtitle {
+        font-size: 16px;
     }
 
     .blog-grid {
         grid-template-columns: 1fr;
     }
 
+    .card-image {
+        height: 180px;
+    }
+
     .video-search-box {
         flex-direction: column;
     }
 
+    .video-search-btn {
+        width: 100%;
+        justify-content: center;
+    }
+
     .video-results {
-        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
     }
 
     .about-content {
@@ -62,41 +88,101 @@
     .video-player-container {
         height: 300px;
     }
+
+    .footer-content {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .footer-brand {
+        align-items: center;
+    }
+
+    .footer-links {
+        justify-content: center;
+    }
+
+    .ai-chat-box {
+        width: calc(100vw - 48px);
+        right: -12px;
+        height: 450px;
+    }
 }
 
 /* 手机设备 */
 @media (max-width: 480px) {
     .nav-container {
-        padding: 0 15px;
+        padding: 0 16px;
     }
 
-    .nav-logo {
-        font-size: 20px;
+    .nav-logo .logo-text {
+        font-size: 16px;
     }
 
-    .hero-title {
-        font-size: 24px;
+    .hero-section {
+        padding: 40px 16px;
+    }
+
+    .hero-avatar {
+        width: 100px;
+        height: 100px;
+        font-size: 48px;
+    }
+
+    .hero-title .greeting {
+        font-size: 18px;
+    }
+
+    .hero-title .name {
+        font-size: 28px;
+    }
+
+    .hero-subtitle {
+        font-size: 16px;
     }
 
     .hero-links {
         flex-direction: column;
-        gap: 10px;
+        gap: 12px;
+    }
+
+    .hero-link {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .hero-stats {
+        gap: 24px;
+    }
+
+    .stat-number {
+        font-size: 24px;
+    }
+
+    .stat-label {
+        font-size: 12px;
+    }
+
+    .section-title {
+        font-size: 28px;
     }
 
     .video-search-input {
-        font-size: 14px;
+        padding: 14px 16px;
+        font-size: 15px;
     }
 
     .video-search-btn {
-        font-size: 14px;
+        padding: 14px 24px;
+        font-size: 15px;
     }
 
     .video-card {
-        border-radius: 6px;
+        border-radius: 10px;
     }
 
     .video-cover {
-        height: 90px;
+        height: 120px;
     }
 
     .video-player-container {
@@ -104,10 +190,36 @@
     }
 
     .blog-card {
-        padding: 15px;
+        border-radius: var(--radius);
+    }
+
+    .card-content {
+        padding: 20px;
     }
 
     .blog-title {
-        font-size: 18px;
+        font-size: 20px;
+    }
+
+    .modal-content {
+        padding: 24px;
+    }
+
+    .ai-chat-box {
+        width: calc(100vw - 32px);
+        right: -8px;
+        height: 400px;
+    }
+
+    .ai-chat-header {
+        padding: 16px 20px;
+    }
+
+    .ai-chat-messages {
+        padding: 16px;
+    }
+
+    .ai-chat-input-area {
+        padding: 12px;
     }
 }
