@@ -65,13 +65,15 @@
     }
 
     .hero-stats-bar {
-        gap: 12px;
+        gap: 10px;
         margin-bottom: 40px;
+        flex-wrap: wrap;
     }
 
     .stat-card {
         padding: 14px 18px;
-        min-width: 120px;
+        min-width: calc(50% - 10px);
+        flex: unset;
     }
 
     .stat-icon {

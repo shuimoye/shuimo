@@ -25,7 +25,7 @@ const DOMElements = {
 
 // 打字机效果配置
 const typingTexts = [
-    '全栈开发者 · 技术博主',
+    'Vibe Coding 开发者 · 技术博主',
     'AI 探索者 · 开源爱好者',
     '热爱技术，热爱生活'
 ];
@@ -66,6 +66,42 @@ function typeWriter() {
 }
 
 /**
+ * 初始化粒子效果
+ */
+function initParticles() {
+    const container = document.querySelector('.hero-particles');
+    if (!container) return;
+    
+    const particleCount = 30;
+    
+    for (let i = 0; i < particleCount; i++) {
+        const particle = document.createElement('div');
+        particle.className = 'particle';
+        const size = Math.random() * 4 + 1;
+        const opacity = Math.random() * 0.5 + 0.2;
+        const duration = Math.random() * 10 + 10;
+        const delay = Math.random() * 10;
+        const color = Math.random() > 0.5 ? '99, 102, 241' : '139, 92, 246';
+        
+        particle.style.cssText = `
+            position: absolute;
+            width: ${size}px;
+            height: ${size}px;
+            background: rgba(${color}, ${opacity});
+            border-radius: 50%;
+            left: ${Math.random() * 100}%;
+            top: ${Math.random() * 100}%;
+            animation-duration: ${duration}s;
+            animation-delay: ${delay}s;
+            animation-timing-function: linear;
+            animation-iteration-count: infinite;
+            pointer-events: none;
+        `;
+        container.appendChild(particle);
+    }
+}
+
+/**
  * 初始化应用
  */
 function initApp() {
@@ -78,6 +114,9 @@ function initApp() {
     
     // 启动打字机效果
     setTimeout(typeWriter, 500);
+    
+    // 初始化粒子效果
+    initParticles();
     
     console.log('应用初始化完成');
 }
