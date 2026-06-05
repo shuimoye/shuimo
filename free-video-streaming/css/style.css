@@ -601,9 +601,28 @@ a:hover {
     margin-top: 40px;
     background: #000;
     border-radius: var(--radius-lg);
-    overflow: hidden;
     height: 500px;
     box-shadow: var(--shadow-xl);
+    position: relative;
+}
+
+/* 确保DPlayer控制栏正常显示 */
+.video-player-container .dplayer {
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+}
+
+.video-player-container .dplayer-controller {
+    display: flex !important;
+    opacity: 1 !important;
+}
+
+.video-player-container .dplayer-bar-wrap {
+    display: block !important;
+}
+
+.video-player-container .dplayer-full {
+    display: inline-block !important;
 }
 
 .video-detail-container {
