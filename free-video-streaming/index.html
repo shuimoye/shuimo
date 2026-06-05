@@ -65,7 +65,7 @@
                 </div>
                 <div class="hero-stats">
                     <div class="stat-item">
-                        <span class="stat-number">3+</span>
+                        <span class="stat-number">4+</span>
                         <span class="stat-label">技术文章</span>
                     </div>
                     <div class="stat-item">
@@ -110,11 +110,15 @@
                         <span class="filter-icon">🔧</span>
                         <span>开发工具</span>
                     </button>
+                    <button class="filter-btn" data-filter="AI">
+                        <span class="filter-icon">🤖</span>
+                        <span>AI 大模型</span>
+                    </button>
                 </div>
                 
                 <!-- 文章统计 -->
                 <div class="blog-stats">
-                    <span class="stats-text">共 <strong>3</strong> 篇文章</span>
+                    <span class="stats-text">共 <strong>4</strong> 篇文章</span>
                     <span class="stats-divider">·</span>
                     <span class="stats-text">持续更新中...</span>
                 </div>
@@ -217,6 +221,41 @@
                                 <span class="tag">Gitee</span>
                             </div>
                             <a href="#" class="blog-link" onclick="showArticle('git-multi')">
+                                阅读全文
+                                <span class="arrow">→</span>
+                            </a>
+                        </div>
+                    </article>
+                    <article class="blog-card" data-category="AI">
+                        <div class="card-image" style="background: linear-gradient(135deg, #ef4444 0%, #f97316 100%);">
+                            <div class="card-gradient"></div>
+                            <div class="card-icon">🤖</div>
+                            <span class="card-category">AI 大模型</span>
+                        </div>
+                        <div class="card-content">
+                            <div class="card-meta">
+                                <span class="blog-date">
+                                    <span class="meta-icon">📅</span>
+                                    2026-06-05
+                                </span>
+                                <span class="read-time">
+                                    <span class="meta-icon">⏱️</span>
+                                    15分钟阅读
+                                </span>
+                                <span class="view-count" data-article="mimo-analysis">
+                                    <span class="meta-icon">👁️</span>
+                                    <span class="count">0</span> 阅读
+                                </span>
+                            </div>
+                            <h3 class="blog-title">小米 MiMo 大模型深度使用分析</h3>
+                            <p class="blog-excerpt">全面解析小米 MiMo V2.5 系列大模型的功能特点、使用体验、价格优势及开发者生态...</p>
+                            <div class="card-tags">
+                                <span class="tag">小米</span>
+                                <span class="tag">MiMo</span>
+                                <span class="tag">大模型</span>
+                                <span class="tag">AI</span>
+                            </div>
+                            <a href="#" class="blog-link" onclick="showArticle('mimo-analysis')">
                                 阅读全文
                                 <span class="arrow">→</span>
                             </a>
@@ -362,7 +401,7 @@
                             <div class="stats-list">
                                 <div class="stat-row">
                                     <span class="stat-label">技术文章</span>
-                                    <span class="stat-value">3 篇</span>
+                                    <span class="stat-value">4 篇</span>
                                 </div>
                                 <div class="stat-row">
                                     <span class="stat-label">视频资源</span>
@@ -581,6 +620,226 @@ done</code></pre>
                     
                     <blockquote>
                         建议使用 SSH 方式连接仓库，更安全也更方便。
+                    </blockquote>
+                `
+            },
+            'mimo-analysis': {
+                title: '小米 MiMo 大模型深度使用分析',
+                date: '2026-06-05',
+                readTime: '15分钟阅读',
+                category: 'AI',
+                content: `
+                    <h2 id="section-1">小米 MiMo 大模型深度使用分析</h2>
+                    <p>2026年，AI大模型竞争进入白热化阶段。小米作为科技巨头，推出了自研的MiMo大模型系列，凭借超强的性能和极具竞争力的价格，迅速在开发者社区引起轰动。本文将从多个维度深入分析MiMo大模型的实际使用体验。</p>
+                    
+                    <img src="https://picx.zhimg.com/v2-mimo-v25-banner.jpg" alt="MiMo V2.5 Banner" style="width:100%; border-radius:12px; margin:20px 0;">
+                    
+                    <h3 id="section-2">一、MiMo 模型家族概览</h3>
+                    <p>MiMo V2.5 系列包含多个版本，满足不同场景需求：</p>
+                    <ul>
+                        <li><strong>MiMo-V2.5</strong>：标准版，适合通用多模态任务，性价比极高</li>
+                        <li><strong>MiMo-V2.5-Pro</strong>：旗舰版，面向复杂软件工程与长链路Agent任务</li>
+                        <li><strong>MiMo-V2.5-TTS</strong>：语音合成模型，支持多音色和情感调节</li>
+                        <li><strong>MiMo-V2.5-ASR</strong>：语音识别模型，中英文混合识别领先</li>
+                    </ul>
+                    
+                    <img src="https://miro.medium.com/v2/mimo-models.jpg" alt="MiMo 模型系列" style="width:100%; border-radius:12px; margin:20px 0;">
+                    
+                    <h3 id="section-3">二、核心优势深度解析</h3>
+                    
+                    <h4>1. 超长上下文窗口</h4>
+                    <p>MiMo V2.5 支持高达 <strong>1M tokens</strong> 的超长上下文窗口，这意味着：</p>
+                    <ul>
+                        <li>可以一次性处理长篇小说、专业研究报告</li>
+                        <li>支持完整代码库分析</li>
+                        <li>50多轮对话后仍能准确记住前文细节</li>
+                    </ul>
+                    
+                    <h4>2. 全模态原生融合</h4>
+                    <p>不同于简单的多模态模块堆叠，MiMo 实现了文本、图像、音频与视频的统一建模：</p>
+                    <ul>
+                        <li>图像理解：精准识别图片内容和语义</li>
+                        <li>视频分析：支持视频摘要和内容提取</li>
+                        <li>音频处理：语音识别与合成一体化</li>
+                    </ul>
+                    
+                    <img src="https://example.com/mimo-multimodal.jpg" alt="MiMo 多模态能力" style="width:100%; border-radius:12px; margin:20px 0;">
+                    
+                    <h4>3. Agent 工具调用能力</h4>
+                    <p>MiMo 具备强大的 Agent 能力，支持：</p>
+                    <ul>
+                        <li>多轮工具调用与任务拆解</li>
+                        <li>长链路规划与执行</li>
+                        <li>复杂软件工程任务自动化</li>
+                    </ul>
+                    
+                    <h3 id="section-4">三、价格优势：降价99%的背后</h3>
+                    <p>2026年5月27日，小米宣布 MiMo-V2.5 系列 API <strong>永久降价</strong>，最高降幅达99%！</p>
+                    
+                    <table style="width:100%; border-collapse:collapse; margin:20px 0;">
+                        <thead>
+                            <tr style="background:#f3f4f6;">
+                                <th style="padding:12px; border:1px solid #e5e7eb;">模型</th>
+                                <th style="padding:12px; border:1px solid #e5e7eb;">输入价格</th>
+                                <th style="padding:12px; border:1px solid #e5e7eb;">输出价格</th>
+                                <th style="padding:12px; border:1px solid #e5e7eb;">降幅</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td style="padding:12px; border:1px solid #e5e7eb;">MiMo-V2.5</td>
+                                <td style="padding:12px; border:1px solid #e5e7eb;">0.02元/百万tokens</td>
+                                <td style="padding:12px; border:1px solid #e5e7eb;">2元/百万tokens</td>
+                                <td style="padding:12px; border:1px solid #e5e7eb; color:#10b981; font-weight:bold;">98%</td>
+                            </tr>
+                            <tr>
+                                <td style="padding:12px; border:1px solid #e5e7eb;">MiMo-V2.5-Pro</td>
+                                <td style="padding:12px; border:1px solid #e5e7eb;">0.025元/百万tokens</td>
+                                <td style="padding:12px; border:1px solid #e5e7eb;">6元/百万tokens</td>
+                                <td style="padding:12px; border:1px solid #e5e7eb; color:#10b981; font-weight:bold;">99%</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    
+                    <blockquote>
+                        降价核心技术：通过 Hybrid SWA + MoE + 多模态复合架构优化，KVCache 存储压缩至同级方案的约 1/7。
+                    </blockquote>
+                    
+                    <h3 id="section-5">四、开发者接入体验</h3>
+                    <p>MiMo 最大的亮点之一是<strong>兼容 OpenAI 协议</strong>，这意味着：</p>
+                    <ul>
+                        <li>Cherry Studio、Open WebUI、NextChat 等工具可直接接入</li>
+                        <li>原有 OpenAI 代码只需改 URL 和 Key 即可运行</li>
+                        <li>支持 Claude Code、Cline 等主流 Agent 框架</li>
+                    </ul>
+                    
+                    <h4>快速接入示例</h4>
+                    <pre><code>// OpenAI 兼容调用
+const response = await fetch('https://api.xiaomimimo.com/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer YOUR_API_KEY'
+    },
+    body: JSON.stringify({
+        model: 'mimo-v2.5-pro',
+        messages: [{ role: 'user', content: '你好' }]
+    })
+});</code></pre>
+                    
+                    <img src="https://example.com/mimo-developer.jpg" alt="MiMo 开发者体验" style="width:100%; border-radius:12px; margin:20px 0;">
+                    
+                    <h3 id="section-6">五、实际使用场景测试</h3>
+                    
+                    <h4>1. 代码生成能力</h4>
+                    <p>MiMo V2.5 Pro 在代码生成方面表现出色，能够：</p>
+                    <ul>
+                        <li>快速搭建后端服务架构</li>
+                        <li>生成带详尽注释的代码</li>
+                        <li>优秀的 Debug 能力</li>
+                    </ul>
+                    
+                    <h4>2. 中文创作能力</h4>
+                    <p>中文表达自然流畅，完全没有"AI腔"，适合：</p>
+                    <ul>
+                        <li>营销文案撰写</li>
+                        <li>技术博客初稿</li>
+                        <li>正式报告生成</li>
+                    </ul>
+                    
+                    <h4>3. 逻辑推理能力</h4>
+                    <p>在复杂问题分析中，MiMo 展现出强大的推理能力：</p>
+                    <ul>
+                        <li>系统拆解多变量问题</li>
+                        <li>清晰的思考链条</li>
+                        <li>准确的结论输出</li>
+                    </ul>
+                    
+                    <h3 id="section-7">六、与其他大模型对比</h3>
+                    <table style="width:100%; border-collapse:collapse; margin:20px 0;">
+                        <thead>
+                            <tr style="background:#f3f4f6;">
+                                <th style="padding:12px; border:1px solid #e5e7eb;">维度</th>
+                                <th style="padding:12px; border:1px solid #e5e7eb;">MiMo V2.5</th>
+                                <th style="padding:12px; border:1px solid #e5e7eb;">国外顶级模型</th>
+                                <th style="padding:12px; border:1px solid #e5e7eb;">国内竞品</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td style="padding:12px; border:1px solid #e5e7eb;">中文能力</td>
+                                <td style="padding:12px; border:1px solid #e5e7eb; color:#10b981;">优秀</td>
+                                <td style="padding:12px; border:1px solid #e5e7eb;">良好</td>
+                                <td style="padding:12px; border:1px solid #e5e7eb;">优秀</td>
+                            </tr>
+                            <tr>
+                                <td style="padding:12px; border:1px solid #e5e7eb;">推理能力</td>
+                                <td style="padding:12px; border:1px solid #e5e7eb; color:#10b981;">顶尖</td>
+                                <td style="padding:12px; border:1px solid #e5e7eb;">顶尖</td>
+                                <td style="padding:12px; border:1px solid #e5e7eb;">良好</td>
+                            </tr>
+                            <tr>
+                                <td style="padding:12px; border:1px solid #e5e7eb;">调用成本</td>
+                                <td style="padding:12px; border:1px solid #e5e7eb; color:#10b981; font-weight:bold;">极低</td>
+                                <td style="padding:12px; border:1px solid #e5e7eb;">较高</td>
+                                <td style="padding:12px; border:1px solid #e5e7eb;">中等</td>
+                            </tr>
+                            <tr>
+                                <td style="padding:12px; border:1px solid #e5e7eb;">上下文长度</td>
+                                <td style="padding:12px; border:1px solid #e5e7eb; color:#10b981;">1M tokens</td>
+                                <td style="padding:12px; border:1px solid #e5e7eb;">200K-1M</td>
+                                <td style="padding:12px; border:1px solid #e5e7eb;">128K-1M</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    
+                    <h3 id="section-8">七、免费体验福利</h3>
+                    <p>现在注册 MiMo 开放平台，可享受以下福利：</p>
+                    
+                    <div style="background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); padding:24px; border-radius:12px; margin:20px 0; border-left:4px solid #f59e0b;">
+                        <h4 style="margin-bottom:12px; color:#92400e;">限时福利</h4>
+                        <ul style="margin:0; padding-left:20px;">
+                            <li>新用户注册即送 <strong>¥10 API 体验金</strong></li>
+                            <li>体验金有效期 40 天</li>
+                            <li>TTS 语音合成模型限时免费</li>
+                            <li>Token Plan 用量提升 5-8 倍</li>
+                        </ul>
+                    </div>
+                    
+                    <h4>注册步骤</h4>
+                    <ol>
+                        <li>访问 MiMo 开放平台注册账号</li>
+                        <li>进入控制台，点击左下方「绑定邀请码」</li>
+                        <li>输入邀请码，体验金立即到账</li>
+                        <li>创建 API Key，开始调用</li>
+                    </ol>
+                    
+                    <h3 id="section-9">八、总结与建议</h3>
+                    <p>MiMo V2.5 系列大模型凭借以下优势，成为开发者的新宠：</p>
+                    <ul>
+                        <li><strong>价格断层领先</strong>：降价99%后，成本远低于竞品</li>
+                        <li><strong>性能顶尖</strong>：代码生成、中文创作、逻辑推理均表现出色</li>
+                        <li><strong>生态友好</strong>：兼容OpenAI协议，现有项目无缝迁移</li>
+                        <li><strong>超长上下文</strong>：1M tokens支持超大规模任务</li>
+                    </ul>
+                    
+                    <p>对于个人开发者、学生、小团队来说，现在是体验和使用MiMo的最佳时机。建议：</p>
+                    <ul>
+                        <li>先用免费额度测试，验证是否满足需求</li>
+                        <li>利用Token Plan降低长期使用成本</li>
+                        <li>关注官方动态，把握更多福利机会</li>
+                    </ul>
+                    
+                    <div style="background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%); padding:24px; border-radius:12px; margin:20px 0; border-left:4px solid #3b82f6;">
+                        <h4 style="margin-bottom:12px; color:#1e40af;">专属邀请福利</h4>
+                        <p style="margin-bottom:8px;">我在用 MiMo 开放平台体验小米顶尖模型 MiMo V2.5 等，通过我的邀请码注册为新用户，即得 <strong>¥10 API 体验金</strong>。</p>
+                        <p style="margin-bottom:8px;"><strong>邀请码：</strong><code style="background:#fff; padding:4px 8px; border-radius:4px; font-weight:bold;">SLQ2PZ</code></p>
+                        <p style="margin-bottom:8px;"><strong>注册地址：</strong><a href="https://platform.xiaomimimo.com?ref=SLQ2PZ" target="_blank">https://platform.xiaomimimo.com?ref=SLQ2PZ</a></p>
+                        <p style="margin:0; font-size:14px; color:#6b7280;">注册后点控制台左下方入口填入邀请码，体验金40天有效</p>
+                    </div>
+                    
+                    <blockquote>
+                        MiMo 大模型正在改变 AI 开发的成本结构，让更多开发者能够用上顶级 AI 能力。抓住这波福利，开启你的 AI 开发之旅吧！
                     </blockquote>
                 `
             }
