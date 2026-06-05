@@ -25,27 +25,77 @@
     }
 
     .hero-section {
-        padding: 60px 20px;
+        padding: 60px 20px 40px;
     }
 
     .hero-title .name {
-        font-size: 36px;
+        font-size: 32px;
     }
 
-    .hero-subtitle {
-        font-size: 18px;
+    .hero-typing {
+        font-size: 16px;
     }
 
-    .hero-description {
-        font-size: 15px;
+    .hero-skills {
+        gap: 8px;
     }
 
-    .hero-stats {
-        gap: 32px;
+    .skill-badge {
+        font-size: 12px;
+        padding: 5px 12px;
+    }
+
+    .hero-actions {
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .hero-btn {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .hero-links {
+        gap: 12px;
+    }
+
+    .hero-link {
+        width: 40px;
+        height: 40px;
+    }
+
+    .hero-stats-bar {
+        gap: 12px;
+        margin-bottom: 40px;
+    }
+
+    .stat-card {
+        padding: 14px 18px;
+        min-width: 120px;
+    }
+
+    .stat-icon {
+        font-size: 24px;
     }
 
     .stat-number {
-        font-size: 28px;
+        font-size: 20px;
+    }
+
+    .stat-label {
+        font-size: 12px;
+    }
+
+    .latest-item {
+        padding: 14px 16px;
+    }
+
+    .latest-article-title {
+        font-size: 14px;
+    }
+
+    .latest-excerpt {
+        display: none;
     }
 
     .section {
@@ -129,47 +179,105 @@
     }
 
     .hero-section {
-        padding: 40px 16px;
+        padding: 40px 16px 30px;
     }
 
     .hero-avatar {
-        width: 100px;
-        height: 100px;
-        font-size: 48px;
+        width: 80px;
+        height: 80px;
+        font-size: 38px;
     }
 
     .hero-title .greeting {
-        font-size: 18px;
+        font-size: 16px;
     }
 
     .hero-title .name {
         font-size: 28px;
     }
 
-    .hero-subtitle {
-        font-size: 16px;
+    .hero-typing {
+        font-size: 14px;
+    }
+
+    .hero-description {
+        font-size: 14px;
+    }
+
+    .hero-skills {
+        gap: 6px;
+    }
+
+    .skill-badge {
+        font-size: 11px;
+        padding: 4px 10px;
+    }
+
+    .hero-actions {
+        gap: 10px;
+    }
+
+    .hero-btn {
+        padding: 10px 20px;
+        font-size: 14px;
     }
 
     .hero-links {
-        flex-direction: column;
-        gap: 12px;
+        gap: 10px;
     }
 
     .hero-link {
-        width: 100%;
-        justify-content: center;
+        width: 38px;
+        height: 38px;
     }
 
-    .hero-stats {
-        gap: 24px;
+    .link-svg {
+        width: 18px;
+        height: 18px;
+    }
+
+    .hero-stats-bar {
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    .stat-card {
+        padding: 12px 14px;
+        min-width: calc(50% - 10px);
+        flex: 1;
+    }
+
+    .stat-icon {
+        font-size: 20px;
     }
 
     .stat-number {
-        font-size: 24px;
+        font-size: 18px;
     }
 
     .stat-label {
-        font-size: 12px;
+        font-size: 11px;
+    }
+
+    .latest-articles {
+        padding: 0 16px 30px;
+    }
+
+    .latest-title {
+        font-size: 18px;
+    }
+
+    .latest-item {
+        padding: 12px 14px;
+    }
+
+    .latest-badge {
+        font-size: 10px;
+        padding: 3px 8px;
+    }
+
+    .latest-article-title {
+        font-size: 13px;
     }
 
     .section-title {

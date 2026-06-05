@@ -23,6 +23,48 @@ const DOMElements = {
     videoDetail: null
 };
 
+// 打字机效果配置
+const typingTexts = [
+    '全栈开发者 · 技术博主',
+    'AI 探索者 · 开源爱好者',
+    '热爱技术，热爱生活'
+];
+
+let typingIndex = 0;
+let charIndex = 0;
+let isDeleting = false;
+
+/**
+ * 打字机效果
+ */
+function typeWriter() {
+    const typingElement = document.getElementById('typingText');
+    if (!typingElement) return;
+    
+    const currentText = typingTexts[typingIndex];
+    
+    if (isDeleting) {
+        typingElement.textContent = currentText.substring(0, charIndex - 1);
+        charIndex--;
+    } else {
+        typingElement.textContent = currentText.substring(0, charIndex + 1);
+        charIndex++;
+    }
+    
+    let typeSpeed = isDeleting ? 30 : 80;
+    
+    if (!isDeleting && charIndex === currentText.length) {
+        typeSpeed = 2000;
+        isDeleting = true;
+    } else if (isDeleting && charIndex === 0) {
+        isDeleting = false;
+        typingIndex = (typingIndex + 1) % typingTexts.length;
+        typeSpeed = 500;
+    }
+    
+    setTimeout(typeWriter, typeSpeed);
+}
+
 /**
  * 初始化应用
  */
@@ -33,6 +75,9 @@ function initApp() {
     bindEvents();
     showWelcomeMessage();
     checkUrlParams();
+    
+    // 启动打字机效果
+    setTimeout(typeWriter, 500);
     
     console.log('应用初始化完成');
 }
