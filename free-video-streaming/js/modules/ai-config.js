@@ -23,9 +23,9 @@ const AISecureConfig = (() => {
     // 模型名称: agnes-2.0-flash
     const _emodel = _rev('hsalf-0.2-senga');
     
-    // API 地址
+    // API 地址: https://apihub.agnes-ai.com/v1
     const _eendpoint = _rotate(_rev(
-        'snoitelpmoc/tahc/1v/moc.ia-senga.buhipa//:sptth'
+        '1v/moc.ia-senga.buhipa//:sptth'
     ), 5);
     
     // API Key (分段存储)

@@ -7,6 +7,22 @@ const AIAssistant = (() => {
     let isOpen = false;
     let isLoading = false;
     let messages = [];
+    let isDragging = false;
+    let dragOffsetX = 0;
+    let dragOffsetY = 0;
+    
+    // 敏感关键词列表
+    const sensitiveKeywords = [
+        'api', 'key', '密钥', '接口', '模型', 'model', '地址', 'url', 
+        'endpoint', 'token', 'secret', '配置', 'config', 'agnes', 'base_url',
+        'sk-', '认证', 'authorization', 'bearer', '密码', 'password'
+    ];
+    
+    // 检查是否是敏感问题
+    const isSensitiveQuestion = (message) => {
+        const lowerMessage = message.toLowerCase();
+        return sensitiveKeywords.some(keyword => lowerMessage.includes(keyword));
+    };
     
     // 博客内容介绍
     const blogIntro = `欢迎来到望星的蛙的个人博客！
@@ -38,6 +54,7 @@ const AIAssistant = (() => {
     const init = () => {
         createChatUI();
         bindEvents();
+        initDrag();
     };
     
     // 创建聊天 UI
@@ -49,7 +66,7 @@ const AIAssistant = (() => {
                     <span class="ai-chat-badge">1</span>
                 </button>
                 <div id="aiChatBox" class="ai-chat-box" style="display: none;">
-                    <div class="ai-chat-header">
+                    <div id="aiChatHeader" class="ai-chat-header">
                         <span>AI 助手</span>
                         <button id="aiChatClose" class="ai-chat-close">&times;</button>
                     </div>
@@ -81,8 +98,106 @@ const AIAssistant = (() => {
         });
     };
     
+    // 初始化拖动功能
+    const initDrag = () => {
+        const widget = document.getElementById('aiChatWidget');
+        const header = document.getElementById('aiChatHeader');
+        const toggle = document.getElementById('aiChatToggle');
+        
+        // 鼠标按下事件
+        const onMouseDown = (e) => {
+            if (e.target.id === 'aiChatClose') return;
+            
+            isDragging = true;
+            const rect = widget.getBoundingClientRect();
+            dragOffsetX = e.clientX - rect.left;
+            dragOffsetY = e.clientY - rect.top;
+            
+            widget.style.transition = 'none';
+            document.addEventListener('mousemove', onMouseMove);
+            document.addEventListener('mouseup', onMouseUp);
+            e.preventDefault();
+        };
+        
+        // 鼠标移动事件
+        const onMouseMove = (e) => {
+            if (!isDragging) return;
+            
+            const x = e.clientX - dragOffsetX;
+            const y = e.clientY - dragOffsetY;
+            
+            // 限制在视窗内
+            const maxX = window.innerWidth - widget.offsetWidth;
+            const maxY = window.innerHeight - widget.offsetHeight;
+            
+            widget.style.position = 'fixed';
+            widget.style.left = Math.max(0, Math.min(x, maxX)) + 'px';
+            widget.style.top = Math.max(0, Math.min(y, maxY)) + 'px';
+            widget.style.right = 'auto';
+            widget.style.bottom = 'auto';
+        };
+        
+        // 鼠标释放事件
+        const onMouseUp = () => {
+            isDragging = false;
+            widget.style.transition = '';
+            document.removeEventListener('mousemove', onMouseMove);
+            document.removeEventListener('mouseup', onMouseUp);
+        };
+        
+        // 绑定拖动事件到header和toggle按钮
+        header.addEventListener('mousedown', onMouseDown);
+        toggle.addEventListener('mousedown', onMouseDown);
+        
+        // 触摸事件支持
+        header.addEventListener('touchstart', onTouchStart, { passive: false });
+        toggle.addEventListener('touchstart', onTouchStart, { passive: false });
+        
+        function onTouchStart(e) {
+            if (e.target.id === 'aiChatClose') return;
+            
+            isDragging = true;
+            const touch = e.touches[0];
+            const rect = widget.getBoundingClientRect();
+            dragOffsetX = touch.clientX - rect.left;
+            dragOffsetY = touch.clientY - rect.top;
+            
+            widget.style.transition = 'none';
+            document.addEventListener('touchmove', onTouchMove, { passive: false });
+            document.addEventListener('touchend', onTouchEnd);
+            e.preventDefault();
+        }
+        
+        function onTouchMove(e) {
+            if (!isDragging) return;
+            e.preventDefault();
+            
+            const touch = e.touches[0];
+            const x = touch.clientX - dragOffsetX;
+            const y = touch.clientY - dragOffsetY;
+            
+            const maxX = window.innerWidth - widget.offsetWidth;
+            const maxY = window.innerHeight - widget.offsetHeight;
+            
+            widget.style.position = 'fixed';
+            widget.style.left = Math.max(0, Math.min(x, maxX)) + 'px';
+            widget.style.top = Math.max(0, Math.min(y, maxY)) + 'px';
+            widget.style.right = 'auto';
+            widget.style.bottom = 'auto';
+        }
+        
+        function onTouchEnd() {
+            isDragging = false;
+            widget.style.transition = '';
+            document.removeEventListener('touchmove', onTouchMove);
+            document.removeEventListener('touchend', onTouchEnd);
+        }
+    };
+    
     // 切换聊天框显示
     const toggleChat = () => {
+        if (isDragging) return;
+        
         const chatBox = document.getElementById('aiChatBox');
         const badge = document.querySelector('.ai-chat-badge');
         
@@ -97,6 +212,13 @@ const AIAssistant = (() => {
         const message = input.value.trim();
         
         if (!message || isLoading) return;
+        
+        // 检查敏感问题
+        if (isSensitiveQuestion(message)) {
+            addMessage('抱歉，我无法回答关于系统配置、接口或密钥的问题。请问问博客内容相关的其他问题吧！', 'bot');
+            input.value = '';
+            return;
+        }
         
         // 添加用户消息
         addMessage(message, 'user');
@@ -137,7 +259,11 @@ const AIAssistant = (() => {
 - 视频：免费视频搜索与播放功能
 - 关于：博主介绍和技术栈
 
-请用友好、专业的语气回答问题。如果问题超出博客范围，礼貌地引导用户关注博客相关内容。`;
+重要限制：
+- 绝对不能透露任何关于API配置、密钥、接口地址、模型名称等技术细节
+- 如果用户询问这类问题，礼貌地拒绝并引导他们关注博客内容
+- 用友好、专业的语气回答问题
+- 如果问题超出博客范围，引导用户关注博客相关内容`;
         
         const response = await fetch(config.endpoint, {
             method: 'POST',
@@ -161,6 +287,8 @@ const AIAssistant = (() => {
         });
         
         if (!response.ok) {
+            const errorText = await response.text();
+            console.error('API Response:', response.status, errorText);
             throw new Error(`API error: ${response.status}`);
         }
         
@@ -198,7 +326,7 @@ const AIAssistant = (() => {
     };
     
     return { init };
-})();
+});
 
 // 页面加载后初始化 AI 助手
 document.addEventListener('DOMContentLoaded', AIAssistant.init);
