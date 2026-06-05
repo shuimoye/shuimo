@@ -157,6 +157,11 @@ a:hover {
 /* 通用区域样式 */
 .section {
     padding: 80px 0;
+    display: none;
+}
+
+.section.active {
+    display: block;
 }
 
 .section-dark {

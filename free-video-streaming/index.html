@@ -14,12 +14,12 @@
     <!-- 导航栏 -->
     <nav class="navbar">
         <div class="nav-container">
-            <a href="#" class="nav-logo">水墨页</a>
+            <a href="#" class="nav-logo" onclick="showSection('home')">水墨页</a>
             <div class="nav-links">
-                <a href="#home" class="nav-link active">首页</a>
-                <a href="#blog" class="nav-link">博客</a>
-                <a href="#video" class="nav-link">视频</a>
-                <a href="#about" class="nav-link">关于</a>
+                <a href="#home" class="nav-link active" onclick="showSection('home')">首页</a>
+                <a href="#blog" class="nav-link" onclick="showSection('blog')">博客</a>
+                <a href="#video" class="nav-link" onclick="showSection('video')">视频</a>
+                <a href="#about" class="nav-link" onclick="showSection('about')">关于</a>
             </div>
             <button class="nav-toggle">☰</button>
         </div>
@@ -28,7 +28,7 @@
     <!-- 主页内容 -->
     <main class="main-content">
         <!-- 个人介绍区域 -->
-        <section id="home" class="hero-section">
+        <section id="home" class="section hero-section active">
             <div class="hero-content">
                 <div class="hero-avatar">
                     <div class="avatar-placeholder">墨</div>
@@ -38,7 +38,7 @@
                 <div class="hero-links">
                     <a href="https://github.com/shuimoye" target="_blank" class="hero-link">GitHub</a>
                     <a href="https://gitee.com/gx95" target="_blank" class="hero-link">Gitee</a>
-                    <a href="#blog" class="hero-link">博客</a>
+                    <a href="#blog" class="hero-link" onclick="showSection('blog')">博客</a>
                 </div>
             </div>
         </section>
@@ -229,17 +229,39 @@ git push gitee master</code></pre>
             document.getElementById('articleModal').style.display = 'none';
         }
 
-        // 导航链接点击
-        document.querySelectorAll('.nav-link').forEach(link => {
-            link.addEventListener('click', function(e) {
-                document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
-                this.classList.add('active');
+        // 显示指定区域，隐藏其他区域
+        function showSection(sectionId) {
+            // 隐藏所有区域
+            document.querySelectorAll('.section').forEach(section => {
+                section.classList.remove('active');
             });
-        });
+            
+            // 显示目标区域
+            const targetSection = document.getElementById(sectionId);
+            if (targetSection) {
+                targetSection.classList.add('active');
+            }
+            
+            // 更新导航链接状态
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === '#' + sectionId) {
+                    link.classList.add('active');
+                }
+            });
+            
+            // 滚动到页面顶部
+            window.scrollTo(0, 0);
+        }
 
         // 移动端导航切换
         document.querySelector('.nav-toggle').addEventListener('click', function() {
             document.querySelector('.nav-links').classList.toggle('show');
+        });
+
+        // 初始化显示首页
+        document.addEventListener('DOMContentLoaded', function() {
+            showSection('home');
         });
     </script>
 </body>
