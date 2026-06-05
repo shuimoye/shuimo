@@ -91,55 +91,119 @@
                     <h2 class="section-title">博客文章</h2>
                     <p class="section-subtitle">分享我的技术心得和学习笔记</p>
                 </div>
+                
+                <!-- 分类筛选 -->
+                <div class="blog-filters">
+                    <button class="filter-btn active" data-filter="all">
+                        <span class="filter-icon">📚</span>
+                        <span>全部文章</span>
+                    </button>
+                    <button class="filter-btn" data-filter="教程">
+                        <span class="filter-icon">📖</span>
+                        <span>技术教程</span>
+                    </button>
+                    <button class="filter-btn" data-filter="部署">
+                        <span class="filter-icon">🚀</span>
+                        <span>部署指南</span>
+                    </button>
+                    <button class="filter-btn" data-filter="工具">
+                        <span class="filter-icon">🔧</span>
+                        <span>开发工具</span>
+                    </button>
+                </div>
+                
+                <!-- 文章统计 -->
+                <div class="blog-stats">
+                    <span class="stats-text">共 <strong>3</strong> 篇文章</span>
+                    <span class="stats-divider">·</span>
+                    <span class="stats-text">持续更新中...</span>
+                </div>
+                
                 <div class="blog-grid">
-                    <article class="blog-card">
-                        <div class="card-image">
+                    <article class="blog-card" data-category="教程">
+                        <div class="card-image" style="background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);">
                             <div class="card-gradient"></div>
+                            <div class="card-icon">🎬</div>
                             <span class="card-category">技术教程</span>
                         </div>
                         <div class="card-content">
                             <div class="card-meta">
-                                <span class="blog-date">2026-06-04</span>
-                                <span class="read-time">5分钟阅读</span>
+                                <span class="blog-date">
+                                    <span class="meta-icon">📅</span>
+                                    2026-06-04
+                                </span>
+                                <span class="read-time">
+                                    <span class="meta-icon">⏱️</span>
+                                    5分钟阅读
+                                </span>
                             </div>
                             <h3 class="blog-title">搭建免费视频流媒体网站</h3>
                             <p class="blog-excerpt">使用纯前端技术搭建了一个免费的视频流媒体网站，支持搜索、播放、下载功能...</p>
+                            <div class="card-tags">
+                                <span class="tag">前端</span>
+                                <span class="tag">视频</span>
+                                <span class="tag">开源</span>
+                            </div>
                             <a href="#" class="blog-link" onclick="showArticle('video-project')">
                                 阅读全文
                                 <span class="arrow">→</span>
                             </a>
                         </div>
                     </article>
-                    <article class="blog-card">
-                        <div class="card-image">
+                    <article class="blog-card" data-category="部署">
+                        <div class="card-image" style="background: linear-gradient(135deg, #f59e0b 0%, #f97316 100%);">
                             <div class="card-gradient"></div>
+                            <div class="card-icon">☁️</div>
                             <span class="card-category">部署指南</span>
                         </div>
                         <div class="card-content">
                             <div class="card-meta">
-                                <span class="blog-date">2026-06-03</span>
-                                <span class="read-time">8分钟阅读</span>
+                                <span class="blog-date">
+                                    <span class="meta-icon">📅</span>
+                                    2026-06-03
+                                </span>
+                                <span class="read-time">
+                                    <span class="meta-icon">⏱️</span>
+                                    8分钟阅读
+                                </span>
                             </div>
                             <h3 class="blog-title">Cloudflare Pages 部署指南</h3>
                             <p class="blog-excerpt">如何使用 Cloudflare Pages 免费部署静态网站，享受全球CDN加速...</p>
+                            <div class="card-tags">
+                                <span class="tag">Cloudflare</span>
+                                <span class="tag">部署</span>
+                                <span class="tag">CDN</span>
+                            </div>
                             <a href="#" class="blog-link" onclick="showArticle('cloudflare')">
                                 阅读全文
                                 <span class="arrow">→</span>
                             </a>
                         </div>
                     </article>
-                    <article class="blog-card">
-                        <div class="card-image">
+                    <article class="blog-card" data-category="工具">
+                        <div class="card-image" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">
                             <div class="card-gradient"></div>
-                            <span class="card-category">Git教程</span>
+                            <div class="card-icon">🔀</div>
+                            <span class="card-category">开发工具</span>
                         </div>
                         <div class="card-content">
                             <div class="card-meta">
-                                <span class="blog-date">2026-06-02</span>
-                                <span class="read-time">6分钟阅读</span>
+                                <span class="blog-date">
+                                    <span class="meta-icon">📅</span>
+                                    2026-06-02
+                                </span>
+                                <span class="read-time">
+                                    <span class="meta-icon">⏱️</span>
+                                    6分钟阅读
+                                </span>
                             </div>
                             <h3 class="blog-title">Git 多远程仓库管理</h3>
                             <p class="blog-excerpt">如何同时管理 GitHub、Gitee 等多个远程仓库，实现代码多平台同步...</p>
+                            <div class="card-tags">
+                                <span class="tag">Git</span>
+                                <span class="tag">GitHub</span>
+                                <span class="tag">Gitee</span>
+                            </div>
                             <a href="#" class="blog-link" onclick="showArticle('git-multi')">
                                 阅读全文
                                 <span class="arrow">→</span>
@@ -338,8 +402,35 @@
     <!-- 博客文章详情模态框 -->
     <div id="articleModal" class="modal" style="display: none;">
         <div class="modal-content">
-            <button class="modal-close" onclick="closeModal()">&times;</button>
-            <div id="articleContent" class="article-content"></div>
+            <div class="reading-progress" id="readingProgress"></div>
+            <div class="modal-header">
+                <h2 id="articleTitle"></h2>
+                <div class="article-meta">
+                    <span id="articleDate"></span>
+                    <span id="articleReadTime"></span>
+                </div>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <aside class="article-toc" id="articleToc">
+                    <h4 class="toc-title">目录导航</h4>
+                    <ul class="toc-list" id="tocList"></ul>
+                </aside>
+                <main class="article-main" id="articleMain">
+                    <div id="articleContent" class="article-content"></div>
+                    <div class="article-actions">
+                        <button class="action-btn" onclick="toggleLike(this)">
+                            <span class="action-icon">👍</span>
+                            <span>点赞</span>
+                            <span class="like-count">0</span>
+                        </button>
+                        <button class="action-btn" onclick="shareArticle()">
+                            <span class="action-icon">📤</span>
+                            <span>分享</span>
+                        </button>
+                    </div>
+                </main>
+            </div>
         </div>
     </div>
 
@@ -365,41 +456,64 @@
             'video-project': {
                 title: '搭建免费视频流媒体网站',
                 date: '2026-06-04',
+                readTime: '5分钟阅读',
+                category: '教程',
                 content: `
-                    <h2>搭建免费视频流媒体网站</h2>
+                    <h2 id="section-1">搭建免费视频流媒体网站</h2>
                     <p>最近做了一个免费视频流媒体网站，可以搜索和播放各种视频资源。</p>
-                    <h3>技术栈</h3>
+                    
+                    <h3 id="section-2">技术栈</h3>
                     <ul>
                         <li>HTML/CSS/JavaScript（纯前端）</li>
                         <li>DPlayer（视频播放器）</li>
                         <li>HLS.js（m3u8流播放）</li>
                     </ul>
-                    <h3>功能特点</h3>
+                    
+                    <h3 id="section-3">功能特点</h3>
                     <ul>
                         <li>支持多个视频源搜索</li>
                         <li>自动选择最佳视频源</li>
                         <li>支持下载和分享</li>
                         <li>响应式设计，支持手机和电脑</li>
                     </ul>
-                    <h3>部署</h3>
+                    
+                    <h3 id="section-4">部署</h3>
                     <p>使用 Cloudflare Pages 部署，享受免费CDN加速。</p>
                     <p><a href="https://github.com/shuimoye/shuimo" target="_blank">项目地址</a></p>
+                    
+                    <h3 id="section-5">代码示例</h3>
+                    <pre><code>// 初始化播放器
+const dp = new DPlayer({
+    container: document.getElementById('player'),
+    video: {
+        url: 'video.mp4',
+        type: 'auto'
+    }
+});</code></pre>
+                    
+                    <blockquote>
+                        这个项目完全开源，欢迎 Star 和 PR！
+                    </blockquote>
                 `
             },
             'cloudflare': {
                 title: 'Cloudflare Pages 部署指南',
                 date: '2026-06-03',
+                readTime: '8分钟阅读',
+                category: '部署',
                 content: `
-                    <h2>Cloudflare Pages 部署指南</h2>
+                    <h2 id="section-1">Cloudflare Pages 部署指南</h2>
                     <p>Cloudflare Pages 是一个免费的静态网站托管服务，支持全球CDN加速。</p>
-                    <h3>优势</h3>
+                    
+                    <h3 id="section-2">优势</h3>
                     <ul>
                         <li>免费使用</li>
                         <li>全球CDN加速</li>
                         <li>自动HTTPS</li>
                         <li>支持自定义域名</li>
                     </ul>
-                    <h3>部署步骤</h3>
+                    
+                    <h3 id="section-3">部署步骤</h3>
                     <ol>
                         <li>登录 Cloudflare Dashboard</li>
                         <li>选择 Workers & Pages</li>
@@ -407,43 +521,223 @@
                         <li>配置构建设置</li>
                         <li>点击部署</li>
                     </ol>
-                    <h3>注意事项</h3>
+                    
+                    <h3 id="section-4">注意事项</h3>
                     <p>Cloudflare Pages 只支持 GitHub 和 GitLab，不支持 Gitee。</p>
+                    
+                    <h3 id="section-5">配置示例</h3>
+                    <pre><code># 构建配置
+Build command: npm run build
+Build output directory: dist
+Root directory: /</code></pre>
+                    
+                    <blockquote>
+                        推荐使用 GitHub 仓库，可以实现自动部署。
+                    </blockquote>
                 `
             },
             'git-multi': {
                 title: 'Git 多远程仓库管理',
                 date: '2026-06-02',
+                readTime: '6分钟阅读',
+                category: '工具',
                 content: `
-                    <h2>Git 多远程仓库管理</h2>
+                    <h2 id="section-1">Git 多远程仓库管理</h2>
                     <p>有时候我们需要把代码推送到多个远程仓库，比如 GitHub 和 Gitee。</p>
-                    <h3>添加多个远程仓库</h3>
+                    
+                    <h3 id="section-2">添加多个远程仓库</h3>
                     <pre><code>git remote add github https://github.com/user/repo.git
 git remote add gitee https://gitee.com/user/repo.git</code></pre>
-                    <h3>推送到多个仓库</h3>
+                    
+                    <h3 id="section-3">推送到多个仓库</h3>
                     <pre><code>git push github master
 git push gitee master</code></pre>
-                    <h3>查看远程仓库</h3>
+                    
+                    <h3 id="section-4">查看远程仓库</h3>
                     <pre><code>git remote -v</code></pre>
-                    <h3>设置默认远程仓库</h3>
+                    
+                    <h3 id="section-5">设置默认远程仓库</h3>
                     <pre><code>git push origin master</code></pre>
+                    
+                    <h3 id="section-6">批量推送脚本</h3>
+                    <pre><code>#!/bin/bash
+# 推送到所有远程仓库
+for remote in $(git remote); do
+    echo "Pushing to $remote..."
+    git push $remote master
+done</code></pre>
+                    
+                    <blockquote>
+                        建议使用 SSH 方式连接仓库，更安全也更方便。
+                    </blockquote>
                 `
             }
         };
+
+        // 当前文章ID
+        let currentArticleId = null;
 
         // 显示文章
         function showArticle(id) {
             const article = articles[id];
             if (article) {
+                currentArticleId = id;
+                
+                // 设置标题和元信息
+                document.getElementById('articleTitle').textContent = article.title;
+                document.getElementById('articleDate').innerHTML = '<span class="meta-icon">📅</span> ' + article.date;
+                document.getElementById('articleReadTime').innerHTML = '<span class="meta-icon">⏱️</span> ' + article.readTime;
+                
+                // 设置文章内容
                 document.getElementById('articleContent').innerHTML = article.content;
+                
+                // 生成目录
+                generateToc();
+                
+                // 显示模态框
                 document.getElementById('articleModal').style.display = 'flex';
+                document.body.style.overflow = 'hidden';
+                
+                // 重置阅读进度
+                document.getElementById('readingProgress').style.width = '0%';
+                
+                // 绑定滚动事件
+                const articleMain = document.getElementById('articleMain');
+                articleMain.addEventListener('scroll', updateReadingProgress);
+            }
+        }
+
+        // 生成目录导航
+        function generateToc() {
+            const tocList = document.getElementById('tocList');
+            tocList.innerHTML = '';
+            
+            const headings = document.querySelectorAll('#articleContent h2, #articleContent h3');
+            headings.forEach((heading, index) => {
+                const id = heading.id || 'heading-' + index;
+                heading.id = id;
+                
+                const li = document.createElement('li');
+                li.className = 'toc-item';
+                
+                const a = document.createElement('a');
+                a.className = 'toc-link' + (heading.tagName === 'H3' ? ' level-3' : '');
+                a.href = '#' + id;
+                a.textContent = heading.textContent;
+                a.onclick = function(e) {
+                    e.preventDefault();
+                    document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
+                };
+                
+                li.appendChild(a);
+                tocList.appendChild(li);
+            });
+        }
+
+        // 更新阅读进度
+        function updateReadingProgress() {
+            const articleMain = document.getElementById('articleMain');
+            const scrollTop = articleMain.scrollTop;
+            const scrollHeight = articleMain.scrollHeight - articleMain.clientHeight;
+            const progress = (scrollTop / scrollHeight) * 100;
+            document.getElementById('readingProgress').style.width = progress + '%';
+            
+            // 更新目录高亮
+            updateTocHighlight();
+        }
+
+        // 更新目录高亮
+        function updateTocHighlight() {
+            const headings = document.querySelectorAll('#articleContent h2, #articleContent h3');
+            const tocLinks = document.querySelectorAll('.toc-link');
+            
+            let currentHeading = null;
+            headings.forEach(heading => {
+                const rect = heading.getBoundingClientRect();
+                if (rect.top <= 100) {
+                    currentHeading = heading;
+                }
+            });
+            
+            tocLinks.forEach(link => link.classList.remove('active'));
+            if (currentHeading) {
+                const activeLink = document.querySelector(`.toc-link[href="#${currentHeading.id}"]`);
+                if (activeLink) {
+                    activeLink.classList.add('active');
+                }
+            }
+        }
+
+        // 切换点赞
+        function toggleLike(btn) {
+            btn.classList.toggle('liked');
+            const count = btn.querySelector('.like-count');
+            const currentCount = parseInt(count.textContent);
+            count.textContent = btn.classList.contains('liked') ? currentCount + 1 : currentCount - 1;
+        }
+
+        // 分享文章
+        function shareArticle() {
+            const article = articles[currentArticleId];
+            if (article) {
+                const text = `${article.title} - 望星的蛙的博客`;
+                const url = window.location.href;
+                
+                if (navigator.share) {
+                    navigator.share({
+                        title: article.title,
+                        text: text,
+                        url: url
+                    });
+                } else {
+                    // 复制到剪贴板
+                    navigator.clipboard.writeText(`${text}\n${url}`).then(() => {
+                        alert('链接已复制到剪贴板！');
+                    });
+                }
             }
         }
 
         // 关闭模态框
         function closeModal() {
             document.getElementById('articleModal').style.display = 'none';
+            document.body.style.overflow = 'auto';
+            currentArticleId = null;
         }
+
+        // 分类筛选功能
+        document.addEventListener('DOMContentLoaded', function() {
+            const filterBtns = document.querySelectorAll('.filter-btn');
+            const blogCards = document.querySelectorAll('.blog-card');
+            
+            filterBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    // 更新按钮状态
+                    filterBtns.forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    const filter = this.dataset.filter;
+                    
+                    // 筛选文章
+                    blogCards.forEach((card, index) => {
+                        const category = card.dataset.category;
+                        
+                        if (filter === 'all' || category === filter) {
+                            card.classList.remove('hidden');
+                            card.classList.add('fade-in');
+                            card.style.animationDelay = (index * 0.1) + 's';
+                        } else {
+                            card.classList.add('hidden');
+                            card.classList.remove('fade-in');
+                        }
+                    });
+                    
+                    // 更新统计
+                    const visibleCount = document.querySelectorAll('.blog-card:not(.hidden)').length;
+                    document.querySelector('.stats-text strong').textContent = visibleCount;
+                });
+            });
+        });
 
         // 显示指定区域，隐藏其他区域
         function showSection(sectionId) {
