@@ -313,7 +313,9 @@ const AIAssistant = (() => {
         messagesContainer.scrollTop = messagesContainer.scrollHeight;
         
         if (!isLoading) {
-            messages.push({ role, content });
+            // 将 "bot" 转换为 "assistant" 以符合 API 要求
+            const apiRole = role === 'bot' ? 'assistant' : role;
+            messages.push({ role: apiRole, content });
         }
         
         return messageId;
