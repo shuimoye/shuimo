@@ -563,6 +563,20 @@ a:hover {
     gap: 6px;
 }
 
+.view-count {
+    font-size: 13px;
+    color: var(--text-light);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-left: auto;
+}
+
+.view-count .count {
+    font-weight: 600;
+    color: var(--primary);
+}
+
 .meta-icon {
     font-size: 14px;
 }

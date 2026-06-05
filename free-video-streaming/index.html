@@ -136,6 +136,10 @@
                                     <span class="meta-icon">⏱️</span>
                                     5分钟阅读
                                 </span>
+                                <span class="view-count" data-article="video-project">
+                                    <span class="meta-icon">👁️</span>
+                                    <span class="count">0</span> 阅读
+                                </span>
                             </div>
                             <h3 class="blog-title">搭建免费视频流媒体网站</h3>
                             <p class="blog-excerpt">使用纯前端技术搭建了一个免费的视频流媒体网站，支持搜索、播放、下载功能...</p>
@@ -166,6 +170,10 @@
                                     <span class="meta-icon">⏱️</span>
                                     8分钟阅读
                                 </span>
+                                <span class="view-count" data-article="cloudflare">
+                                    <span class="meta-icon">👁️</span>
+                                    <span class="count">0</span> 阅读
+                                </span>
                             </div>
                             <h3 class="blog-title">Cloudflare Pages 部署指南</h3>
                             <p class="blog-excerpt">如何使用 Cloudflare Pages 免费部署静态网站，享受全球CDN加速...</p>
@@ -195,6 +203,10 @@
                                 <span class="read-time">
                                     <span class="meta-icon">⏱️</span>
                                     6分钟阅读
+                                </span>
+                                <span class="view-count" data-article="git-multi">
+                                    <span class="meta-icon">👁️</span>
+                                    <span class="count">0</span> 阅读
                                 </span>
                             </div>
                             <h3 class="blog-title">Git 多远程仓库管理</h3>
@@ -577,11 +589,43 @@ done</code></pre>
         // 当前文章ID
         let currentArticleId = null;
 
+        // 获取阅读量
+        function getViewCount(articleId) {
+            const counts = JSON.parse(localStorage.getItem('blogViewCounts') || '{}');
+            return counts[articleId] || 0;
+        }
+
+        // 增加阅读量
+        function incrementViewCount(articleId) {
+            const counts = JSON.parse(localStorage.getItem('blogViewCounts') || '{}');
+            counts[articleId] = (counts[articleId] || 0) + 1;
+            localStorage.setItem('blogViewCounts', JSON.stringify(counts));
+            return counts[articleId];
+        }
+
+        // 初始化阅读量显示
+        function initViewCounts() {
+            document.querySelectorAll('.view-count').forEach(el => {
+                const articleId = el.dataset.article;
+                const count = getViewCount(articleId);
+                el.querySelector('.count').textContent = count;
+            });
+        }
+
         // 显示文章
         function showArticle(id) {
             const article = articles[id];
             if (article) {
                 currentArticleId = id;
+                
+                // 增加阅读量
+                const newCount = incrementViewCount(id);
+                
+                // 更新卡片上的阅读量显示
+                const viewCountEl = document.querySelector(`.view-count[data-article="${id}"] .count`);
+                if (viewCountEl) {
+                    viewCountEl.textContent = newCount;
+                }
                 
                 // 设置标题和元信息
                 document.getElementById('articleTitle').textContent = article.title;
@@ -772,6 +816,7 @@ done</code></pre>
         // 初始化显示首页
         document.addEventListener('DOMContentLoaded', function() {
             showSection('home');
+            initViewCounts();
         });
     </script>
 </body>
