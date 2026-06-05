@@ -260,6 +260,9 @@ class PlayerModule {
             return;
         }
         
+        // 检查当前是否全屏
+        const isFullscreen = !!document.fullscreenElement;
+        
         console.log(`自动播放下一集: ${nextEpisode.name}`);
         this.currentEpisodeIndex = nextIndex;
         
@@ -269,6 +272,16 @@ class PlayerModule {
         
         // 播放下一集
         this.play(nextEpisode.url, this.sources, playMode);
+        
+        // 如果之前是全屏，保持全屏状态
+        if (isFullscreen && this.container) {
+            // 延迟一点时间等待播放器加载完成
+            setTimeout(() => {
+                this.container.requestFullscreen().catch(err => {
+                    console.log('恢复全屏失败:', err);
+                });
+            }, 500);
+        }
         
         // 调用回调函数更新UI
         if (typeof this.onEpisodeChange === 'function') {

@@ -676,75 +676,12 @@ function showWelcomeMessage() {
             <div class="empty">
                 <div class="empty-icon">🎬</div>
                 <p>欢迎使用免费视频流媒体</p>
-                <p style="font-size: 14px; color: #666; margin-top: 8px;">
+                <p style="font-size: 14px; color: #6b7280; margin-top: 8px;">
                     输入关键词开始搜索视频
                 </p>
             </div>
         `;
     }
-    
-    // 加载随机推荐视频
-    loadRandomVideos();
-}
-
-/**
- * 加载随机推荐视频
- */
-async function loadRandomVideos() {
-    const randomVideosGrid = document.getElementById('randomVideosGrid');
-    if (!randomVideosGrid) return;
-    
-    // 热门搜索关键词
-    const hotKeywords = ['流浪地球', '三体', '庆余年', '狂飙', '漫长的季节', '繁花', '哈尔滨1944', '我的阿勒泰', '玫瑰的故事', '与凤行', '墨雨云间', '度华年', '颜心记', '狐妖小红娘'];
-    
-    // 随机选择8个关键词
-    const shuffled = hotKeywords.sort(() => 0.5 - Math.random());
-    const selectedKeywords = shuffled.slice(0, 8);
-    
-    // 显示加载状态
-    randomVideosGrid.innerHTML = '<div class="loading"><div class="loading-spinner"></div><p>加载推荐视频...</p></div>';
-    
-    try {
-        // 并行搜索多个关键词
-        const searchPromises = selectedKeywords.map(async (keyword) => {
-            try {
-                const results = await searchModule.search(keyword);
-                // 返回第一个结果
-                return results.length > 0 ? results[0] : null;
-            } catch (err) {
-                return null;
-            }
-        });
-        
-        const results = await Promise.allSettled(searchPromises);
-        const videos = results
-            .filter(r => r.status === 'fulfilled' && r.value !== null)
-            .map(r => r.value)
-            .slice(0, 8);
-        
-        // 渲染随机视频
-        if (videos.length > 0) {
-            randomVideosGrid.innerHTML = videos.map(video => `
-                <div class="random-video-card" onclick="showVideoDetail(searchModule.getResults().find(v => v.id === '${video.id}') || ${JSON.stringify(video).replace(/"/g, '&quot;')})">
-                    <div class="random-video-cover">
-                        <img src="${video.cover}" alt="${video.title}" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 300 400%22><rect fill=%22%23667eea%22 width=%22300%22 height=%22400%22/><text fill=%22white%22 font-size=%2248%22 x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22 dy=%22.3em%22>🎬</text></svg>'">
-                    </div>
-                    <div class="random-video-info">
-                        <h4 class="random-video-title">${video.title}</h4>
-                        <span class="random-video-source">${video.source}</span>
-                    </div>
-                </div>
-            `).join('');
-        } else {
-            randomVideosGrid.innerHTML = '<p style="color: #6b7280; text-align: center;">暂无推荐视频</p>';
-        }
-    } catch (error) {
-        console.error('加载随机视频失败:', error);
-        randomVideosGrid.innerHTML = '<p style="color: #6b7280; text-align: center;">加载推荐视频失败</p>';
-    }
-    
-    // 清除搜索模块缓存，避免影响正常搜索
-    searchModule.clearCache();
 }
 
 // 页面加载完成后初始化应用
