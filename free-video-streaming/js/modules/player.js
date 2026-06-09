@@ -116,6 +116,11 @@ class PlayerModule {
             }
         });
         
+        // 监听视频元数据加载，动态调整容器比例
+        this.dp.on('loadedmetadata', () => {
+            this.adjustContainerRatio();
+        });
+        
         // 添加错误处理
         this.dp.on('error', () => {
             console.error('播放错误，尝试切换源...');
@@ -134,6 +139,32 @@ class PlayerModule {
         });
         
         console.log('DPlayer播放器创建成功');
+    }
+    
+    /**
+     * 根据视频真实比例调整容器大小
+     */
+    adjustContainerRatio() {
+        if (!this.dp || !this.dp.video || !this.container) return;
+        
+        const video = this.dp.video;
+        const videoWidth = video.videoWidth;
+        const videoHeight = video.videoHeight;
+        
+        if (!videoWidth || !videoHeight) return;
+        
+        const ratio = videoWidth / videoHeight;
+        const containerWidth = this.container.offsetWidth;
+        const newHeight = containerWidth / ratio;
+        
+        console.log(`视频分辨率: ${videoWidth}x${videoHeight}, 比例: ${ratio.toFixed(2)}`);
+        
+        // 限制最大高度，避免竖屏视频过高
+        const maxHeight = window.innerHeight * 0.7;
+        const finalHeight = Math.min(newHeight, maxHeight);
+        
+        this.container.style.height = `${finalHeight}px`;
+        console.log(`容器高度调整为: ${finalHeight}px`);
     }
     
     /**
@@ -354,6 +385,11 @@ class PlayerModule {
 
 // 创建全局播放模块实例
 const playerModule = new PlayerModule();
+
+// 窗口大小变化时重新调整比例
+window.addEventListener('resize', () => {
+    playerModule.adjustContainerRatio();
+});
 
 // 导出播放模块
 if (typeof module !== 'undefined' && module.exports) {

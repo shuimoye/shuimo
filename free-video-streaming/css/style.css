@@ -1408,9 +1408,12 @@ a:hover {
     background: #000;
     border-radius: var(--radius-lg);
     height: 500px;
+    min-height: 300px;
+    max-height: 70vh;
     box-shadow: var(--shadow-xl);
     position: relative;
     z-index: 1;
+    transition: height 0.3s ease;
 }
 
 .video-detail-container {
