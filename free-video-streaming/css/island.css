@@ -1,0 +1,795 @@
+/* 浮空孤岛 · 望星居 */
+
+body.island-active {
+    overflow: hidden;
+    background: #04070d;
+}
+
+body.island-active .footer {
+    display: none;
+}
+
+body.island-active .navbar {
+    display: none;
+}
+
+body.island-active .main-content {
+    margin-top: 0;
+}
+
+.island-section {
+    padding: 0;
+    background: #04070d;
+}
+
+.island-stage {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    height: 100dvh;
+    min-height: 520px;
+    overflow: hidden;
+    background: #04070d;
+}
+
+.island-canvas {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+}
+
+.island-canvas canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+    touch-action: none;
+    cursor: grab;
+    outline: none;
+}
+
+.island-canvas canvas.is-dragging {
+    cursor: grabbing;
+}
+
+.island-vignette {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    background:
+        radial-gradient(ellipse at 50% 46%, transparent 36%, rgba(3, 6, 11, 0.46) 82%, rgba(3, 6, 11, 0.86) 100%),
+        linear-gradient(to bottom, rgba(3, 6, 11, 0.5) 0%, transparent 25%, transparent 66%, rgba(3, 6, 11, 0.8) 100%);
+}
+
+.island-hud {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    pointer-events: none;
+}
+
+.island-brand {
+    position: absolute;
+    top: clamp(20px, 5vh, 56px);
+    left: 50%;
+    transform: translateX(-50%);
+    text-align: center;
+    color: #f2e8d5;
+    animation: islandRise 1.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+    pointer-events: none;
+}
+
+.island-kicker {
+    font-family: 'Inter', sans-serif;
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.5em;
+    color: rgba(201, 168, 106, 0.76);
+    text-transform: uppercase;
+    margin-bottom: 14px;
+    padding-left: 0.5em;
+}
+
+.island-title {
+    font-family: 'Noto Serif SC', 'Songti SC', 'STSong', 'SimSun', 'KaiTi', serif;
+    font-size: clamp(44px, 6.2vw, 82px);
+    font-weight: 400;
+    letter-spacing: 0.32em;
+    line-height: 1.08;
+    padding-left: 0.32em;
+    margin: 0;
+    color: #f6ecd6;
+    text-shadow:
+        0 0 24px rgba(255, 210, 140, 0.26),
+        0 0 80px rgba(120, 160, 230, 0.16),
+        0 4px 18px rgba(0, 0, 0, 0.6);
+}
+
+.island-subtitle {
+    margin-top: 12px;
+    font-family: 'Noto Serif SC', 'Songti SC', 'STSong', 'SimSun', serif;
+    font-size: clamp(12px, 1.2vw, 15px);
+    letter-spacing: 0.4em;
+    padding-left: 0.4em;
+    color: rgba(226, 214, 190, 0.64);
+}
+
+.island-hints {
+    position: absolute;
+    bottom: 132px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    font-size: 11px;
+    letter-spacing: 0.22em;
+    color: rgba(232, 222, 202, 0.5);
+    white-space: nowrap;
+    animation: islandFade 2s ease 1.2s both;
+}
+
+.island-hints i {
+    width: 3px;
+    height: 3px;
+    border-radius: 50%;
+    background: rgba(201, 168, 106, 0.5);
+}
+
+.island-rooms {
+    position: absolute;
+    bottom: 28px;
+    left: 0;
+    right: 0;
+    margin: 0 auto;
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    padding: 8px;
+    border: 1px solid rgba(201, 168, 106, 0.2);
+    border-radius: 4px;
+    background: rgba(7, 12, 21, 0.52);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    box-shadow: 0 18px 50px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+    pointer-events: auto;
+    animation: islandRise 1.6s cubic-bezier(0.22, 1, 0.36, 1) 0.25s both;
+    width: min(660px, calc(100vw - 24px));
+}
+
+.island-room-card {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    min-width: 148px;
+    padding: 12px 17px;
+    border: 1px solid transparent;
+    border-radius: 2px;
+    background: transparent;
+    color: #e9dfca;
+    font-family: inherit;
+    text-align: left;
+    cursor: pointer;
+    transition: background 0.35s ease, border-color 0.35s ease, transform 0.35s ease;
+}
+
+.island-room-card + .island-room-card::before {
+    content: '';
+    position: absolute;
+    left: -5px;
+    top: 18%;
+    bottom: 18%;
+    width: 1px;
+    background: rgba(201, 168, 106, 0.16);
+    transition: opacity 0.3s ease;
+}
+
+.island-room-card:hover,
+.island-room-card:focus-visible,
+.island-room-card.is-active {
+    background: rgba(201, 168, 106, 0.09);
+    border-color: rgba(201, 168, 106, 0.38);
+    transform: translateY(-2px);
+    outline: none;
+}
+
+.island-room-card:hover + .island-room-card::before,
+.island-room-card.is-active + .island-room-card::before {
+    opacity: 0;
+}
+
+.room-index {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    flex: 0 0 28px;
+    border: 1px solid rgba(201, 168, 106, 0.5);
+    background: rgba(140, 42, 30, 0.32);
+    color: #e5c98d;
+    font-family: 'Noto Serif SC', 'Songti SC', 'STSong', 'SimSun', serif;
+    font-size: 13px;
+    transition: background 0.35s ease;
+}
+
+.island-room-card:hover .room-index,
+.island-room-card.is-active .room-index {
+    background: rgba(165, 58, 43, 0.7);
+}
+
+.room-text {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.25;
+}
+
+.room-name {
+    font-family: 'Noto Serif SC', 'Songti SC', 'STSong', 'SimSun', serif;
+    font-size: 16px;
+    letter-spacing: 0.16em;
+    color: #f1e7d2;
+}
+
+.room-tag {
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    color: rgba(201, 168, 106, 0.7);
+    margin-top: 4px;
+}
+
+.island-hover-label {
+    position: absolute;
+    left: 0;
+    top: 0;
+    z-index: 3;
+    padding: 7px 13px 8px;
+    border: 1px solid rgba(201, 168, 106, 0.45);
+    background: rgba(7, 12, 20, 0.8);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    color: #f3e7cf;
+    font-family: 'Noto Serif SC', 'Songti SC', 'STSong', 'SimSun', serif;
+    font-size: 13px;
+    letter-spacing: 0.18em;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease;
+    transform: translate(-999px, -999px);
+    box-shadow: 0 8px 26px rgba(0, 0, 0, 0.45);
+}
+
+.island-hover-label.is-visible {
+    opacity: 1;
+}
+
+.island-hover-label small {
+    display: block;
+    margin-top: 3px;
+    font-family: 'Inter', sans-serif;
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    color: rgba(201, 168, 106, 0.75);
+}
+
+.island-loading {
+    position: absolute;
+    inset: 0;
+    z-index: 5;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    background: radial-gradient(circle at 50% 45%, #0d1624 0%, #04070d 72%);
+    transition: opacity 1.1s ease, visibility 1.1s ease;
+    pointer-events: none;
+}
+
+.island-loading.is-hidden {
+    opacity: 0;
+    visibility: hidden;
+}
+
+.loading-seal {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 62px;
+    height: 62px;
+    border: 1px solid rgba(201, 168, 106, 0.55);
+    background: rgba(140, 42, 30, 0.28);
+    color: #e5c98d;
+    font-family: 'Noto Serif SC', 'Songti SC', 'STSong', 'SimSun', serif;
+    font-size: 26px;
+    animation: sealBreath 2.4s ease-in-out infinite;
+}
+
+.island-loading p {
+    font-family: 'Noto Serif SC', 'Songti SC', 'STSong', 'SimSun', serif;
+    font-size: 12px;
+    letter-spacing: 0.48em;
+    padding-left: 0.48em;
+    color: rgba(226, 214, 190, 0.6);
+}
+
+.island-fallback {
+    position: absolute;
+    inset: 0;
+    z-index: 6;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    padding: 24px;
+    text-align: center;
+    background: radial-gradient(circle at 50% 40%, #14202f 0%, #050a11 70%);
+}
+
+.island-fallback[hidden] {
+    display: none;
+}
+
+.island-fallback h2 {
+    font-family: 'Noto Serif SC', 'Songti SC', 'STSong', 'SimSun', serif;
+    font-size: 34px;
+    font-weight: 400;
+    letter-spacing: 0.3em;
+    color: #f2e6cd;
+}
+
+.island-fallback p {
+    font-size: 13px;
+    color: rgba(226, 214, 190, 0.62);
+    letter-spacing: 0.08em;
+}
+
+.island-fallback-links {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 12px;
+}
+
+.island-fallback-links a {
+    padding: 9px 22px;
+    border: 1px solid rgba(201, 168, 106, 0.38);
+    border-radius: 2px;
+    color: #e9dfca;
+    font-family: 'Noto Serif SC', 'Songti SC', 'STSong', 'SimSun', serif;
+    font-size: 13px;
+    letter-spacing: 0.22em;
+    text-decoration: none;
+    transition: border-color 0.3s ease, color 0.3s ease, background 0.3s ease;
+}
+
+.island-fallback-links a:hover {
+    border-color: rgba(201, 168, 106, 0.85);
+    color: #f6ead2;
+    background: rgba(201, 168, 106, 0.12);
+}
+
+.return-isle {
+    position: fixed;
+    left: 24px;
+    bottom: 24px;
+    z-index: 1200;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 11px 18px;
+    border: 1px solid rgba(201, 168, 106, 0.4);
+    border-radius: 2px;
+    background: rgba(12, 18, 28, 0.86);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    color: #e9dfca;
+    font-family: 'Noto Serif SC', 'Songti SC', 'STSong', 'SimSun', serif;
+    font-size: 13px;
+    letter-spacing: 0.2em;
+    cursor: pointer;
+    opacity: 0;
+    transform: translateY(12px);
+    pointer-events: none;
+    transition: opacity 0.4s ease, transform 0.4s ease, border-color 0.3s ease;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
+}
+
+body.away-from-isle .return-isle {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+}
+
+.return-isle:hover {
+    border-color: rgba(201, 168, 106, 0.8);
+    color: #fff5df;
+}
+
+.return-isle span {
+    font-size: 15px;
+    color: #c9a86a;
+}
+
+.room-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 3000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+}
+
+.room-modal[hidden] {
+    display: none;
+}
+
+.room-modal-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(2, 5, 10, 0.66);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    animation: islandFade 0.4s ease both;
+}
+
+.room-modal-panel {
+    position: relative;
+    width: min(540px, calc(100vw - 32px));
+    padding: 46px 46px 38px;
+    text-align: center;
+    background:
+        radial-gradient(circle at 50% 0%, rgba(201, 168, 106, 0.13), transparent 55%),
+        linear-gradient(160deg, #14120e 0%, #0b0f16 58%, #080b11 100%);
+    border: 1px solid rgba(201, 168, 106, 0.42);
+    box-shadow:
+        0 40px 100px rgba(0, 0, 0, 0.72),
+        inset 0 0 70px rgba(201, 168, 106, 0.05);
+    animation: modalRise 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.room-modal-panel::before,
+.room-modal-panel::after {
+    content: '';
+    position: absolute;
+    width: 26px;
+    height: 26px;
+    border: 1px solid rgba(201, 168, 106, 0.6);
+}
+
+.room-modal-panel::before {
+    top: 10px;
+    left: 10px;
+    border-right: none;
+    border-bottom: none;
+}
+
+.room-modal-panel::after {
+    right: 10px;
+    bottom: 10px;
+    border-left: none;
+    border-top: none;
+}
+
+.room-modal-close {
+    position: absolute;
+    top: 14px;
+    right: 16px;
+    width: 34px;
+    height: 34px;
+    border: none;
+    background: transparent;
+    color: rgba(226, 214, 190, 0.55);
+    font-size: 24px;
+    line-height: 1;
+    cursor: pointer;
+    transition: color 0.25s ease, transform 0.25s ease;
+}
+
+.room-modal-close:hover {
+    color: #f4e9d2;
+    transform: rotate(90deg);
+}
+
+.room-modal-kicker {
+    font-family: 'Inter', sans-serif;
+    font-size: 10px;
+    letter-spacing: 0.4em;
+    padding-left: 0.4em;
+    color: rgba(201, 168, 106, 0.85);
+    margin-bottom: 18px;
+}
+
+.room-modal-title {
+    font-family: 'Noto Serif SC', 'Songti SC', 'STSong', 'SimSun', serif;
+    font-size: clamp(38px, 6vw, 52px);
+    font-weight: 400;
+    letter-spacing: 0.2em;
+    padding-left: 0.2em;
+    color: #f6ecd6;
+    margin-bottom: 22px;
+    text-shadow: 0 0 30px rgba(255, 208, 138, 0.22);
+}
+
+.room-modal-rule {
+    width: 84px;
+    height: 1px;
+    margin: 0 auto 22px;
+    background: linear-gradient(90deg, transparent, rgba(201, 168, 106, 0.75), transparent);
+    position: relative;
+}
+
+.room-modal-rule::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 5px;
+    height: 5px;
+    background: rgba(201, 168, 106, 0.9);
+    transform: translate(-50%, -50%) rotate(45deg);
+}
+
+.room-modal-desc {
+    font-size: 14.5px;
+    line-height: 2;
+    letter-spacing: 0.04em;
+    color: rgba(224, 214, 194, 0.76);
+    margin-bottom: 20px;
+}
+
+.room-modal-meta {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    color: rgba(201, 168, 106, 0.68);
+    margin-bottom: 32px;
+}
+
+.room-modal-meta i {
+    width: 3px;
+    height: 3px;
+    border-radius: 50%;
+    background: rgba(201, 168, 106, 0.45);
+    align-self: center;
+}
+
+.room-modal-actions {
+    display: flex;
+    justify-content: center;
+    gap: 14px;
+}
+
+.room-enter,
+.room-later {
+    font-family: 'Noto Serif SC', 'Songti SC', 'STSong', 'SimSun', serif;
+    font-size: 14px;
+    letter-spacing: 0.32em;
+    padding: 13px 32px 13px 36px;
+    border-radius: 2px;
+    cursor: pointer;
+    transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+.room-enter {
+    color: #f8eed8;
+    background: linear-gradient(135deg, #8f3223 0%, #5f1f16 100%);
+    border: 1px solid rgba(201, 168, 106, 0.65);
+    box-shadow: 0 10px 26px rgba(120, 35, 24, 0.4);
+}
+
+.room-enter:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 16px 34px rgba(140, 44, 30, 0.5);
+    background: linear-gradient(135deg, #a63a28 0%, #70251a 100%);
+}
+
+.room-later {
+    color: rgba(224, 214, 194, 0.7);
+    background: transparent;
+    border: 1px solid rgba(201, 168, 106, 0.22);
+}
+
+.room-later:hover {
+    color: #f4e9d2;
+    border-color: rgba(201, 168, 106, 0.5);
+}
+
+.island-transition {
+    position: fixed;
+    inset: 0;
+    z-index: 4000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #02040a;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.5s ease, visibility 0.5s ease;
+}
+
+.island-transition.is-active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.island-transition span {
+    font-family: 'Noto Serif SC', 'Songti SC', 'STSong', 'SimSun', serif;
+    font-size: 15px;
+    letter-spacing: 0.6em;
+    padding-left: 0.6em;
+    color: rgba(232, 212, 172, 0.85);
+    animation: sealBreath 2s ease-in-out infinite;
+}
+
+@keyframes islandRise {
+    from { opacity: 0; transform: translateY(26px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.island-brand {
+    animation-name: islandRiseCentered;
+}
+
+@keyframes islandRiseCentered {
+    from { opacity: 0; transform: translate(-50%, 22px); }
+    to { opacity: 1; transform: translate(-50%, 0); }
+}
+
+@keyframes islandFade {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes sealBreath {
+    0%, 100% { opacity: 0.55; transform: scale(0.97); }
+    50% { opacity: 1; transform: scale(1); }
+}
+
+@keyframes modalRise {
+    from { opacity: 0; transform: translateY(28px) scale(0.97); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@media (max-width: 768px) {
+    .island-hints {
+        display: none;
+    }
+
+    body.island-active .ai-chat-widget {
+        bottom: 128px;
+        right: 14px;
+    }
+
+    body.island-active .ai-chat-toggle {
+        width: 50px;
+        height: 50px;
+    }
+
+    body.island-active .ai-chat-icon {
+        font-size: 24px;
+    }
+
+    .island-rooms {
+        bottom: 18px;
+        gap: 4px;
+        padding: 6px;
+    }
+
+    .island-room-card {
+        min-width: 0;
+        flex: 1;
+        flex-direction: column;
+        gap: 6px;
+        padding: 10px 6px;
+        text-align: center;
+    }
+
+    .island-room-card + .island-room-card::before {
+        display: none;
+    }
+
+    .room-text {
+        align-items: center;
+    }
+
+    .room-name {
+        font-size: 13px;
+        letter-spacing: 0.08em;
+    }
+
+    .room-tag {
+        font-size: 9px;
+        letter-spacing: 0.06em;
+    }
+
+    .room-index {
+        width: 24px;
+        height: 24px;
+        flex: 0 0 24px;
+        font-size: 12px;
+    }
+
+    .island-brand {
+        top: 26px;
+    }
+
+    .island-kicker {
+        letter-spacing: 0.34em;
+        padding-left: 0.34em;
+        font-size: 9px;
+    }
+
+    .island-title {
+        letter-spacing: 0.2em;
+        padding-left: 0.2em;
+    }
+
+    .island-subtitle {
+        letter-spacing: 0.24em;
+        padding-left: 0.24em;
+        font-size: 11px;
+    }
+
+    .room-modal-panel {
+        padding: 40px 24px 30px;
+    }
+
+    .room-modal-actions {
+        flex-direction: column;
+    }
+
+    .room-enter,
+    .room-later {
+        width: 100%;
+        letter-spacing: 0.24em;
+    }
+
+    .return-isle {
+        left: 12px;
+        bottom: 12px;
+        padding: 9px 14px;
+        font-size: 12px;
+    }
+}
+
+@media (max-height: 560px) {
+    .island-stage {
+        min-height: 300px;
+    }
+
+    .island-brand {
+        top: 10px;
+    }
+
+    .island-kicker,
+    .island-subtitle,
+    .island-hints {
+        display: none;
+    }
+
+    .island-title {
+        font-size: 28px;
+    }
+
+    .island-rooms {
+        bottom: 8px;
+        padding: 5px;
+    }
+
+    .island-room-card {
+        padding: 7px 12px;
+    }
+
+    body.island-active .ai-chat-widget {
+        bottom: 82px;
+        right: 10px;
+    }
+}
