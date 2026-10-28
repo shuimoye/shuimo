@@ -12,6 +12,7 @@
     <link rel="stylesheet" href="lib/DPlayer.min.css">
     <link rel="stylesheet" href="css/island.css">
     <link rel="stylesheet" href="css/library.css">
+    <link rel="stylesheet" href="css/theater.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -428,24 +429,66 @@
         </section>
 
         <!-- 视频区域 -->
-        <section id="video" class="section section-dark">
-            <div class="container">
-                <div class="section-header">
-                    <h2 class="section-title">视频搜索</h2>
-                    <p class="section-subtitle">海量视频资源，一键搜索</p>
-                </div>
-                <div class="video-search-wrapper">
-                    <div class="video-search-box">
-                        <input type="text" id="searchInput" class="video-search-input" placeholder="搜索你喜欢的视频...">
-                        <button id="searchBtn" class="video-search-btn">
-                            <span class="search-icon">🔍</span>
-                            <span>搜索</span>
-                        </button>
+        <section id="video" class="section theater-section">
+            <div class="theater-stage" id="theaterStage">
+                <div class="theater-canvas" id="theaterCanvas"></div>
+                <div class="theater-vignette" aria-hidden="true"></div>
+
+                <div class="theater-hud">
+                    <div class="theater-head">
+                        <p class="theater-kicker">贰 · THE PAVILION</p>
+                        <h2 class="theater-title">观澜榭</h2>
+                        <p class="theater-subtitle">戏台搜片 · 卷轴展目 · 灯火可观</p>
+                    </div>
+
+                    <div class="theater-tools">
+                        <button type="button" class="theater-tool theater-tool-reset" id="theaterReset">戏台</button>
+                        <button type="button" class="theater-tool theater-tool-home" id="theaterHome" aria-label="返回望星居">归</button>
+                    </div>
+
+                    <div class="theater-search search-container" id="theaterSearch">
+                        <p class="theater-search-label"><span>点一出好戏</span></p>
+                        <div class="theater-search-box">
+                            <input type="text" id="searchInput" class="video-search-input theater-input" placeholder="输入片名、演员或关键词" autocomplete="off">
+                            <button id="searchBtn" class="video-search-btn theater-submit">搜 戏</button>
+                        </div>
+                        <p class="theater-search-hint">回车开锣 · 结果沿卷轴横向展开</p>
+                    </div>
+
+                    <div class="theater-results-wrap" id="theaterResultsWrap" hidden>
+                        <div class="theater-results-head">
+                            <span class="theater-results-title">戏目卷轴</span>
+                            <span class="theater-result-count" id="theaterResultCount"></span>
+                            <div class="theater-scroll-nav">
+                                <button type="button" class="theater-scroll-btn" id="theaterPrev" aria-label="向左卷动">←</button>
+                                <button type="button" class="theater-scroll-btn" id="theaterNext" aria-label="向右卷动">→</button>
+                            </div>
+                        </div>
+                        <div class="theater-roller">
+                            <div id="searchResults" class="video-results" tabindex="0"></div>
+                        </div>
+                        <div class="theater-quick" id="theaterQuick" hidden>
+                            <span class="theater-quick-label">试听</span>
+                            <button type="button" data-term="京剧">京剧</button>
+                            <button type="button" data-term="越剧">越剧</button>
+                            <button type="button" data-term="昆曲">昆曲</button>
+                            <button type="button" data-term="黄梅戏">黄梅戏</button>
+                        </div>
+                    </div>
+
+                    <div class="theater-panel" id="theaterPanel">
+                        <div class="theater-panel-body">
+                            <button type="button" class="theater-panel-close" id="theaterPanelClose" aria-label="收起戏单">收</button>
+                            <div id="videoPlayer" class="video-player-container" style="display: none;"></div>
+                            <div id="videoDetail" class="video-detail-container" style="display: none;"></div>
+                        </div>
+                    </div>
+
+                    <div class="theater-loading" id="theaterLoading">
+                        <span class="theater-seal">启</span>
+                        <p>开锣中</p>
                     </div>
                 </div>
-                <div id="searchResults" class="video-results"></div>
-                <div id="videoPlayer" class="video-player-container" style="display: none;"></div>
-                <div id="videoDetail" class="video-detail-container" style="display: none;"></div>
             </div>
         </section>
 
@@ -1963,5 +2006,6 @@ response = client.images.generate(
         });
     </script>
     <script src="js/blog/library.js"></script>
+    <script src="js/theater/theater.js"></script>
 </body>
 </html>
