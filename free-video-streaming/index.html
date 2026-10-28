@@ -6,9 +6,12 @@
     <meta name="description" content="望星的蛙的个人博客 - 技术分享与视频资源">
     <meta name="keywords" content="博客,视频,个人主页,技术分享">
     <title>望星的蛙 - 个人博客</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230b1420'/%3E%3Ccircle cx='16' cy='16' r='7.5' fill='%23c9a86a'/%3E%3C/svg%3E">
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/responsive.css">
     <link rel="stylesheet" href="lib/DPlayer.min.css">
+    <link rel="stylesheet" href="css/island.css">
+    <link rel="stylesheet" href="css/library.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -34,150 +37,111 @@
     <!-- 主页内容 -->
     <main class="main-content">
         <!-- 个人介绍区域 -->
-        <section id="home" class="section hero-section active">
-            <div class="hero-bg-effects">
-                <div class="bg-orb bg-orb-1"></div>
-                <div class="bg-orb bg-orb-2"></div>
-                <div class="bg-orb bg-orb-3"></div>
-                <div class="bg-orb bg-orb-4"></div>
-                <div class="bg-orb bg-orb-5"></div>
-                <div class="bg-grid"></div>
-            </div>
-            <div class="hero-particles"></div>
-            <div class="hero-content">
-                <div class="hero-avatar-wrapper">
-                    <div class="hero-avatar">
-                        <div class="avatar-placeholder">蛙</div>
+        <!-- 浮空孤岛首页 -->
+        <section id="home" class="section island-section active">
+            <div class="island-stage">
+                <div id="islandCanvas" class="island-canvas"></div>
+                <div class="island-vignette"></div>
+
+                <div class="island-hud">
+                    <header class="island-brand">
+                        <p class="island-kicker">WANGXING · FLOATING ISLE</p>
+                        <h1 class="island-title">望星居</h1>
+                        <p class="island-subtitle">孤岛之上，有山有水有亭台</p>
+                    </header>
+
+                    <div class="island-hints">
+                        <span>拖拽环视</span>
+                        <i></i>
+                        <span>滚轮远近</span>
+                        <i></i>
+                        <span>点亭入室</span>
                     </div>
-                    <div class="avatar-ring"></div>
-                    <div class="avatar-status">
-                        <span class="status-dot"></span>
-                        <span class="status-text">在线</span>
+
+                    <nav class="island-rooms" aria-label="岛屿房间">
+                        <button type="button" class="island-room-card" data-room="blog">
+                            <span class="room-index">壹</span>
+                            <span class="room-text">
+                                <span class="room-name">文渊阁</span>
+                                <span class="room-tag">博客</span>
+                            </span>
+                        </button>
+                        <button type="button" class="island-room-card" data-room="video">
+                            <span class="room-index">贰</span>
+                            <span class="room-text">
+                                <span class="room-name">观澜榭</span>
+                                <span class="room-tag">视频</span>
+                            </span>
+                        </button>
+                        <button type="button" class="island-room-card" data-room="about">
+                            <span class="room-index">叁</span>
+                            <span class="room-text">
+                                <span class="room-name">栖心庐</span>
+                                <span class="room-tag">关于</span>
+                            </span>
+                        </button>
+                        <button type="button" class="island-room-card" data-room="home">
+                            <span class="room-index">序</span>
+                            <span class="room-text">
+                                <span class="room-name">望星台</span>
+                                <span class="room-tag">全景</span>
+                            </span>
+                        </button>
+                    </nav>
+                </div>
+
+                <div id="islandHoverLabel" class="island-hover-label" aria-hidden="true"></div>
+
+                <div id="islandLoading" class="island-loading">
+                    <div class="loading-seal">望</div>
+                    <p>孤岛浮生</p>
+                </div>
+
+                <div id="islandFallback" class="island-fallback" hidden>
+                    <h2>望星居</h2>
+                    <p>当前浏览器未启用 WebGL，三维孤岛无法呈现。</p>
+                    <p>已为你切换到常规首页，博客、视频与关于均可正常使用。</p>
+                    <div class="island-fallback-links">
+                        <a href="#blog" data-room-jump="blog">博客</a>
+                        <a href="#video" data-room-jump="video">视频</a>
+                        <a href="#about" data-room-jump="about">关于</a>
                     </div>
-                </div>
-                <h1 class="hero-title">
-                    <span class="greeting">你好，我是</span>
-                    <span class="name">望星的蛙</span>
-                </h1>
-                <div class="hero-typing">
-                    <span class="typing-text" id="typingText"></span>
-                    <span class="typing-cursor">|</span>
-                </div>
-                <p class="hero-description">热爱技术，热爱生活。在这里分享我的技术心得和学习笔记。</p>
-                
-                <!-- 技能标签 -->
-                <div class="hero-skills">
-                    <span class="skill-badge">前端开发</span>
-                    <span class="skill-badge">全栈工程师</span>
-                    <span class="skill-badge">AI 探索者</span>
-                    <span class="skill-badge">开源贡献者</span>
-                </div>
-                
-                <div class="hero-actions">
-                    <a href="#" class="hero-btn primary" onclick="showSection('blog')">
-                        <span class="btn-icon">📝</span>
-                        <span>查看博客</span>
-                    </a>
-                    <a href="#" class="hero-btn secondary" onclick="showSection('about')">
-                        <span class="btn-icon">👋</span>
-                        <span>了解我</span>
-                    </a>
-                </div>
-            </div>
-            
-            <!-- 数据统计 -->
-            <div class="hero-stats-bar">
-                <div class="stat-card">
-                    <div class="stat-icon">📄</div>
-                    <div class="stat-info">
-                        <span class="stat-number">7</span>
-                        <span class="stat-label">技术文章</span>
-                    </div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon">🎬</div>
-                    <div class="stat-info">
-                        <span class="stat-number">10+</span>
-                        <span class="stat-label">视频资源</span>
-                    </div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon">⭐</div>
-                    <div class="stat-info">
-                        <span class="stat-number">100%</span>
-                        <span class="stat-label">开源免费</span>
-                    </div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon">🚀</div>
-                    <div class="stat-info">
-                        <span class="stat-number">2</span>
-                        <span class="stat-label">开源项目</span>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- 最新文章预览 -->
-            <div class="latest-articles">
-                <div class="latest-header">
-                    <h2 class="latest-title">最新文章</h2>
-                    <a href="#" class="latest-more" onclick="showSection('blog')">查看全部 →</a>
-                </div>
-                <div class="latest-list">
-                    <article class="latest-item" onclick="showSection('blog'); setTimeout(() => showArticle('mimocode-guide'), 300)">
-                        <div class="latest-badge">NEW</div>
-                        <div class="latest-content">
-                            <div class="latest-meta">
-                                <span class="latest-category">开发工具</span>
-                                <span class="latest-date">06-10</span>
-                            </div>
-                            <h3 class="latest-article-title">小米 MiMo Code：AI 编码代理深度解析</h3>
-                            <p class="latest-excerpt">小米推出的 AI 编码代理，支持 75+ LLM 提供商，三种工作模式...</p>
-                        </div>
-                        <div class="latest-arrow">→</div>
-                    </article>
-                    <article class="latest-item" onclick="showSection('blog'); setTimeout(() => showArticle('monkeycode-review'), 300)">
-                        <div class="latest-badge">NEW</div>
-                        <div class="latest-content">
-                            <div class="latest-meta">
-                                <span class="latest-category">开发工具</span>
-                                <span class="latest-date">06-05</span>
-                            </div>
-                            <h3 class="latest-article-title">MonkeyCode 深度使用体验：AI编程新范式</h3>
-                            <p class="latest-excerpt">在 AI 编程工具百花齐放的 2026 年，MonkeyCode 以其独特的定位和免费策略，迅速成为开发者社区的热门话题...</p>
-                        </div>
-                        <div class="latest-arrow">→</div>
-                    </article>
-                    <article class="latest-item" onclick="showSection('blog'); setTimeout(() => showArticle('agnes-analysis'), 300)">
-                        <div class="latest-badge">NEW</div>
-                        <div class="latest-content">
-                            <div class="latest-meta">
-                                <span class="latest-category">AI 大模型</span>
-                                <span class="latest-date">06-05</span>
-                            </div>
-                            <h3 class="latest-article-title">Agnes AI：全球首个全模态免费API深度解析</h3>
-                            <p class="latest-excerpt">2026年6月1日，全球 Top 10 AI Lab Agnes AI 宣布无限期免费开放旗下核心模型 API...</p>
-                        </div>
-                        <div class="latest-arrow">→</div>
-                    </article>
-                    <article class="latest-item" onclick="showSection('blog'); setTimeout(() => showArticle('mimo-analysis'), 300)">
-                        <div class="latest-badge">HOT</div>
-                        <div class="latest-content">
-                            <div class="latest-meta">
-                                <span class="latest-category">AI 大模型</span>
-                                <span class="latest-date">06-05</span>
-                            </div>
-                            <h3 class="latest-article-title">小米 MiMo 大模型深度使用分析</h3>
-                            <p class="latest-excerpt">2026年，AI大模型竞争进入白热化阶段。小米作为科技巨头，推出了自研的MiMo大模型系列...</p>
-                        </div>
-                        <div class="latest-arrow">→</div>
-                    </article>
                 </div>
             </div>
         </section>
 
         <!-- 博客区域 -->
-        <section id="blog" class="section">
+        <section id="blog" class="section library-section">
+            <div class="library-stage" id="libraryStage">
+                <div class="library-canvas" id="libraryCanvas"></div>
+                <div class="library-vignette" aria-hidden="true"></div>
+
+                <div class="library-hud">
+                    <div class="library-head">
+                        <p class="library-kicker">壹 · THE STUDY</p>
+                        <h2 class="library-title">藏书楼</h2>
+                        <p class="library-subtitle"><span id="libraryCount">7</span> 卷藏书 · 点击匾额入架</p>
+                    </div>
+
+                    <div class="library-tools">
+                        <button type="button" class="library-tool library-back" id="libraryBack" hidden>← 全景</button>
+                        <button type="button" class="library-tool" id="libraryListBtn" aria-controls="libraryList" aria-expanded="false">书目</button>
+                    </div>
+
+                    <div class="library-shelf-tags" id="libraryShelfTags"></div>
+
+                    <div class="library-hover" id="libraryHover" aria-hidden="true"></div>
+
+                    <div class="library-loading" id="libraryLoading">
+                        <span class="library-seal">启</span>
+                        <p>启阁中</p>
+                    </div>
+
+                    <div class="library-list" id="libraryList" hidden></div>
+                </div>
+            </div>
+
+            <div class="library-fallback" id="libraryFallback" hidden>
             <div class="container">
                 <div class="section-header">
                     <h2 class="section-title">博客文章</h2>
@@ -210,7 +174,7 @@
                 
                 <!-- 文章统计 -->
                 <div class="blog-stats">
-                    <span class="stats-text">共 <strong>6</strong> 篇文章</span>
+                    <span class="stats-text">共 <strong>7</strong> 篇文章</span>
                     <span class="stats-divider">·</span>
                     <span class="stats-text">持续更新中...</span>
                 </div>
@@ -460,6 +424,7 @@
                     </article>
                 </div>
             </div>
+            </div>
         </section>
 
         <!-- 视频区域 -->
@@ -668,7 +633,8 @@
 
     <!-- 博客文章详情模态框 -->
     <div id="articleModal" class="modal" style="display: none;">
-        <div class="modal-content">
+        <div class="modal-content scroll-paper">
+            <div class="scroll-rod scroll-rod-top" aria-hidden="true"></div>
             <div class="reading-progress" id="readingProgress"></div>
             <div class="modal-header">
                 <h2 id="articleTitle"></h2>
@@ -676,7 +642,7 @@
                     <span id="articleDate"></span>
                     <span id="articleReadTime"></span>
                 </div>
-                <button class="modal-close" onclick="closeModal()">&times;</button>
+                <button class="modal-close" type="button" aria-label="收卷关闭" title="收卷" onclick="closeModal()">收卷</button>
             </div>
             <div class="modal-body">
                 <aside class="article-toc" id="articleToc">
@@ -698,8 +664,37 @@
                     </div>
                 </main>
             </div>
+            <div class="scroll-rod scroll-rod-bottom" aria-hidden="true"></div>
         </div>
     </div>
+
+
+    <!-- 房间进入确认 -->
+    <div id="roomModal" class="room-modal" hidden>
+        <div class="room-modal-backdrop"></div>
+        <div class="room-modal-panel" role="dialog" aria-modal="true" aria-labelledby="roomModalTitle">
+            <button type="button" class="room-modal-close" aria-label="关闭">&times;</button>
+            <p class="room-modal-kicker" id="roomModalKicker">壹 · THE STUDY</p>
+            <h2 class="room-modal-title" id="roomModalTitle">文渊阁</h2>
+            <div class="room-modal-rule"></div>
+            <p class="room-modal-desc" id="roomModalDesc"></p>
+            <div class="room-modal-meta" id="roomModalMeta"></div>
+            <div class="room-modal-actions">
+                <button type="button" class="room-enter" id="roomEnter">入阁阅文</button>
+                <button type="button" class="room-later" id="roomLater">再逛逛</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 入室转场 -->
+    <div id="islandTransition" class="island-transition" aria-hidden="true">
+        <span>入 · 文渊阁</span>
+    </div>
+
+    <!-- 返回孤岛 -->
+    <button type="button" id="returnIsle" class="return-isle" aria-label="返回浮空孤岛">
+        <span>←</span> 回望星居
+    </button>
 
     <!-- JavaScript -->
     <script src="js/utils/helpers.js"></script>
@@ -717,6 +712,7 @@
     <script src="js/modules/ai-config.js"></script>
     <script src="js/modules/ai-assistant.js"></script>
     <script src="js/app.js"></script>
+    <script src="js/island/island.js"></script>
     <script>
         // 博客文章内容
         const articles = {
@@ -1959,9 +1955,13 @@ response = client.images.generate(
 
         // 初始化显示首页
         document.addEventListener('DOMContentLoaded', function() {
-            showSection('home');
+            var initial = (window.location.hash || '').replace('#', '');
+            if (initial !== 'blog' && initial !== 'video' && initial !== 'about') {
+                showSection('home');
+            }
             initViewCounts();
         });
     </script>
+    <script src="js/blog/library.js"></script>
 </body>
 </html>
