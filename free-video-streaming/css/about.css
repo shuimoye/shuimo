@@ -1,0 +1,844 @@
+/* 栖心庐 · 三维书画阁关于页 */
+
+.about-section {
+    padding: 0;
+    min-height: 0;
+    background: #050403;
+    scroll-margin-top: 72px;
+}
+
+.about-stage {
+    position: relative;
+    width: 100%;
+    height: calc(100vh - 72px);
+    height: calc(100dvh - 72px);
+    min-height: 560px;
+    overflow: hidden;
+    background: #050403;
+}
+
+.about-canvas {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+}
+
+.about-canvas canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+    outline: none;
+}
+
+.about-vignette {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    background:
+        radial-gradient(ellipse at 50% 44%, transparent 32%, rgba(5, 4, 3, 0.4) 74%, rgba(4, 3, 2, 0.84) 100%),
+        linear-gradient(to bottom, rgba(5, 4, 3, 0.66) 0%, transparent 22%, transparent 66%, rgba(4, 3, 2, 0.76) 100%);
+}
+
+.about-hud {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    pointer-events: none;
+}
+
+.about-head {
+    position: absolute;
+    top: clamp(22px, 5vh, 54px);
+    left: clamp(22px, 4.5vw, 64px);
+    color: #f4e8cf;
+    animation: aboutRise 1.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+    transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+.about-head::after {
+    content: '';
+    display: block;
+    width: 58px;
+    height: 1px;
+    margin-top: 16px;
+    background: linear-gradient(90deg, rgba(201, 162, 92, 0.9), rgba(201, 162, 92, 0));
+}
+
+body.about-reading .about-head,
+body.about-reading .about-hint {
+    opacity: 0;
+    pointer-events: none;
+}
+
+@keyframes aboutRise {
+    from { opacity: 0; transform: translateY(18px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.about-kicker {
+    margin: 0 0 12px;
+    font-family: 'Inter', 'Helvetica Neue', sans-serif;
+    font-size: 11px;
+    letter-spacing: 0.34em;
+    color: rgba(201, 162, 92, 0.74);
+}
+
+.about-title {
+    margin: 0;
+    font-family: 'Ma Shan Zheng', 'Noto Serif SC', 'Songti SC', 'STSong', 'SimSun', serif;
+    font-size: clamp(40px, 5.4vw, 66px);
+    font-weight: 400;
+    letter-spacing: 0.14em;
+    line-height: 1.06;
+    text-shadow:
+        0 0 26px rgba(255, 206, 132, 0.2),
+        0 18px 48px rgba(0, 0, 0, 0.68);
+}
+
+.about-subtitle {
+    margin: 12px 0 0;
+    font-size: 12px;
+    letter-spacing: 0.22em;
+    color: rgba(232, 216, 187, 0.56);
+}
+
+.about-tools {
+    position: absolute;
+    top: clamp(22px, 5vh, 54px);
+    right: clamp(22px, 4.5vw, 64px);
+    display: flex;
+    gap: 10px;
+    pointer-events: auto;
+}
+
+.about-tool {
+    padding: 9px 18px;
+    border: 1px solid rgba(201, 162, 92, 0.34);
+    border-radius: 2px;
+    background: rgba(14, 10, 7, 0.72);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    color: rgba(235, 220, 194, 0.86);
+    font-family: 'Ma Shan Zheng', 'Noto Serif SC', 'Songti SC', serif;
+    font-size: 15px;
+    letter-spacing: 0.2em;
+    padding-left: 24px;
+    cursor: pointer;
+    transition: border-color 0.3s ease, color 0.3s ease, background 0.3s ease;
+}
+
+.about-tool:hover {
+    border-color: rgba(224, 190, 122, 0.86);
+    background: rgba(201, 162, 92, 0.16);
+    color: #f7ead0;
+}
+
+.about-back {
+    color: rgba(232, 196, 126, 0.95);
+}
+
+.about-back[hidden] {
+    display: none !important;
+}
+
+.about-hint {
+    position: absolute;
+    left: 50%;
+    bottom: clamp(24px, 5vh, 48px);
+    transform: translateX(-50%);
+    margin: 0;
+    font-family: 'Ma Shan Zheng', 'Noto Serif SC', 'Songti SC', serif;
+    font-size: 16px;
+    letter-spacing: 0.22em;
+    color: rgba(232, 214, 182, 0.58);
+    white-space: nowrap;
+    pointer-events: none;
+    transition: opacity 0.5s ease;
+    animation: aboutBreath 3.4s ease-in-out infinite;
+}
+
+@keyframes aboutBreath {
+    0%, 100% { opacity: 0.52; }
+    50% { opacity: 0.94; }
+}
+
+.about-hover {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 208px;
+    padding: 12px 15px 11px;
+    border: 1px solid rgba(201, 162, 92, 0.42);
+    background: rgba(16, 11, 8, 0.92);
+    box-shadow: 0 14px 38px rgba(0, 0, 0, 0.5);
+    color: #f2e6ce;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.16s ease;
+    pointer-events: none;
+    backdrop-filter: blur(8px);
+}
+
+.about-hover.is-visible {
+    opacity: 1;
+    visibility: visible;
+}
+
+.about-hover strong {
+    display: block;
+    font-family: 'Ma Shan Zheng', 'Noto Serif SC', 'Songti SC', serif;
+    font-size: 22px;
+    font-weight: 400;
+    letter-spacing: 0.1em;
+    line-height: 1.3;
+    margin-bottom: 4px;
+}
+
+.about-hover span {
+    display: block;
+    font-family: 'Noto Serif SC', 'Songti SC', serif;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    color: rgba(214, 190, 148, 0.68);
+}
+
+.about-hover em {
+    display: block;
+    margin-top: 7px;
+    font-style: normal;
+    font-size: 10px;
+    letter-spacing: 0.22em;
+    color: rgba(224, 190, 122, 0.9);
+}
+
+.about-loading {
+    position: absolute;
+    inset: 0;
+    z-index: 6;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    background: #050403;
+    transition: opacity 0.5s ease, visibility 0.5s ease;
+}
+
+.about-loading.is-hidden {
+    opacity: 0;
+    visibility: hidden;
+}
+
+.about-seal {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 56px;
+    height: 56px;
+    border: 1px solid rgba(201, 162, 92, 0.6);
+    color: rgba(232, 202, 142, 0.94);
+    font-family: 'Ma Shan Zheng', 'Noto Serif SC', 'Songti SC', serif;
+    font-size: 26px;
+    animation: aboutSeal 2.2s ease-in-out infinite;
+}
+
+@keyframes aboutSeal {
+    0%, 100% { opacity: 0.55; transform: rotate(-3deg) scale(0.97); }
+    50% { opacity: 1; transform: rotate(2deg) scale(1.03); }
+}
+
+.about-loading p {
+    margin: 0;
+    font-family: 'Ma Shan Zheng', 'Noto Serif SC', 'Songti SC', serif;
+    font-size: 15px;
+    letter-spacing: 0.42em;
+    padding-left: 0.42em;
+    color: rgba(214, 194, 158, 0.62);
+}
+
+.about-panel {
+    position: absolute;
+    top: 50%;
+    right: clamp(24px, 5vw, 72px);
+    z-index: 5;
+    width: min(430px, 82vw);
+    max-height: min(78vh, 660px);
+    transform: translate(24px, -50%);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 0.42s ease, transform 0.42s cubic-bezier(0.22, 1, 0.36, 1), visibility 0.42s ease;
+}
+
+.about-panel.is-open {
+    opacity: 1;
+    visibility: visible;
+    transform: translate(0, -50%);
+    pointer-events: auto;
+}
+
+.about-panel-inner {
+    position: relative;
+    max-height: min(78vh, 660px);
+    overflow-y: auto;
+    padding: 40px 34px 34px;
+    border: 1px solid rgba(201, 162, 92, 0.32);
+    background:
+        linear-gradient(160deg, rgba(24, 17, 11, 0.97) 0%, rgba(17, 12, 8, 0.98) 60%, rgba(22, 15, 9, 0.97) 100%);
+    box-shadow: 0 30px 80px rgba(0, 0, 0, 0.62), inset 0 0 0 1px rgba(255, 226, 172, 0.05);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    scrollbar-width: thin;
+    scrollbar-color: rgba(201, 162, 92, 0.3) transparent;
+}
+
+.about-panel-inner::before {
+    content: '';
+    position: absolute;
+    inset: 9px;
+    border: 1px solid rgba(201, 162, 92, 0.12);
+    pointer-events: none;
+}
+
+.about-panel-close {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 46px;
+    height: 46px;
+    flex-shrink: 0;
+    border: 1px solid rgba(201, 162, 92, 0.34);
+    border-radius: 50%;
+    background: rgba(14, 10, 7, 0.86);
+    color: rgba(232, 214, 182, 0.82);
+    font-family: 'Ma Shan Zheng', 'Noto Serif SC', 'Songti SC', serif;
+    font-size: 20px;
+    line-height: 1;
+    cursor: pointer;
+    transition: border-color 0.24s ease, color 0.24s ease, background 0.24s ease;
+}
+
+.about-panel-close:hover {
+    border-color: rgba(224, 190, 122, 0.86);
+    background: rgba(201, 162, 92, 0.18);
+    color: #f8ecd4;
+}
+
+.about-panel-kicker {
+    margin: 0 0 10px;
+    font-family: 'Inter', sans-serif;
+    font-size: 10px;
+    letter-spacing: 0.36em;
+    color: rgba(201, 162, 92, 0.72);
+}
+
+.about-panel-title {
+    margin: 0;
+    font-family: 'Ma Shan Zheng', 'Noto Serif SC', 'Songti SC', serif;
+    font-size: 40px;
+    font-weight: 400;
+    letter-spacing: 0.14em;
+    color: #f4e6c8;
+    text-shadow: 0 0 24px rgba(255, 206, 132, 0.18);
+}
+
+.about-panel-sub {
+    margin: 8px 0 0;
+    font-family: 'Noto Serif SC', 'Songti SC', serif;
+    font-size: 12px;
+    letter-spacing: 0.18em;
+    color: rgba(214, 190, 148, 0.56);
+}
+
+.about-panel-sub::after {
+    content: '';
+    display: block;
+    width: 44px;
+    height: 1px;
+    margin-top: 18px;
+    background: linear-gradient(90deg, rgba(201, 162, 92, 0.82), rgba(201, 162, 92, 0));
+}
+
+.about-panel-content {
+    margin-top: 22px;
+    font-family: 'Noto Serif SC', 'Songti SC', 'STSong', 'SimSun', serif;
+    font-size: 14px;
+    line-height: 1.95;
+    color: rgba(232, 222, 204, 0.82);
+}
+
+.about-panel-content p {
+    margin: 0 0 14px;
+}
+
+.about-lede {
+    font-family: 'Ma Shan Zheng', 'Noto Serif SC', 'Songti SC', serif;
+    font-size: 19px;
+    line-height: 1.9;
+    letter-spacing: 0.04em;
+    color: rgba(244, 232, 208, 0.94);
+}
+
+.about-facts {
+    margin: 20px 0;
+    border-top: 1px solid rgba(201, 162, 92, 0.14);
+}
+
+.about-fact {
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+    padding: 12px 0;
+    border-bottom: 1px solid rgba(201, 162, 92, 0.14);
+}
+
+.about-fact span {
+    flex: 0 0 44px;
+    font-size: 11px;
+    letter-spacing: 0.24em;
+    color: rgba(201, 162, 92, 0.72);
+}
+
+.about-fact strong {
+    font-weight: 400;
+    font-size: 14px;
+    color: rgba(240, 228, 206, 0.9);
+}
+
+.about-list {
+    margin: 0 0 14px;
+    padding: 0;
+    list-style: none;
+}
+
+.about-list li {
+    position: relative;
+    padding-left: 20px;
+    margin-bottom: 9px;
+    color: rgba(230, 220, 202, 0.82);
+}
+
+.about-list li::before {
+    content: '·';
+    position: absolute;
+    left: 4px;
+    color: rgba(201, 162, 92, 0.9);
+}
+
+.about-list-brush li {
+    font-family: 'Ma Shan Zheng', 'Noto Serif SC', 'Songti SC', serif;
+    font-size: 18px;
+    letter-spacing: 0.05em;
+    margin-bottom: 12px;
+}
+
+.about-skills section {
+    margin-bottom: 18px;
+}
+
+.about-skills h4 {
+    margin: 0 0 10px;
+    font-family: 'Ma Shan Zheng', 'Noto Serif SC', 'Songti SC', serif;
+    font-size: 18px;
+    font-weight: 400;
+    letter-spacing: 0.12em;
+    color: rgba(232, 196, 126, 0.9);
+}
+
+.about-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.about-tags span {
+    padding: 6px 13px;
+    border: 1px solid rgba(201, 162, 92, 0.26);
+    border-radius: 2px;
+    background: rgba(201, 162, 92, 0.07);
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    color: rgba(232, 220, 198, 0.86);
+}
+
+.about-contacts {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    margin-top: 18px;
+}
+
+.about-contacts a,
+.about-contact-static {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 13px 14px;
+    border: 1px solid transparent;
+    border-bottom-color: rgba(201, 162, 92, 0.16);
+    text-decoration: none;
+    transition: background 0.24s ease, border-color 0.24s ease;
+}
+
+.about-contacts a:hover {
+    border-color: rgba(201, 162, 92, 0.3);
+    background: rgba(201, 162, 92, 0.08);
+}
+
+.about-contacts span {
+    font-family: 'Ma Shan Zheng', 'Noto Serif SC', 'Songti SC', serif;
+    font-size: 19px;
+    letter-spacing: 0.08em;
+    color: #f0e2c8;
+}
+
+.about-contacts em {
+    font-style: normal;
+    font-family: 'Inter', 'Noto Serif SC', sans-serif;
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    color: rgba(214, 190, 148, 0.56);
+}
+
+.about-contact-static span {
+    color: rgba(240, 226, 200, 0.9);
+}
+
+.about-quote-brush {
+    margin: 20px 0 22px;
+    padding: 18px 20px;
+    border-left: 2px solid rgba(201, 162, 92, 0.5);
+    background: rgba(201, 162, 92, 0.06);
+    font-family: 'Ma Shan Zheng', 'Noto Serif SC', 'Songti SC', serif;
+    font-size: 24px;
+    line-height: 1.7;
+    letter-spacing: 0.08em;
+    color: rgba(246, 234, 210, 0.94);
+}
+
+.about-stats {
+    display: flex;
+    gap: 10px;
+    margin: 20px 0 22px;
+}
+
+.about-stats div {
+    flex: 1;
+    padding: 16px 10px;
+    border: 1px solid rgba(201, 162, 92, 0.2);
+    text-align: center;
+}
+
+.about-stats strong {
+    display: block;
+    font-family: 'Ma Shan Zheng', 'Noto Serif SC', 'Songti SC', serif;
+    font-size: 30px;
+    font-weight: 400;
+    color: rgba(238, 200, 132, 0.96);
+}
+
+.about-stats span {
+    display: block;
+    margin-top: 4px;
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    color: rgba(214, 190, 148, 0.6);
+}
+
+.about-star {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 4px;
+    padding: 11px 24px;
+    border: 1px solid rgba(201, 162, 92, 0.4);
+    border-radius: 2px;
+    font-family: 'Ma Shan Zheng', 'Noto Serif SC', 'Songti SC', serif;
+    font-size: 16px;
+    letter-spacing: 0.1em;
+    color: rgba(240, 222, 190, 0.92);
+    text-decoration: none;
+    transition: border-color 0.24s ease, background 0.24s ease, color 0.24s ease;
+}
+
+.about-star:hover {
+    border-color: rgba(224, 190, 122, 0.86);
+    background: rgba(201, 162, 92, 0.14);
+    color: #f8ecd4;
+}
+
+body.about-focus .navbar,
+body.about-focus .footer {
+    display: none !important;
+}
+
+body.about-focus .main-content {
+    margin-top: 0;
+}
+
+body.about-focus .about-section {
+    scroll-margin-top: 0;
+}
+
+body.about-focus .about-stage {
+    height: 100vh;
+    height: 100dvh;
+    min-height: 0;
+}
+
+body.about-focus #aiChatWidget,
+body.about-focus .ai-chat-badge,
+body.about-focus .return-isle {
+    display: none !important;
+}
+
+.about-stage[hidden],
+.about-fallback[hidden] {
+    display: none !important;
+}
+
+.about-tool:focus-visible,
+.about-panel-close:focus-visible,
+.about-contacts a:focus-visible,
+.about-star:focus-visible {
+    outline: 2px solid rgba(224, 190, 122, 0.8);
+    outline-offset: 3px;
+}
+
+.about-fallback {
+    padding: 88px 0 76px;
+    background:
+        radial-gradient(ellipse at 50% 0%, rgba(58, 38, 22, 0.55) 0%, rgba(5, 4, 3, 0) 62%),
+        #050403;
+}
+
+.about-fallback-inner {
+    width: min(1120px, 92vw);
+    margin: 0 auto;
+}
+
+.about-fallback-head {
+    max-width: 720px;
+    margin-bottom: 44px;
+}
+
+.about-fallback-note {
+    margin: 16px 0 0;
+    font-size: 13px;
+    line-height: 1.8;
+    color: rgba(214, 194, 158, 0.6);
+}
+
+.about-fallback-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px;
+}
+
+.about-fallback-card {
+    padding: 30px 28px 32px;
+    border: 1px solid rgba(201, 162, 92, 0.24);
+    background: linear-gradient(160deg, rgba(24, 17, 11, 0.94), rgba(15, 10, 7, 0.96));
+    box-shadow: 0 20px 54px rgba(0, 0, 0, 0.42);
+}
+
+.about-fallback-card h3 {
+    margin: 0 0 18px;
+    font-family: 'Ma Shan Zheng', 'Noto Serif SC', 'Songti SC', serif;
+    font-size: 30px;
+    font-weight: 400;
+    letter-spacing: 0.14em;
+    color: #f2e4c8;
+}
+
+.about-fallback-kicker {
+    margin: 0 0 10px;
+    font-family: 'Inter', sans-serif;
+    font-size: 10px;
+    letter-spacing: 0.32em;
+    color: rgba(201, 162, 92, 0.7);
+}
+
+.about-fallback-card p {
+    margin: 0 0 12px;
+    font-size: 14px;
+    line-height: 1.95;
+    color: rgba(230, 220, 202, 0.8);
+}
+
+.about-fallback-wide {
+    grid-column: 1 / -1;
+}
+
+.about-fallback-card .about-facts {
+    margin-top: 4px;
+}
+
+.about-fallback-card .about-skills {
+    margin-top: 4px;
+}
+
+@media (max-width: 900px) {
+    .about-panel {
+        top: auto;
+        bottom: 0;
+        right: 0;
+        left: 0;
+        width: 100%;
+        max-height: 62vh;
+        transform: translate(0, 24px);
+    }
+
+    .about-panel.is-open {
+        transform: translate(0, 0);
+    }
+
+    .about-panel-inner {
+        max-height: 62vh;
+        padding: 34px 24px 32px;
+        border-left: 0;
+        border-right: 0;
+        border-bottom: 0;
+    }
+
+    .about-fallback-grid {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .about-stage {
+        min-height: 540px;
+    }
+
+    .about-title {
+        font-size: clamp(32px, 9vw, 44px);
+        letter-spacing: 0.12em;
+    }
+
+    .about-kicker {
+        font-size: 9px;
+        letter-spacing: 0.28em;
+    }
+
+    .about-subtitle {
+        font-size: 11px;
+        letter-spacing: 0.14em;
+    }
+
+    .about-head::after {
+        margin-top: 12px;
+        width: 42px;
+    }
+
+    .about-tool {
+        padding: 8px 14px;
+        font-size: 14px;
+        letter-spacing: 0.16em;
+        padding-left: 19px;
+    }
+
+    .about-hint {
+        font-size: 13px;
+        letter-spacing: 0.16em;
+    }
+
+    .about-hover {
+        display: none;
+    }
+
+    .about-panel-title {
+        font-size: 32px;
+    }
+
+    .about-lede {
+        font-size: 17px;
+    }
+
+    .about-quote-brush {
+        font-size: 20px;
+    }
+}
+
+@media (max-height: 520px) and (orientation: landscape) {
+    .about-kicker,
+    .about-subtitle,
+    .about-hint {
+        display: none;
+    }
+
+    .about-title {
+        font-size: 26px;
+        letter-spacing: 0.12em;
+    }
+
+    .about-head {
+        top: 14px;
+    }
+
+    .about-head::after {
+        display: none;
+    }
+
+    .about-tools {
+        top: 14px;
+    }
+
+    .about-panel {
+        top: 0;
+        bottom: 0;
+        right: 0;
+        left: auto;
+        width: min(400px, 62vw);
+        max-height: 100%;
+        transform: translate(24px, 0);
+    }
+
+    .about-panel.is-open {
+        transform: translate(0, 0);
+    }
+
+    .about-panel-inner {
+        height: 100%;
+        max-height: 100%;
+        padding: 26px 20px 24px;
+    }
+
+    .about-panel-title {
+        font-size: 26px;
+    }
+
+    .about-panel-content {
+        font-size: 12px;
+        line-height: 1.8;
+    }
+
+    .about-lede {
+        font-size: 15px;
+    }
+
+    .about-panel-close {
+        width: 40px;
+        height: 40px;
+        font-size: 17px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .about-head {
+        animation: none;
+    }
+
+    .about-hint {
+        animation: none;
+    }
+
+    .about-seal {
+        animation: none;
+    }
+}
