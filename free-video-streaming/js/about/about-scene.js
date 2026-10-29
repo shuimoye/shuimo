@@ -58,6 +58,9 @@ export function createHermitage(options) {
     let time = 0;
     let enterStart = -1;
     let focused = null;
+    let yaw = 0;
+    let dragging = false;
+    let dragLastX = 0;
     let panelOpen = false;
     let smallScreen = false;
     let hovered = null;
@@ -1016,12 +1019,16 @@ export function createHermitage(options) {
         const sway = Math.sin(time * 0.19) * 0.22;
         const bob = Math.sin(time * 0.26 + 1.1) * 0.07;
         if (!entering) {
-            pos = pos.clone();
-            pos.x += sway + pointer.x * 0.55;
-            pos.y += bob - pointer.y * 0.3;
-            look = look.clone();
-            look.x += pointer.x * 0.34;
-            look.y += pointer.y * 0.2;
+            const cy = 6.0;
+            const cz = -3.0;
+            const rx = pos.x - 0;
+            const rz = pos.z - cz;
+            const cos = Math.cos(yaw);
+            const sin = Math.sin(yaw);
+            pos = new THREE.Vector3(rx * cos - rz * sin, pos.y + sway, rx * sin + rz * cos + cz);
+            const lx = look.x - 0;
+            const lz = look.z - cz;
+            look = new THREE.Vector3(lx * cos - lz * sin, look.y + bob, lx * sin + lz * cos + cz);
         }
 
         const k = entering ? Math.min(1, dt * 9) : Math.min(1, dt * 2.8);
@@ -1128,6 +1135,7 @@ export function createHermitage(options) {
         enterStart = time;
         focused = null;
         panelOpen = false;
+        yaw = 0;
         clearHover();
         for (let i = 0; i < doorPivots.length; i++) doorPivots[i].group.visible = true;
     }
@@ -1195,6 +1203,12 @@ export function createHermitage(options) {
         const rect = container.getBoundingClientRect();
         pointer.tx = clamp(((e.clientX - rect.left) / Math.max(1, rect.width)) * 2 - 1, -1, 1);
         pointer.ty = clamp(((e.clientY - rect.top) / Math.max(1, rect.height)) * 2 - 1, -1, 1) * 0.7;
+        if (dragging) {
+            const dx = e.clientX - dragLastX;
+            dragLastX = e.clientX;
+            yaw += dx * 0.004;
+            yaw = clamp(yaw, -1.2, 1.2);
+        }
         updateHover(e.clientX, e.clientY);
     }
 
@@ -1222,9 +1236,22 @@ export function createHermitage(options) {
         if (hit && hit.userData.scrollId) onSelect(hit.userData.scrollId);
     }
 
+    function onPointerDown(e) {
+        if (e.button !== 0) return;
+        dragging = true;
+        dragLastX = e.clientX;
+    }
+
+    function onPointerUp() {
+        dragging = false;
+    }
+
     function bind() {
         const el = renderer.domElement;
+        el.addEventListener('pointerdown', onPointerDown);
         el.addEventListener('pointermove', onPointerMove);
+        el.addEventListener('pointerup', onPointerUp);
+        el.addEventListener('pointercancel', onPointerUp);
         el.addEventListener('pointerleave', onPointerLeave);
         el.addEventListener('click', onClick);
         el.addEventListener('touchend', onTouch);
