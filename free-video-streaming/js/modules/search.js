@@ -158,7 +158,7 @@ class SearchModule {
         const searchUrl = source.api + source.searchPath.replace('{keyword}', encodeURIComponent(keyword));
         
         // 使用更快的超时时间
-        const response = await corsModule.fetchWithCORS(searchUrl, { timeout: 4000 });
+        const response = await corsModule.fetchWithCORS(searchUrl, { timeout: 12000 });
         const data = await response.json();
         
         return this.parseSearchResults(data, source);
@@ -331,7 +331,7 @@ class SearchModule {
         const detailUrl = source.api + source.detailPath.replace('{id}', videoId);
         
         try {
-            const response = await corsModule.fetchWithCORS(detailUrl);
+            const response = await corsModule.fetchWithCORS(detailUrl, { timeout: 12000 });
             const data = await response.json();
             
             let item = null;
