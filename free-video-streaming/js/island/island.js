@@ -41,6 +41,16 @@
             enterLabel: '推门入庐',
             desc: '竹影掩映的小庐，主人日常起居之处。关于我、联系方式与支持方式，都收在这一室灯火里。',
             meta: ['关于站长', '联系方式', '支持小屋']
+        },
+        'ai-town': {
+            order: '肆',
+            kicker: 'THE TOWN',
+            name: '问道镇',
+            target: 'ai-town',
+            href: 'ai-town/index.html',
+            enterLabel: '入镇寻仙',
+            desc: '大模型驱动的修仙小镇，NPC 各有决策、彼此平权。镇中可修炼、建造、交易与对话，AI 对话需自备 Key。',
+            meta: ['修仙世界', 'NPC 自主', '自备 Key']
         }
     };
 
@@ -227,6 +237,13 @@
         if (!info) return;
         closeModal(true);
         document.body.style.overflow = 'auto';
+
+        if (info.href) {
+            runTransition('入 · ' + info.name, function () {
+                window.location.href = new URL(info.href, window.location.href).href;
+            });
+            return;
+        }
 
         if (roomId === 'home') {
             if (state.scene) state.scene.resetFocus();

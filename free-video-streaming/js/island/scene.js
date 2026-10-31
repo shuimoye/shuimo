@@ -584,6 +584,16 @@ const ROOM_LAYOUT = [
         position: [-8.0, 0, 6.2],
         rotation: 0.72,
         scale: 0.9
+    },
+    {
+        id: 'ai-town',
+        name: '问道镇',
+        plaque: '问道镇',
+        kind: 'pavilion',
+        tiers: 2,
+        position: [9.8, 0, -11.2],
+        rotation: -0.72,
+        scale: 1
     }
 ];
 
@@ -1963,10 +1973,11 @@ export function createIsland(options = {}) {
         addPath([[0.1, 2.6], [-2.4, 2.2], [-4.8, 0.2], [-6.9, -1.6]], 1.45);
         addPath([[0.5, 10.5], [-1.8, 10.1], [-3.9, 9.4], [-5.3, 8.9], [-6.4, 8.5]], 1.4);
         addPath([[0.3, 6.5], [2.4, 6.0], [4.2, 5.5], [5.2, 4.8], [5.55, 4.2]], 1.4);
+        addPath([[-1.0, -7.4], [1.4, -8.1], [4.0, -9.1], [6.6, -10.1], [8.3, -10.8]], 1.45);
 
         const landingGeo = new THREE.BoxGeometry(2.1, 0.09, 1.35);
         const landingMatrices = [];
-        [[-6.9, -1.6, 1.16], [-6.4, 8.48, 0.72], [-1.15, -7.35, 0.06], [5.55, 4.2, -2.22]].forEach(([lx, lz, rot]) => {
+        [[-6.9, -1.6, 1.16], [-6.4, 8.48, 0.72], [-1.15, -7.35, 0.06], [5.55, 4.2, -2.22], [8.3, -10.8, -0.72]].forEach(([lx, lz, rot]) => {
             dummy.position.set(lx, 0.062, lz);
             dummy.rotation.set(0, rot, 0);
             dummy.scale.set(1, 1, 1);

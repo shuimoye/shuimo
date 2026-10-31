@@ -154,16 +154,16 @@ body.island-active .main-content {
     box-shadow: 0 18px 50px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.04);
     pointer-events: auto;
     animation: islandRise 1.6s cubic-bezier(0.22, 1, 0.36, 1) 0.25s both;
-    width: min(660px, calc(100vw - 24px));
+    width: min(768px, calc(100vw - 24px));
 }
 
 .island-room-card {
     position: relative;
     display: flex;
     align-items: center;
-    gap: 11px;
-    min-width: 148px;
-    padding: 12px 17px;
+    gap: 9px;
+    min-width: 136px;
+    padding: 11px 13px;
     border: 1px solid transparent;
     border-radius: 2px;
     background: transparent;
@@ -792,4 +792,27 @@ body.away-from-isle .return-isle {
         bottom: 82px;
         right: 10px;
     }
+}
+
+/* 直接入口链接 */
+.island-hint-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    color: #e5c98d;
+    text-decoration: none;
+    font-size: 13px;
+    letter-spacing: 0.1em;
+    padding: 4px 10px;
+    border: 1px solid rgba(201, 168, 106, 0.35);
+    border-radius: 2px;
+    background: rgba(140, 42, 30, 0.2);
+    transition: background 0.3s ease, border-color 0.3s ease;
+    font-family: 'Noto Serif SC', 'Songti SC', 'STSong', 'SimSun', serif;
+    pointer-events: auto;
+}
+
+.island-hint-link:hover {
+    background: rgba(140, 42, 30, 0.45);
+    border-color: rgba(201, 168, 106, 0.6);
 }
