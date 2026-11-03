@@ -27,9 +27,9 @@ const SocialSystem = {
                     // 同门派关系更好
                     let relation = 0;
                     if (npc.factionName && npc.factionName === other.factionName) {
-                        relation = 30 + Math.floor(Math.random() * 30);
+                        relation = 30 + Math.floor(RNG.random() * 30);
                     } else {
-                        relation = -20 + Math.floor(Math.random() * 40);
+                        relation = -20 + Math.floor(RNG.random() * 40);
                     }
                     npc.socialRelations[other.id] = relation;
                 }
@@ -38,18 +38,19 @@ const SocialSystem = {
     },
     
     updateNPCSocial(npc, dt) {
+        if (!npc.socialRelations) npc.socialRelations = {};
         // 社交计时器
-        npc.socialTimer -= dt;
+        npc.socialTimer = (npc.socialTimer || 0) - dt;
         
         if (npc.socialTimer <= 0) {
             this.processNPCSocial(npc);
-            npc.socialTimer = 30 + Math.random() * 60; // 30-90秒
+            npc.socialTimer = 30 + RNG.random() * 60; // 30-90秒
         }
         
         // 检查是否与其他NPC接近
         const nearbyNPCs = this.getNearbyNPCs(npc, 100);
         
-        if (nearbyNPCs.length > 0 && Math.random() < 0.01) {
+        if (nearbyNPCs.length > 0 && RNG.random() < 0.01) {
             // 发生社交交互
             this.socialize(npc, nearbyNPCs[0]);
         }
@@ -86,11 +87,13 @@ const SocialSystem = {
     },
     
     socialize(npc1, npc2) {
+        if (!npc1.socialRelations) npc1.socialRelations = {};
+        if (!npc2.socialRelations) npc2.socialRelations = {};
         // 获取或创建关系
-        if (!npc1.socialRelations[npc2.id]) {
+        if (npc1.socialRelations[npc2.id] === undefined) {
             npc1.socialRelations[npc2.id] = 0;
         }
-        if (!npc2.socialRelations[npc1.id]) {
+        if (npc2.socialRelations[npc1.id] === undefined) {
             npc2.socialRelations[npc1.id] = 0;
         }
         
@@ -118,7 +121,7 @@ const SocialSystem = {
             '分享资源'
         ];
         
-        const action = actions[Math.floor(Math.random() * actions.length)];
+        const action = actions[Math.floor(RNG.random() * actions.length)];
         
         // 关系加深
         npc1.socialRelations[npc2.id] = Math.min(100, (npc1.socialRelations[npc2.id] || 0) + 2);
@@ -148,14 +151,14 @@ const SocialSystem = {
             '互相威胁'
         ];
         
-        const action = actions[Math.floor(Math.random() * actions.length)];
+        const action = actions[Math.floor(RNG.random() * actions.length)];
         
         // 关系恶化
         npc1.socialRelations[npc2.id] = Math.max(-100, (npc1.socialRelations[npc2.id] || 0) - 3);
         npc2.socialRelations[npc1.id] = Math.max(-100, (npc2.socialRelations[npc1.id] || 0) - 3);
         
         // 可能触发战斗
-        if (npc1.socialRelations[npc2.id] < -80 && Math.random() < 0.3) {
+        if (npc1.socialRelations[npc2.id] < -80 && RNG.random() < 0.3) {
             // 开始战斗
             npc1.state = 'fighting';
             npc1.targetId = npc2.id;
@@ -171,8 +174,8 @@ const SocialSystem = {
     
     neutralInteraction(npc1, npc2) {
         // 中性交互：简单交流
-        npc1.socialRelations[npc2.id] = (npc1.socialRelations[npc2.id] || 0) + Math.random() * 2 - 0.5;
-        npc2.socialRelations[npc1.id] = (npc2.socialRelations[npc1.id] || 0) + Math.random() * 2 - 0.5;
+        npc1.socialRelations[npc2.id] = (npc1.socialRelations[npc2.id] || 0) + RNG.random() * 2 - 0.5;
+        npc2.socialRelations[npc1.id] = (npc2.socialRelations[npc1.id] || 0) + RNG.random() * 2 - 0.5;
     },
     
     // 玩家送礼给NPC
@@ -246,6 +249,6 @@ const SocialSystem = {
             '有人在拍卖会上拍得了仙器...'
         ];
         
-        return rumors[Math.floor(Math.random() * rumors.length)];
+        return rumors[Math.floor(RNG.random() * rumors.length)];
     }
 };

@@ -118,7 +118,7 @@ const SurvivalSystem = {
         // 检查是否是生肉
         if (item.isRaw) {
             // 吃生肉有风险
-            if (Math.random() < 0.6 - player.immunity / 200) {
+            if (RNG.random() < 0.6 - player.immunity / 200) {
                 this.contractSickness('food_poisoning');
                 Game.showMessage('吃了生肉，感觉不舒服...', 'danger');
             }

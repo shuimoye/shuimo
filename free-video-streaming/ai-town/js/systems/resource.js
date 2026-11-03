@@ -56,7 +56,7 @@ const ResourceSystem = {
         player.stamina -= 5;
         
         // 采集
-        const gatherAmount = Math.min(resource.amount, 1 + Math.floor(Math.random() * 2));
+        const gatherAmount = Math.min(resource.amount, 1 + Math.floor(RNG.random() * 2));
         resource.amount -= gatherAmount;
         
         // 获取物品
@@ -111,14 +111,28 @@ const ResourceSystem = {
     
     respawnResource(resource) {
         const amounts = {
-            tree: () => 5 + Math.floor(Math.random() * 10),
-            rock: () => 3 + Math.floor(Math.random() * 7),
-            herb: () => 1 + Math.floor(Math.random() * 3),
-            spirit_stone: () => 1 + Math.floor(Math.random() * 2),
+            tree: () => 5 + Math.floor(RNG.random() * 10),
+            rock: () => 3 + Math.floor(RNG.random() * 7),
+            herb: () => 1 + Math.floor(RNG.random() * 3),
+            spirit_stone: () => 1 + Math.floor(RNG.random() * 2),
             water: () => 100
         };
         
         resource.amount = amounts[resource.type] ? amounts[resource.type]() : 5;
+        resource.respawnTime = 0;
+        
+        // 恢复传感器物理体，让碰撞采集重新生效
+        if (!resource.body) {
+            const body = Matter.Bodies.circle(resource.x, resource.y, Math.max(resource.size * 0.8, 12), {
+                isStatic: true,
+                isSensor: true,
+                label: `resource_${resource.id}`,
+                collisionFilter: { category: 0x0004, mask: 0x0001 | 0x0002 }
+            });
+            body.resource = resource;
+            resource.body = body;
+            Core.addBody(body);
+        }
     },
     
     getResourceByPosition(x, y) {

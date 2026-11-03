@@ -74,6 +74,12 @@ const Core = {
         Matter.World.remove(this.world, body);
     },
     
+    // 碰撞事件订阅
+    on(eventName, callback) {
+        if (!this.engine) return;
+        Matter.Events.on(this.engine, eventName, callback);
+    },
+    
     // 创建圆形物体
     createCircle(x, y, radius, options = {}) {
         const body = Matter.Bodies.circle(x, y, radius, {

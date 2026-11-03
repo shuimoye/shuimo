@@ -60,7 +60,7 @@ const WeatherSystem = {
         ];
         
         // 随机选择天气，但倾向于合理过渡
-        const roll = Math.random();
+        const roll = RNG.random();
         let weather;
         
         if (roll < 0.4) {
@@ -71,10 +71,10 @@ const WeatherSystem = {
             weather = weathers[1];
         } else if (roll < 0.75) {
             // 15% 雨
-            weather = weathers[2 + Math.floor(Math.random() * 2)];
+            weather = weathers[2 + Math.floor(RNG.random() * 2)];
         } else if (roll < 0.85) {
             // 10% 雪
-            weather = weathers[4 + Math.floor(Math.random() * 2)];
+            weather = weathers[4 + Math.floor(RNG.random() * 2)];
         } else if (roll < 0.95) {
             // 10% 雾
             weather = weathers[6];
@@ -91,12 +91,12 @@ const WeatherSystem = {
         this.effects = weather.effects;
         
         // 设置下一次天气变化时间
-        this.weatherDuration = 60 + Math.random() * 180;
+        this.weatherDuration = 60 + RNG.random() * 180;
         this.weatherTimer = this.weatherDuration;
         
         // 风向
-        this.windDirection = Math.random() * Math.PI * 2;
-        this.windStrength = weather.type === 'storm' ? 20 : (Math.random() * 5);
+        this.windDirection = RNG.random() * Math.PI * 2;
+        this.windStrength = weather.type === 'storm' ? 20 : (RNG.random() * 5);
         
         Game.showMessage(`天气变化: ${weather.name} ${weather.icon}`);
     },
@@ -132,15 +132,15 @@ const WeatherSystem = {
         }
         
         // 雷暴特殊效果
-        if (this.type === 'storm' && Math.random() < 0.001) {
+        if (this.type === 'storm' && RNG.random() < 0.001) {
             this.lightningStrike();
         }
     },
     
     lightningStrike() {
         // 随机位置闪电
-        const x = Math.random() * 3000;
-        const y = Math.random() * 2000;
+        const x = RNG.random() * 3000;
+        const y = RNG.random() * 2000;
         
         // 检查是否击中玩家
         const player = GameState.player;

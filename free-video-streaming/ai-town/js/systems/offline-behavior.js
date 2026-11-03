@@ -27,7 +27,7 @@ const OfflineBehaviorSystem = {
         });
         
         // 随机触发新行为（每10-20秒）
-        if (Math.random() < dt * 0.06) {
+        if (RNG.random() < dt * 0.06) {
             this.triggerRandomBehavior();
         }
     },
@@ -36,7 +36,7 @@ const OfflineBehaviorSystem = {
         const npcs = GameState.npcs.filter(n => !n.isMonster && n.persona);
         if (npcs.length === 0) return;
         
-        const npc = npcs[Math.floor(Math.random() * npcs.length)];
+        const npc = npcs[Math.floor(RNG.random() * npcs.length)];
         const persona = DialogSystem.getPersona(npc);
         if (!persona || !persona.offlineEvents || persona.offlineEvents.length === 0) return;
         
@@ -44,7 +44,7 @@ const OfflineBehaviorSystem = {
         const availableEvents = persona.offlineEvents.filter(e => !npc.usedEvents?.includes(e.text));
         if (availableEvents.length === 0) return;
         
-        const event = availableEvents[Math.floor(Math.random() * availableEvents.length)];
+        const event = availableEvents[Math.floor(RNG.random() * availableEvents.length)];
         
         // 标记为已使用（循环使用）
         if (!npc.usedEvents) npc.usedEvents = [];
@@ -56,20 +56,17 @@ const OfflineBehaviorSystem = {
     },
     
     startBehavior(npc, event) {
-        // 计算屏幕坐标
-        const screenPos = Renderer.worldToScreen(npc.x, npc.y);
-        
-        // 添加粒子效果
+        // 粒子以世界坐标记录，渲染时再转换，避免镜头移动导致粒子错位
         const particles = [];
         for (let i = 0; i < 15; i++) {
             particles.push({
-                x: screenPos.x + (Math.random() - 0.5) * 60,
-                y: screenPos.y + (Math.random() - 0.5) * 40,
-                vx: (Math.random() - 0.5) * 50,
-                vy: -Math.random() * 30 - 10,
+                x: npc.x + (RNG.random() - 0.5) * 60,
+                y: npc.y + (RNG.random() - 0.5) * 40,
+                vx: (RNG.random() - 0.5) * 50,
+                vy: -RNG.random() * 30 - 10,
                 color: event.particle,
-                size: 3 + Math.random() * 4,
-                life: 1.5 + Math.random() * 0.5
+                size: 3 + RNG.random() * 4,
+                life: 1.5 + RNG.random() * 0.5
             });
         }
         
@@ -94,12 +91,13 @@ const OfflineBehaviorSystem = {
             const npc = GameState.npcs.find(n => n.id === effect.npcId);
             if (!npc) return;
             
-            const pos = Renderer.camera?.worldToScreen({ x: npc.x, y: npc.y }) || { x: npc.x, y: npc.y };
+            const pos = Renderer.worldToScreen(npc.x, npc.y);
             
             // 绘制粒子
             effect.particles.forEach(p => {
+                const sp = Renderer.worldToScreen(p.x, p.y);
                 ctx.beginPath();
-                ctx.arc(p.x, p.y, p.size * (1 - effect.progress * 0.5), 0, Math.PI * 2);
+                ctx.arc(sp.x, sp.y, p.size * (1 - effect.progress * 0.5) * Renderer.camera.zoom, 0, Math.PI * 2);
                 ctx.fillStyle = effect.particleColor;
                 ctx.globalAlpha = 0.6 * (1 - effect.progress);
                 ctx.fill();

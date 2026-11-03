@@ -216,7 +216,7 @@ const CraftingSystem = {
             successRate += (factionBonus - 1) * 0.1;
         }
         
-        if (Math.random() < successRate) {
+        if (RNG.random() < successRate) {
             // 成功
             const resultItem = {
                 ...GameData.items[recipe.result.id],

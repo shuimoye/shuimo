@@ -46,7 +46,7 @@ const CombatSystem = {
     
     isHostile(npc) { return npc.relationship < -50 || npc.type === 'monster'; },
     
-    calculateDamage(atk, def) { return Math.floor(Math.max(1, atk - def * 0.5) * (1 + (Math.random() - 0.5) * 0.2)); },
+    calculateDamage(atk, def) { return Math.floor(Math.max(1, atk - def * 0.5) * (1 + (RNG.random() - 0.5) * 0.2)); },
     
     dealDamage(target, damage, source) {
         target.health -= damage;
@@ -61,12 +61,16 @@ const CombatSystem = {
         if (target.body) Core.removeBody(target.body);
         const idx = GameState.npcs.indexOf(target);
         if (idx !== -1) GameState.npcs.splice(idx, 1);
+        // 登记复生，避免小镇随时间被清空
+        GameState.scheduleRespawn(target);
+        if (target.isNPC) WorldLogSystem.addLog(`${target.name} 倒下了`, 'danger');
+        else WorldLogSystem.addLog(`${target.name} 被击败`, 'normal');
     },
     
     getDropLoot(target) {
         const drops = [];
         if (target.type === 'monster') drops.push({ id: 'raw_meat', name: '生肉', icon: '🍖', type: 'food', count: 1, isRaw: true });
-        if (Math.random() < 0.3) drops.push({ id: 'spirit_stone', name: '灵石', icon: '💎', type: 'currency', count: 1 });
+        if (RNG.random() < 0.3) drops.push({ id: 'spirit_stone', name: '灵石', icon: '💎', type: 'currency', count: 1 });
         return drops;
     },
     
@@ -75,11 +79,15 @@ const CombatSystem = {
     showDamage(x, y, dmg, color) { this.damageNumbers.push({ x, y, damage: dmg, color, life: 1.5 }); },
     
     updateCombatAI(dt) {
+        // 伤害统一由碰撞系统在接触时结算，这里只负责怪物追击玩家
         GameState.npcs.forEach(npc => {
-            if (!this.isHostile(npc)) return;
+            if (!npc.isMonster) return;
             const dist = Math.hypot(npc.x - GameState.player.x, npc.y - GameState.player.y);
-            if (dist < 200) { npc.state = 'chasing'; npc.targetX = GameState.player.x; npc.targetY = GameState.player.y; if (dist < 50) this.npcAttack(npc, GameState.player); }
-            else if (npc.state === 'chasing') npc.state = 'idle';
+            if (dist < 300 && npc.state !== 'chasing') {
+                npc.state = 'chasing';
+                npc.targetX = GameState.player.x;
+                npc.targetY = GameState.player.y;
+            }
         });
     },
     

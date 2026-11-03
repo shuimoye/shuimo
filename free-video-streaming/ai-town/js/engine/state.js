@@ -6,6 +6,7 @@
 const GameState = {
     time: 0, gameTime: 0, dayTime: 0, day: 1,
     player: null, npcs: [], buildings: [], resources: [], droppedItems: [], particles: [], projectiles: [], decorations: [], spiritualAreas: [],
+    respawnQueue: [], npcTemplates: [],
     mouseX: 0, mouseY: 0,
     
     init() {
@@ -29,6 +30,7 @@ const GameState = {
             label: 'player', frictionAir: 0.1, friction: 0.05, restitution: 0.1,
             collisionFilter: { category: 0x0001, mask: 0xFFFFFFFF }
         });
+        this.player.body.entity = this.player;
         Core.addBody(this.player.body);
         this.addItem(this.player, { id: 'herb', name: '灵草', icon: '🌿', type: 'material', count: 5, description: '炼丹材料' });
         this.addItem(this.player, { id: 'raw_meat', name: '生肉', icon: '🍖', type: 'food', count: 3, description: '生肉，直接吃容易生病', isRaw: true });
@@ -44,7 +46,7 @@ const GameState = {
         ];
         for (let i = 0; i < 200; i++) {
             const types = ['grass', 'flower', 'bush'];
-            this.decorations.push({ x: Math.random() * 3000, y: Math.random() * 2000, type: types[Math.floor(Math.random() * types.length)] });
+            this.decorations.push({ x: RNG.random() * 3000, y: RNG.random() * 2000, type: types[Math.floor(RNG.random() * types.length)] });
         }
         [{ x: 500, y: 1800, w: 400, h: 30 }, { x: 1200, y: 1600, w: 300, h: 30 }, { x: 2000, y: 1700, w: 350, h: 30 }, { x: 2600, y: 1500, w: 250, h: 30 }]
             .forEach(p => Core.addBody(Core.createStatic(p.x, p.y, p.w, p.h, 'platform')));
@@ -61,16 +63,57 @@ const GameState = {
             { name: '段无尘', x: 800, y: 1400, type: 'wanderer', faction: null, persona: 'blind_formations_master' },
             { name: '花间客', x: 2000, y: 600, type: 'leader', faction: null, persona: 'immortal_wanderer' }
         ];
+        this.npcTemplates = templates;
         templates.forEach((t, i) => {
             const npc = this.createEntity(t.name, t.x, t.y, t.type, t.faction, i + 1, false);
             npc.persona = t.persona;
+            npc.templateId = i + 1;
             this.npcs.push(npc);
         });
         // 创建怪物
         for (let i = 0; i < 5; i++) {
-            const monster = this.createEntity(`妖兽${i+1}`, 500 + Math.random() * 2000, 500 + Math.random() * 1000, 'monster', null, 100 + i, true);
+            const monster = this.createEntity(`妖兽${i+1}`, 500 + RNG.random() * 2000, 500 + RNG.random() * 1000, 'monster', null, 100 + i, true);
+            monster.templateId = 100 + i;
             this.npcs.push(monster);
         }
+    },
+    
+    // 死亡后回到小镇：NPC 在出生点重聚，妖兽在边缘重生
+    scheduleRespawn(entity) {
+        const delay = entity.isMonster ? 25 : 60;
+        this.respawnQueue.push({
+            at: this.gameTime + delay,
+            name: entity.name,
+            type: entity.type,
+            faction: entity.factionName,
+            persona: entity.persona,
+            templateId: entity.templateId,
+            isMonster: !!entity.isMonster
+        });
+    },
+    
+    processRespawns() {
+        if (!this.respawnQueue || this.respawnQueue.length === 0) return;
+        const due = this.respawnQueue.filter(r => r.at <= this.gameTime);
+        if (due.length === 0) return;
+        this.respawnQueue = this.respawnQueue.filter(r => r.at > this.gameTime);
+        
+        due.forEach(r => {
+            let x, y;
+            if (r.isMonster) {
+                x = 200 + RNG.random() * 2600;
+                y = 200 + RNG.random() * 1600;
+            } else {
+                const template = (this.npcTemplates || []).find(t => t.name === r.name);
+                x = template ? template.x : 1500;
+                y = template ? template.y : 1000;
+            }
+            const entity = this.createEntity(r.name, x, y, r.type, r.faction, r.templateId, r.isMonster);
+            entity.persona = r.persona || null;
+            entity.templateId = r.templateId;
+            this.npcs.push(entity);
+            WorldLogSystem.addLog(r.isMonster ? `${r.name} 在荒野中重现` : `${r.name} 回到了小镇`, 'important');
+        });
     },
     
     createEntity(name, x, y, type, factionName, id, isMonster) {
@@ -80,18 +123,20 @@ const GameState = {
             id, name, x, y, size: isMonster ? 22 : 18, type, isNPC: !isMonster, isMonster,
             health: baseHealth, maxHealth: baseHealth, mana: 100, maxMana: 100, stamina: 100, maxStamina: 100,
             immunity: 100, maxImmunity: 100, hunger: 100, maxHunger: 100,
-            spiritualPower: 50, maxSpiritualPower: 100, cultivation: isMonster ? 50 : Math.random() * 200,
+            spiritualPower: 50, maxSpiritualPower: 100, cultivation: isMonster ? 50 : RNG.random() * 200,
             cultivationLevel: 1, cultivationRealm: '练气一层', cultivationSpeed: 1,
             attack: baseAttack, defense: isMonster ? 8 : 10, attackSpeed: 1, attackRange: 80,
             factionName, faction: factionName ? { name: factionName, color: this.getFactionColor(factionName) } : null,
-            relationship: Math.floor(Math.random() * 201) - 100,
+            relationship: Math.floor(RNG.random() * 201) - 100,
             friendship: 0, dialogHistory: [], isQuestGiver: type === 'elder' || type === 'leader',
             quests: [], state: 'idle', targetX: x, targetY: y, stateTimer: 0,
             // NPC功能属性
             npcAction: null, actionTimer: 0, hasFaction: !!factionName, contribution: 0,
-            inventory: new Array(20).fill(null), gold: Math.floor(Math.random() * 50),
+            inventory: new Array(20).fill(null), gold: Math.floor(RNG.random() * 50),
             skills: [], techniques: ['basic_meditation'], effects: [],
             body: null, skinColor: isMonster ? '#8b4513' : (type === 'elder' ? '#d0b090' : '#e0c0a0'),
+            // 社交关系：复生实体同样需要初始化，避免运行时中断
+            socialRelations: {}, socialTimer: 0,
             // 人格数据
             persona: null, emotionalBaseline: 50, speechPattern: {}, secrets: [], offlineEvents: []
         };
@@ -100,6 +145,7 @@ const GameState = {
             frictionAir: 0.1, friction: 0.05, restitution: 0.1,
             collisionFilter: { category: 0x0002, mask: 0xFFFFFFFF }
         });
+        entity.body.entity = entity;
         Core.addBody(entity.body);
         return entity;
     },
@@ -110,20 +156,35 @@ const GameState = {
     },
     
     createResources() {
-        for (let i = 0; i < 30; i++) this.resources.push({ id: `tree_${i}`, type: 'tree', x: 200 + Math.random() * 2600, y: 300 + Math.random() * 1600, size: 30 + Math.random() * 20, amount: 5 + Math.floor(Math.random() * 10), maxAmount: 15, respawnTime: 0 });
-        for (let i = 0; i < 20; i++) this.resources.push({ id: `rock_${i}`, type: 'rock', x: Math.random() * 2900, y: Math.random() * 1900, size: 25 + Math.random() * 15, amount: 3 + Math.floor(Math.random() * 7), maxAmount: 10, respawnTime: 0 });
-        for (let i = 0; i < 25; i++) this.resources.push({ id: `herb_${i}`, type: 'herb', x: Math.random() * 2900, y: Math.random() * 1900, size: 15, amount: 1 + Math.floor(Math.random() * 3), maxAmount: 4, respawnTime: 0 });
+        for (let i = 0; i < 30; i++) this.addResource({ id: `tree_${i}`, type: 'tree', x: 200 + RNG.random() * 2600, y: 300 + RNG.random() * 1600, size: 30 + RNG.random() * 20, amount: 5 + Math.floor(RNG.random() * 10), maxAmount: 15, respawnTime: 0 });
+        for (let i = 0; i < 20; i++) this.addResource({ id: `rock_${i}`, type: 'rock', x: RNG.random() * 2900, y: RNG.random() * 1900, size: 25 + RNG.random() * 15, amount: 3 + Math.floor(RNG.random() * 7), maxAmount: 10, respawnTime: 0 });
+        for (let i = 0; i < 25; i++) this.addResource({ id: `herb_${i}`, type: 'herb', x: RNG.random() * 2900, y: RNG.random() * 1900, size: 15, amount: 1 + Math.floor(RNG.random() * 3), maxAmount: 4, respawnTime: 0 });
         for (let i = 0; i < 10; i++) {
-            const area = this.spiritualAreas[Math.floor(Math.random() * this.spiritualAreas.length)];
-            this.resources.push({ id: `spirit_stone_${i}`, type: 'spirit_stone', x: area.x + (Math.random() - 0.5) * area.radius, y: area.y + (Math.random() - 0.5) * area.radius, size: 12, amount: 1 + Math.floor(Math.random() * 2), maxAmount: 3, respawnTime: 0 });
+            const area = this.spiritualAreas[Math.floor(RNG.random() * this.spiritualAreas.length)];
+            this.addResource({ id: `spirit_stone_${i}`, type: 'spirit_stone', x: area.x + (RNG.random() - 0.5) * area.radius, y: area.y + (RNG.random() - 0.5) * area.radius, size: 12, amount: 1 + Math.floor(RNG.random() * 2), maxAmount: 3, respawnTime: 0 });
         }
-        for (let i = 0; i < 5; i++) this.resources.push({ id: `water_${i}`, type: 'water', x: 300 + i * 600, y: 1700 + Math.random() * 200, size: 50, amount: 100, maxAmount: 100, respawnTime: 0 });
+        for (let i = 0; i < 5; i++) this.addResource({ id: `water_${i}`, type: 'water', x: 300 + i * 600, y: 1700 + RNG.random() * 200, size: 50, amount: 100, maxAmount: 100, respawnTime: 0 });
+    },
+    
+    addResource(resource) {
+        const body = Matter.Bodies.circle(resource.x, resource.y, Math.max(resource.size * 0.8, 12), {
+            isStatic: true,
+            isSensor: true,
+            label: `resource_${resource.id}`,
+            collisionFilter: { category: 0x0004, mask: 0x0001 | 0x0002 }
+        });
+        body.resource = resource;
+        resource.body = body;
+        this.resources.push(resource);
+        Core.addBody(body);
+        return resource;
     },
     
     update(dt) {
         this.time += dt * 1000; this.gameTime += dt; this.dayTime = (this.dayTime + dt * 10) % 86400;
         if (this.dayTime < dt * 10) this.day++;
         this.updatePlayer(dt); this.updateNPCs(dt); this.updateParticles(dt); this.updateDroppedItems(dt); this.updateProjectiles(dt);
+        this.processRespawns();
     },
     
     updatePlayer(dt) {
@@ -151,58 +212,215 @@ const GameState = {
     },
     
     updateNPCs(dt) {
-        const NPC_SPEED = 4;
         this.npcs.forEach(npc => {
             if (npc.body) { npc.x = npc.body.position.x; npc.y = npc.body.position.y; }
             npc.mana = Math.min(npc.maxMana || 100, (npc.mana || 100) + dt * 1.5);
             npc.stamina = Math.min(npc.maxStamina || 100, (npc.stamina || 100) + dt * 3);
             if (!npc.isMonster) npc.hunger = Math.max(0, (npc.hunger || 100) - dt * 0.3);
             npc.stateTimer -= dt;
-            // NPC行为系统
+            // NPC行为系统：由需求驱动选目标，接触时由碰撞系统产生事件
             npc.actionTimer = (npc.actionTimer || 0) - dt;
-            if (npc.actionTimer <= 0 && !npc.isMonster) this.updateNPCBehavior(npc);
-            if (npc.stateTimer <= 0) this.updateNPCAI(npc);
+            npc.goalTimer = (npc.goalTimer || 0) - dt;
+            if (!npc.isMonster && npc.goalTimer <= 0) this.updateNPCGoal(npc);
             if (npc.state === 'walking' || npc.state === 'chasing') {
+                const speed = this.getMoveSpeed(npc);
                 const dx = npc.targetX - npc.x, dy = npc.targetY - npc.y, dist = Math.hypot(dx, dy);
                 if (dist > 5) {
-                    if (npc.body) Core.setVelocity(npc.body, { x: (dx / dist) * NPC_SPEED, y: (dy / dist) * NPC_SPEED });
+                    if (npc.body) Core.setVelocity(npc.body, { x: (dx / dist) * speed, y: (dy / dist) * speed });
                 }
                 else { npc.state = 'idle'; if (npc.body) Core.setVelocity(npc.body, { x: 0, y: 0 }); }
             }
             if (!npc.isMonster) SocialSystem.updateNPCSocial(npc, dt);
+            if (npc.isMonster) this.updateMonsterGoal(npc);
         });
     },
     
-    updateNPCBehavior(npc) {
-        // NPC随机执行功能
-        const actions = ['gather', 'cultivate', 'rest'];
-        const action = actions[Math.floor(Math.random() * actions.length)];
-        npc.npcAction = action;
-        npc.actionTimer = 30 + Math.random() * 30; // 30-60秒后执行下一个
-        switch(action) {
-            case 'gather':
-                // 寻找附近资源
-                const res = this.resources.find(r => Math.hypot(r.x - npc.x, r.y - npc.y) < 100);
-                if (res) {
-                    npc.targetX = res.x;
-                    npc.targetY = res.y;
+    // 逃跑的 NPC 明显快于妖兽，追击的妖兽略快于普通 NPC，形成可持续的循环
+    getMoveSpeed(npc) {
+        const base = npc.isMonster ? 3.6 : 4;
+        if (npc.npcAction === 'flee') return 5.2;
+        if (npc.npcAction === 'fight') return base * 0.9;
+        return base;
+    },
+    
+    // 需求驱动的目标选择：按生存压力与人格偏好挑最近的合适目标
+    updateNPCGoal(npc) {
+        npc.goalTimer = 4 + RNG.range(0, 4);
+        const goals = [];
+
+        // 0. 威胁规避：附近有妖兽时逃跑或反击，避免小镇被逐渐清空
+        const threat = this.findNearestNPC(npc, 260, n => n.isMonster);
+        if (threat) {
+            const dist = Math.hypot(threat.x - npc.x, threat.y - npc.y);
+            if (npc.health > npc.maxHealth * 0.6 && npc.attack >= 20) {
+                npc.npcAction = 'fight';
+                npc.state = 'chasing';
+                npc.targetX = threat.x;
+                npc.targetY = threat.y;
+            } else {
+                const dx = npc.x - threat.x, dy = npc.y - threat.y;
+                const len = Math.hypot(dx, dy) || 1;
+                npc.npcAction = 'flee';
+                npc.state = 'walking';
+                npc.targetX = Math.max(100, Math.min(2900, npc.x + (dx / len) * 400));
+                npc.targetY = Math.max(100, Math.min(1900, npc.y + (dy / len) * 400));
+                npc.goalTimer = 1.5;
+            }
+            return;
+        }
+
+        // 1. 生存优先：饥饿或低血去采集/接近火源
+        if (npc.hunger < 45) goals.push({ type: 'resource', weight: 6, filter: r => r.type === 'herb' || r.type === 'water' });
+        if (npc.health < npc.maxHealth * 0.5) goals.push({ type: 'rest', weight: 8 });
+
+        // 2. 人格偏好：关键词决定偏好的资源或对象
+        const persona = DialogSystem.getPersona(npc);
+        if (persona) {
+            const preference = this.getPersonaResourcePreference(persona);
+            if (preference) goals.push({ type: 'resource', weight: 4, filter: r => r.type === preference });
+            if (persona.keywords.some(k => k.includes('情') || k.includes('商'))) {
+                goals.push({ type: 'social', weight: 4 });
+            }
+        }
+
+        // 3. 修炼：灵力高就往灵力区域走
+        const spiritual = SpiritualSystem.getSpiritualLevel(npc.x, npc.y);
+        if (spiritual.bonus < 1.5) goals.push({ type: 'spiritual', weight: 3 });
+
+        // 4. 采资源的一般需求
+        goals.push({ type: 'resource', weight: 2, filter: r => r.amount > 0 });
+
+        // 5. 随机闲逛作为兜底
+        goals.push({ type: 'wander', weight: 1 });
+
+        const total = goals.reduce((sum, g) => sum + g.weight, 0);
+        let roll = RNG.range(0, total);
+        let chosen = goals[goals.length - 1];
+        for (const goal of goals) {
+            roll -= goal.weight;
+            if (roll <= 0) { chosen = goal; break; }
+        }
+
+        switch (chosen.type) {
+            case 'resource': {
+                const target = this.findNearestResource(npc, chosen.filter);
+                if (target) {
+                    npc.npcAction = 'gather';
                     npc.state = 'walking';
+                    npc.targetX = target.x;
+                    npc.targetY = target.y;
+                    return;
                 }
                 break;
-            case 'cultivate':
-                npc.cultivation += Math.random() * 5;
+            }
+            case 'social': {
+                const target = this.findNearestNPC(npc, 900);
+                if (target) {
+                    npc.npcAction = 'social';
+                    npc.state = 'walking';
+                    npc.targetX = target.x;
+                    npc.targetY = target.y;
+                    return;
+                }
                 break;
-            case 'rest':
-                npc.health = Math.min(npc.maxHealth, npc.health + 10);
+            }
+            case 'spiritual': {
+                const area = this.findBestSpiritualArea(npc);
+                if (area) {
+                    npc.npcAction = 'cultivate';
+                    npc.state = 'walking';
+                    npc.targetX = area.x + RNG.range(-area.radius * 0.4, area.radius * 0.4);
+                    npc.targetY = area.y + RNG.range(-area.radius * 0.4, area.radius * 0.4);
+                    return;
+                }
                 break;
+            }
+            case 'rest': {
+                const fire = BuildingSystem.getNearbyFireSource(npc.x, npc.y);
+                if (fire) {
+                    npc.npcAction = 'rest';
+                    npc.state = 'walking';
+                    npc.targetX = fire.x;
+                    npc.targetY = fire.y;
+                    return;
+                }
+                npc.npcAction = 'rest';
+                npc.health = Math.min(npc.maxHealth, npc.health + 6);
+                return;
+            }
+            default: {
+                npc.npcAction = 'wander';
+                npc.state = 'walking';
+                npc.targetX = Math.max(100, Math.min(2900, npc.x + RNG.range(-400, 400)));
+                npc.targetY = Math.max(100, Math.min(1900, npc.y + RNG.range(-400, 400)));
+                return;
+            }
         }
     },
     
-    updateNPCAI(npc) {
-        const roll = Math.random();
-        if (roll < 0.3) { npc.state = 'idle'; npc.stateTimer = 2 + Math.random() * 3; if (npc.body) Core.setVelocity(npc.body, { x: 0, y: 0 }); }
-        else if (roll < 0.7) { npc.state = 'walking'; npc.targetX = Math.max(100, Math.min(2900, npc.x + (Math.random() - 0.5) * 200)); npc.targetY = Math.max(100, Math.min(1900, npc.y + (Math.random() - 0.5) * 200)); npc.stateTimer = 3 + Math.random() * 4; }
-        else { npc.state = 'idle'; npc.stateTimer = 1 + Math.random() * 2; }
+    getPersonaResourcePreference(persona) {
+        const keywords = persona.keywords.join(' ');
+        if (/剑|铁|石/.test(keywords)) return 'rock';
+        if (/药|草|丹/.test(keywords)) return 'herb';
+        if (/星|阵|灵/.test(keywords)) return 'spirit_stone';
+        if (/酒|水/.test(keywords)) return 'water';
+        if (/木|杂务/.test(keywords)) return 'tree';
+        return null;
+    },
+    
+    findNearestResource(npc, filter) {
+        let best = null, bestDist = Infinity;
+        for (const res of this.resources) {
+            if (res.amount <= 0) continue;
+            if (filter && !filter(res)) continue;
+            const dist = Math.hypot(res.x - npc.x, res.y - npc.y);
+            if (dist < bestDist) { bestDist = dist; best = res; }
+        }
+        return best;
+    },
+    
+    findNearestNPC(npc, maxDist, predicate) {
+        let best = null, bestDist = maxDist;
+        for (const other of this.npcs) {
+            if (other === npc) continue;
+            if (predicate) {
+                if (!predicate(other)) continue;
+            } else if (!other.isNPC) continue;
+            const dist = Math.hypot(other.x - npc.x, other.y - npc.y);
+            if (dist < bestDist) { bestDist = dist; best = other; }
+        }
+        return best;
+    },
+    
+    findBestSpiritualArea(npc) {
+        let best = null, bestScore = -Infinity;
+        for (const area of this.spiritualAreas) {
+            const dist = Math.hypot(area.x - npc.x, area.y - npc.y);
+            const score = area.level * 100 - dist * 0.05;
+            if (score > bestScore) { bestScore = score; best = area; }
+        }
+        return best;
+    },
+    
+    updateMonsterGoal(npc) {
+        // 妖兽只在有限感知范围内追踪，超出后返回徘徊，避免全图追杀
+        npc.monsterTimer = (npc.monsterTimer || 0) - 0.016;
+        const nearby = this.findNearestNPC(npc, 420);
+        const target = nearby || (Math.hypot(this.player.x - npc.x, this.player.y - npc.y) < 300 ? this.player : null);
+        if (!target) {
+            if (npc.state === 'chasing') {
+                npc.state = 'walking';
+                npc.targetX = Math.max(100, Math.min(2900, npc.x + RNG.range(-300, 300)));
+                npc.targetY = Math.max(100, Math.min(1900, npc.y + RNG.range(-300, 300)));
+            }
+            return;
+        }
+        const dist = Math.hypot(target.x - npc.x, target.y - npc.y);
+        if (dist < 420) {
+            npc.state = 'chasing';
+            npc.targetX = target.x;
+            npc.targetY = target.y;
+        }
     },
     
     updateEffects(entity, dt) {
@@ -257,8 +475,8 @@ const GameState = {
     
     hasItem(entity, itemId, count = 1) { const item = entity.inventory.find(i => i && i.id === itemId); return item && item.count >= count; },
     getItemCount(entity, itemId) { const item = entity.inventory.find(i => i && i.id === itemId); return item ? item.count : 0; },
-    addParticle(x, y, color, count = 10) { for (let i = 0; i < count; i++) this.particles.push({ x, y, vx: (Math.random() - 0.5) * 100, vy: (Math.random() - 0.5) * 100, color, size: 2 + Math.random() * 3, life: 0.5 + Math.random() * 0.5 }); },
-    dropItem(x, y, item) { this.droppedItems.push({ ...item, x: x + (Math.random() - 0.5) * 20, y: y + (Math.random() - 0.5) * 20, lifetime: 60 }); }
+    addParticle(x, y, color, count = 10) { for (let i = 0; i < count; i++) this.particles.push({ x, y, vx: (RNG.random() - 0.5) * 100, vy: (RNG.random() - 0.5) * 100, color, size: 2 + RNG.random() * 3, life: 0.5 + RNG.random() * 0.5 }); },
+    dropItem(x, y, item) { this.droppedItems.push({ ...item, x: x + (RNG.random() - 0.5) * 20, y: y + (RNG.random() - 0.5) * 20, lifetime: 60 }); }
 };
 
 // 游戏数据定义

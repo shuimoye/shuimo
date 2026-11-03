@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>修仙AI小镇</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%231a1a2e'/%3E%3Ccircle cx='16' cy='16' r='7.5' fill='%23c9a86a'/%3E%3C/svg%3E">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -540,6 +541,7 @@ n            border-radius: 8px;
     </div>
     
     <!-- 核心引擎模块 -->
+    <script src="js/engine/rng.js"></script>
     <script src="js/engine/core.js"></script>
     <script src="js/engine/renderer.js"></script>
     <script src="js/engine/state.js"></script>
@@ -555,6 +557,7 @@ n            border-radius: 8px;
     <script src="js/systems/cultivation.js"></script>
     <script src="js/systems/crafting.js"></script>
     <script src="js/systems/social.js"></script>
+    <script src="js/systems/collision.js"></script>
     <script src="js/systems/offline-behavior.js"></script>
     <script src="js/systems/survival.js"></script>
     <script src="js/systems/spiritual.js"></script>
@@ -575,6 +578,7 @@ n            border-radius: 8px;
                 window.addEventListener('resize', () => this.resize());
                 
                 // 初始化核心引擎
+                RNG.init(RNG.seed);
                 Core.init(this.canvas);
                 Renderer.init(this.ctx, this.canvas);
                 GameState.init();
@@ -590,6 +594,7 @@ n            border-radius: 8px;
                 CultivationSystem.init();
                 CraftingSystem.init();
                 SocialSystem.init();
+                CollisionSystem.init();
                 SurvivalSystem.init();
                 QuickBarSystem.init();
                 OfflineBehaviorSystem.init();
@@ -617,11 +622,30 @@ n            border-radius: 8px;
                 this.deltaTime = (currentTime - this.lastTime) / 1000;
                 this.lastTime = currentTime;
                 
-                // 限制deltaTime防止跳帧
-                this.deltaTime = Math.min(this.deltaTime, 0.1);
+                // 固定步长：后台标签页或掉帧时按 1/60 秒补齐，保证小镇演化速度一致
+                const STEP = 1 / 60;
+                const MAX_STEPS = 12;
+                this.accumulator = (this.accumulator || 0) + Math.min(this.deltaTime, 1);
                 
-                this.update(this.deltaTime);
-                this.render();
+                let steps = 0;
+                while (this.accumulator >= STEP && steps < MAX_STEPS) {
+                    try {
+                        this.update(STEP);
+                    } catch (err) {
+                        console.error('[小镇演化异常]', err);
+                        this.lastError = err && err.message;
+                    }
+                    this.accumulator -= STEP;
+                    steps++;
+                }
+                if (steps === MAX_STEPS) this.accumulator = 0;
+                
+                try {
+                    this.render();
+                } catch (err) {
+                    console.error('[渲染异常]', err);
+                    this.lastError = err && err.message;
+                }
                 
                 requestAnimationFrame((t) => this.gameLoop(t));
             },

@@ -181,8 +181,8 @@ const SpiritualSystem = {
     // 灵气爆发事件
     triggerSpiritualBurst() {
         // 随机位置
-        const x = Math.random() * 2800 + 100;
-        const y = Math.random() * 1800 + 100;
+        const x = RNG.random() * 2800 + 100;
+        const y = RNG.random() * 1800 + 100;
         
         // 创建高灵力区域
         this.createSpiritualFluctuation(x, y, 200, 4, 60);

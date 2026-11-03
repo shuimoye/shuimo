@@ -148,10 +148,10 @@ const CultivationSystem = {
         player.spiritualPower = Math.min(player.maxSpiritualPower, player.spiritualPower + dt * 5);
         
         // 粒子效果
-        if (Math.random() < 0.1) {
+        if (RNG.random() < 0.1) {
             GameState.addParticle(
-                player.x + (Math.random() - 0.5) * 30,
-                player.y + (Math.random() - 0.5) * 30,
+                player.x + (RNG.random() - 0.5) * 30,
+                player.y + (RNG.random() - 0.5) * 30,
                 '#aa88ff',
                 1
             );
